@@ -115,6 +115,7 @@ Lambert::shade(const Ray& ray, const HitInfo& hit, const Scene& scene, const int
     }
 
 	if (recDepth > 0) {
+
 		// specular reflection
 		if(reflectionCoefficient > 0){
 			reflectionColor = Vector3(1.0f) - m_kd;
@@ -150,9 +151,11 @@ Lambert::shade(const Ray& ray, const HitInfo& hit, const Scene& scene, const int
 			
 			Vector3 vRefract;
 			if (costheta1 >= 0) {	// Going in
-				vRefract = (my1/my2) * ray.d + ((my1/my2) * costheta1 - costheta2) * hit.N;
+				float my = my1/my2;
+				vRefract = my * ray.d + (my * costheta1 - costheta2) * hit.N;
 			} else {				// Going out
-				vRefract = (my1/my2) * ray.d - ((my1/my2) * costheta1 - costheta2) * hit.N;
+				float my = my2/my1;
+				vRefract = my * ray.d - (my * costheta1 - costheta2) * hit.N;
 			}
 
 			Ray rayRefract = Ray(Vector3(hit.P), vRefract);

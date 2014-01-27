@@ -114,7 +114,24 @@ makeTeapotScene()
     mesh->load("mesh/sphere.obj", xform);
 	material = new Lambert(0, 1, 0, 300, Vector3(0, 0, 0));
     addMeshTrianglesToScene(mesh, material);
+
+	TriangleMesh * plane = new TriangleMesh;	
+    plane->createSingleTriangle();
+    plane->setV1(Vector3(-1, 2, 0));
+    plane->setV2(Vector3( 1, 2, 2));
+    plane->setV3(Vector3( 1, 2, 0));
+    plane->setN1(Vector3(0, 1, 0));
+    plane->setN2(Vector3(0, 1, 0));
+    plane->setN3(Vector3(0, 1, 0));
     
+	Triangle* t;
+	material = new Lambert(0, 0, 1, 1000, Vector3(0, 0, 0));
+    t = new Triangle;
+    t->setIndex(0);
+    t->setMesh(plane);
+    t->setMaterial(material); 
+    g_scene->addObject(t);
+
     // create the floor triangle
     TriangleMesh * floor = new TriangleMesh;
     floor->createSingleTriangle();
@@ -126,8 +143,8 @@ makeTeapotScene()
     floor->setN3(Vector3(0, 1, 0));
     
 	material = new Lambert();
-    Triangle* t = new Triangle;
-    t->setIndex(0);
+	t = new Triangle;
+	//t->setIndex(0);
     t->setMesh(floor);
     t->setMaterial(material); 
     g_scene->addObject(t);

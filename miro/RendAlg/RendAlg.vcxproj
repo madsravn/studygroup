@@ -87,6 +87,7 @@
     <ProjectGuid>{E3CA780F-6F88-4844-8010-4C97B1C82F5A}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>RendAlg</RootNamespace>
+    <ProjectName>Miro</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
