@@ -3,6 +3,7 @@
 #include "Scene.h"
 #include "PFMLoader.h"
 #include "Matrix4x4.h"
+#include <cmath>
 
 struct mat2x2 {
 	float n[2][2];
