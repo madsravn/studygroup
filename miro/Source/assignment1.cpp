@@ -65,8 +65,7 @@ makeTeapotScene()
     light->setColor(Vector3(1, 1, 1));
     light->setWattage(700);
     g_scene->addLight(light);
-    
-    
+        
 	Matrix4x4 xform;
     Matrix4x4 xform2;
 	Material* material;
@@ -76,21 +75,21 @@ makeTeapotScene()
     xform *= translate(2, 0, 2);
     mesh = new TriangleMesh;
     mesh->load("mesh/teapot.obj", xform);
-	material = new Lambert(1, 0, 0, Vector3(1, 1, 1));
+	material = new Lambert(1, 0, 0, 100, Vector3(1, 1, 1));
     addMeshTrianglesToScene(mesh, material);
 
     xform.setIdentity();
     xform *= translate(-2, 0, 2);
     mesh = new TriangleMesh;
     mesh->load("mesh/teapot.obj", xform);
-	material = new Lambert(1, 0, 0, Vector3(0,0,1));
+	material = new Lambert(1, 0, 0, 200, Vector3(0,0,1));
     addMeshTrianglesToScene(mesh, material);
 
 	xform.setIdentity();
     xform *= translate(2, 0, -2);
     mesh = new TriangleMesh;
     mesh->load("mesh/teapot.obj", xform);
-	material = new Lambert(1, 0, 0, Vector3(0,1,0));
+	material = new Lambert(1, 0, 0, 300, Vector3(0,1,0));
     addMeshTrianglesToScene(mesh, material);
 
 	xform.setIdentity();
@@ -98,15 +97,14 @@ makeTeapotScene()
     mesh = new TriangleMesh;
     mesh->load("mesh/teapot.obj", xform);
 	material = new Lambert(Vector3(1, 0, 0));
-    addMeshTrianglesToScene(mesh, material);
-	
+    addMeshTrianglesToScene(mesh, material);	
 
 	xform.setIdentity();
 	xform *= scale(1, 1, 1);
     xform *= translate(0, 1, 0);
     mesh = new TriangleMesh;
     mesh->load("mesh/sphere.obj", xform);
-	material = new Lambert(0, 0, 1, Vector3(0, 0, 0));
+	material = new Lambert(0, 0, 1, 1000, Vector3(0, 0, 0));
     addMeshTrianglesToScene(mesh, material);
 
 	xform.setIdentity();
@@ -114,7 +112,7 @@ makeTeapotScene()
     xform *= translate(0, 3, 0);
     mesh = new TriangleMesh;
     mesh->load("mesh/sphere.obj", xform);
-	material = new Lambert(0, 1, 0, Vector3(0, 0, 0));
+	material = new Lambert(0, 1, 0, 300, Vector3(0, 0, 0));
     addMeshTrianglesToScene(mesh, material);
     
     // create the floor triangle

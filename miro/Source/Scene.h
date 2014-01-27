@@ -20,11 +20,12 @@ public:
 
     void preCalc();
     void openGL(Camera *cam);
-	Vector3 getHDRColorFromVector( const Vector3 direction) const;
+	Vector3 getHDRColorFromVector( const Vector3 &direction) const;
 
     void raytraceImage(Camera *cam, Image *img);
     bool trace(HitInfo& minHit, const Ray& ray,
                float tMin = 0.0f, float tMax = MIRO_TMAX) const;
+	Vector3 basicShading(Ray ray);
 protected:
     Objects m_objects;
     BVH m_bvh;

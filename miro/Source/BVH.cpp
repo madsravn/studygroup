@@ -20,7 +20,6 @@ BVH::build(Objects * objs)
     
     node->split(1);
     
-    
     std::cout << "Building time: " << float( clock() - begin_time) / CLOCKS_PER_SEC << std::endl;
     std::cout << "leaf nodes: " << node->getLeafNodes() << " and nodes: " << node->getNodes() << std::endl;
     
@@ -38,24 +37,7 @@ BVH::drawBoxes() {
 bool
 BVH::intersect(HitInfo& minHit, const Ray& ray, float tMin, float tMax) const
 {
-    // Here you would need to traverse the BVH to perform ray-intersection
-    // acceleration. For now we just intersect every object.
-    // ORIGINAL
-    /*bool hit = false;
-    HitInfo tempMinHit;
-    minHit.t = MIRO_TMAX;
-    
-    for (size_t i = 0; i < m_objects->size(); ++i)
-    {
-        if ((*m_objects)[i]->intersect(tempMinHit, ray, tMin, tMax))
-        {
-            hit = true;
-            if (tempMinHit.t < minHit.t)
-                minHit = tempMinHit;
-        }
-    }
-    return hit;*/
-    bool hit = false;
+	bool hit = false;
     HitInfo tempMinHit;
     minHit.t = MIRO_TMAX;
     std::vector<Object*> nodes = node->traversal(ray); 

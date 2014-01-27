@@ -10,20 +10,22 @@ Lambert::Lambert(const Vector3 & kd, const Vector3 & ka) :
 	this->diffuseCoefficient = 1;
 	this->reflectionCoefficient = 0;
 	this->refractionCoefficient = 0;
+	this->glossiness = 1000;
 	int pfmWidth = 1500, pfmHeight = 1500;
 	pfmImage = readPFMImage("hdr/stpeters_probe.pfm", &pfmWidth, &pfmHeight);
 
 }
-Lambert::Lambert(float diffuseCoefficient, float reflectionCoefficient, float refractionCoefficient, const Vector3 & kd, const Vector3 & ka) :
+Lambert::Lambert(float diffuseCoefficient, float reflectionCoefficient, float refractionCoefficient, float glossiness, const Vector3 & kd, const Vector3 & ka) :
 	m_kd(kd), m_ka(ka) {
 		this->diffuseCoefficient = diffuseCoefficient;
 		this->reflectionCoefficient = reflectionCoefficient;
 		this->refractionCoefficient = refractionCoefficient;
+		this->glossiness = glossiness;
 			int pfmWidth = 1500, pfmHeight = 1500;
 		pfmImage = readPFMImage("hdr/stpeters_probe.pfm", &pfmWidth, &pfmHeight);
 }
 
-Vector3 Lambert::getHDRColorFromVector(const Vector3 direction) const {
+Vector3 Lambert::getHDRColorFromVector(const Vector3 &direction) const {
 
 	Vector3 ret;
 	int pfmWidth = 1500, pfmHeight = 1500;
@@ -39,6 +41,7 @@ Lambert::~Lambert()
 {
 }
 
+/*
 Vector3 generateRandomRayDirection(Vector3 normal){
 	Vector3 rayDirection = Vector3(-normal);
 	
@@ -50,7 +53,7 @@ Vector3 generateRandomRayDirection(Vector3 normal){
 		rayDirection = -rayDirection;
 
 	return rayDirection;
-}
+}*/
 
 Vector3
 Lambert::shade(const Ray& ray, const HitInfo& hit, const Scene& scene, const int recDepth) const
@@ -70,7 +73,7 @@ Lambert::shade(const Ray& ray, const HitInfo& hit, const Scene& scene, const int
     
     // loop over all of the lights
     Lights::const_iterator lightIter;
-    for (lightIter = lightlist->begin(); lightIter != lightlist->end(); lightIter++) {
+    for (lightIter = lightlist->begin(); lightIter != lightlist->end(); ++lightIter) {
 
 		PointLight* pLight = *lightIter;
 		
@@ -103,32 +106,13 @@ Lambert::shade(const Ray& ray, const HitInfo& hit, const Scene& scene, const int
 
 				// Specular highlight
 				Vector3 vHalf = (l + viewDir)/(l + viewDir).length();
-				diffuseColor += pLight->color() * pow(std::max((dot(vHalf, hit.N)), 0.0f), pLight->wattage());
+				diffuseColor += pLight->color() * pow(std::max((dot(vHalf, hit.N)), 0.0f), glossiness);
+				//std::cout << "Glossiness: " << glossiness << std::endl;
+				//std::cout << "pLight->wattage(): " << pLight->wattage() << std::endl;
 				
 			}
 		}
     }
-
-	// Image Based lighting
-	
-	Vector3 HDRColor = Vector3(0.0f);
-	
-    /*	
-	for (int sample = 0; sample < numberOfHDRSamples; sample++) {
-		Vector3 randomRayDirection = generateRandomRayDirection(hit.N);
-		HitInfo HDRHit;
-		if (!scene.trace(HDRHit, Ray(hit.P, randomRayDirection), 0.001f, 100.0f)) {
-
-			// From http://www.pauldebevec.com/Probes/ as referenced on the slides
-			HDRColor += getHDRColorFromVector(randomRayDirection);
-
-		}
-	}
-	*/
-	
-
-	HDRColor = HDRColor / numberOfHDRSamples;
-
 
 	if (recDepth > 0) {
 		// specular reflection
@@ -188,7 +172,6 @@ Lambert::shade(const Ray& ray, const HitInfo& hit, const Scene& scene, const int
 	L += diffuseColor*diffuseCoefficient;
 	L += refractionColor*refractionCoefficient; 
 	L += reflectionColor*reflectionCoefficient;
-	L += HDRColor;
     
     // add the ambient component
     L += m_ka;

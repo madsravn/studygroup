@@ -19,16 +19,15 @@ Image::Image()
 }
 
 Image::~Image()
-{
-    if (m_pixels)
-        delete [] m_pixels;
+{    
+	delete [] m_pixels;
 }
 
 void Image::resize(int width, int height)
-{
-    if (m_pixels)
-        delete [] m_pixels;
-    m_pixels = 0;
+{    
+    delete [] m_pixels;
+    
+	m_pixels = 0;
     m_pixels = new Pixel[width*height];
     memset(m_pixels, 0, width*height*sizeof(Pixel));
     m_width = width;

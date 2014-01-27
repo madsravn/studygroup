@@ -7,7 +7,7 @@
 
 
 Node::Node() {
-    xmin = xmax = ymin = ymax = zmin = zmax = 0.0f;
+    //xmin = xmax = ymin = ymax = zmin = zmax = 0.0f;
     xmin = ymin = zmin = MIRO_TMAX;
     xmax = ymax = zmax = MIRO_TMIN;
     leaf = false;
@@ -19,13 +19,9 @@ Node::Node() {
     traversed = 0;
 }
 
-Node::~Node() {
-    if(left != NULL) {
-        delete left;
-    }
-    if(right != NULL) {
-        delete right;
-    }
+Node::~Node() {    
+    delete left;
+    delete right;    
 }
 
 int
@@ -59,7 +55,7 @@ Node::setTrav(int size) {
     float m = (45-1)/(14000-5.77);
     float b = 1 - m*5.77;
     std::cout << "size = " << size << " and m = " << m << std::endl;
-    C_trav = size/100*m+b;
+    C_trav = (float)(size)/100*m + b;
     C_b = C_trav/2;
     std::cout << "C_b = " << C_b << " and C_trav = " << C_trav << std::endl;
     
@@ -80,13 +76,17 @@ Node::Initialize(Object* obj) {
     Triangle* tri = const_cast<Triangle*>(reinterpret_cast<Triangle*>(obj));
     if(tri != NULL) {
         std::vector<Vector3> vert = tri->getPoints();
+
+		Vector3 a = vert.at(0);
+		Vector3 b = vert.at(1);
+		Vector3 c = vert.at(2);
         
-        xmin = std::min(std::min(vert.at(0).x,vert.at(1).x),std::min(xmin,vert.at(2).x));
-        ymin = std::min(std::min(vert.at(0).y,vert.at(1).y),std::min(ymin,vert.at(2).y));
-        zmin = std::min(std::min(vert.at(0).z,vert.at(1).z),std::min(zmin,vert.at(2).z));
-        xmax = std::max(std::max(vert.at(0).x,vert.at(1).x),std::max(xmax,vert.at(2).x));
-        ymax = std::max(std::max(vert.at(0).y,vert.at(1).y),std::max(ymax,vert.at(2).y));
-        zmax = std::max(std::max(vert.at(0).z,vert.at(1).z),std::max(zmax,vert.at(2).z));
+        xmin = std::min(std::min(a.x, b.x), std::min(xmin, c.x));
+        ymin = std::min(std::min(a.y, b.y), std::min(ymin, c.y));
+        zmin = std::min(std::min(a.z, b.z), std::min(zmin, c.z));
+        xmax = std::max(std::max(a.x, b.x), std::max(xmax, c.x));
+        ymax = std::max(std::max(a.y, b.y), std::max(ymax, c.y));
+        zmax = std::max(std::max(a.z, b.z), std::max(zmax, c.z));
 
         objects.push_back(obj);
     }
@@ -186,7 +186,7 @@ Node::split(int d) {
 //This will save you one sort
 float SAH(int split, std::vector<Object*> objlist, float parentArea) {
     float xmin,xmax,ymin,ymax,zmin,zmax;
-    xmin = xmax = ymin = ymax = zmin = zmax = 0.0f;
+    //xmin = xmax = ymin = ymax = zmin = zmax = 0.0f;
     xmin = zmin = ymin = MIRO_TMAX;
     xmax = ymax = zmax = MIRO_TMIN;
     float result = 0.0f;
@@ -196,16 +196,17 @@ float SAH(int split, std::vector<Object*> objlist, float parentArea) {
         if(tri != NULL) {
             std::vector<Vector3> vert = tri->getPoints();
 
-            xmin = std::min(std::min(vert.at(0).x,vert.at(1).x),std::min(xmin,vert.at(2).x));
-            ymin = std::min(std::min(vert.at(0).y,vert.at(1).y),std::min(ymin,vert.at(2).y));
-            zmin = std::min(std::min(vert.at(0).z,vert.at(1).z),std::min(zmin,vert.at(2).z));
-            xmax = std::max(std::max(vert.at(0).x,vert.at(1).x),std::max(xmax,vert.at(2).x));
-            ymax = std::max(std::max(vert.at(0).y,vert.at(1).y),std::max(ymax,vert.at(2).y));
-            zmax = std::max(std::max(vert.at(0).z,vert.at(1).z),std::max(zmax,vert.at(2).z));
+			Vector3 a = vert.at(0);
+			Vector3 b = vert.at(1);
+			Vector3 c = vert.at(2);
 
-
-        }
-                
+			xmin = std::min(std::min(a.x, b.x), std::min(xmin, c.x));
+			ymin = std::min(std::min(a.y, b.y), std::min(ymin, c.y));
+			zmin = std::min(std::min(a.z, b.z), std::min(zmin, c.z));
+			xmax = std::max(std::max(a.x, b.x), std::max(xmax, c.x));
+			ymax = std::max(std::max(a.y, b.y), std::max(ymax, c.y));
+			zmax = std::max(std::max(a.z, b.z), std::max(zmax, c.z));
+        }                
     }
     result = ((xmax-xmin)*(ymax-ymin)*2 + (zmax-zmin)*(ymax-ymin)*2 + (xmax-xmin)*(zmax-zmin)*2)*split/parentArea;
     xmin = ymin = zmin = MIRO_TMAX;
@@ -214,16 +215,18 @@ float SAH(int split, std::vector<Object*> objlist, float parentArea) {
         Triangle* tri = const_cast<Triangle*>(reinterpret_cast<Triangle*>(objlist.at(i)));
         if(tri != NULL) {
             std::vector<Vector3> vert = tri->getPoints();
-            xmin = std::min(std::min(vert.at(0).x,vert.at(1).x),std::min(xmin,vert.at(2).x));
-            ymin = std::min(std::min(vert.at(0).y,vert.at(1).y),std::min(ymin,vert.at(2).y));
-            zmin = std::min(std::min(vert.at(0).z,vert.at(1).z),std::min(zmin,vert.at(2).z));
-            xmax = std::max(std::max(vert.at(0).x,vert.at(1).x),std::max(xmax,vert.at(2).x));
-            ymax = std::max(std::max(vert.at(0).y,vert.at(1).y),std::max(ymax,vert.at(2).y));
-            zmax = std::max(std::max(vert.at(0).z,vert.at(1).z),std::max(zmax,vert.at(2).z));
 
+            Vector3 a = vert.at(0);
+			Vector3 b = vert.at(1);
+			Vector3 c = vert.at(2);
 
+			xmin = std::min(std::min(a.x, b.x), std::min(xmin, c.x));
+			ymin = std::min(std::min(a.y, b.y), std::min(ymin, c.y));
+			zmin = std::min(std::min(a.z, b.z), std::min(zmin, c.z));
+			xmax = std::max(std::max(a.x, b.x), std::max(xmax, c.x));
+			ymax = std::max(std::max(a.y, b.y), std::max(ymax, c.y));
+			zmax = std::max(std::max(a.z, b.z), std::max(zmax, c.z));
         }
-
     }
     result += ((xmax-xmin)*(ymax-ymin)*2 + (zmax-zmin)*(ymax-ymin)*2 + (xmax-xmin)*(zmax-zmin)*2)*(objlist.size()-split)/parentArea;
     return result;
@@ -238,14 +241,12 @@ Node::traversal(const Ray& ray) {
     float bounds[6] = {xmin,ymin,zmin,xmax,ymax,zmax};
     bool hitBox = rayboxint(ray,bounds);
     if(hitBox && objects.size()>0) {
-        //traversed++; // For statistics
         if(leaf==true) {
-            //for(size_t i = 0; i < objects.size(); i++) {
-            //    objs.push_back(objects.at(i));
-            //}
             objs.insert(objs.end(), objects.begin(), objects.end());
         } else {
-            std::vector<Object*> temp = right->traversal(ray);
+
+            std::vector<Object*> temp;
+			temp = right->traversal(ray);
             objs.insert(objs.end(), temp.begin(), temp.end());
             temp = left->traversal(ray);
             objs.insert(objs.end(), temp.begin(), temp.end());
@@ -283,7 +284,7 @@ Node::rayboxint(const Ray& ray, float bounds[6] )  {
     dir[2] = ray.d.z;
     double coord[NUMDIM];				/* hit point */
 
-	char inside = true;
+	bool inside = true;
 	char quadrant[NUMDIM];
 	register int i;
 	int whichPlane;
@@ -311,11 +312,10 @@ Node::rayboxint(const Ray& ray, float bounds[6] )  {
 		return true;
 	}
 
-
 	/* Calculate T distances to candidate planes */
 	for (i = 0; i < NUMDIM; i++)
-		if (quadrant[i] != MIDDLE && dir[i] !=0.)
-			maxT[i] = (candidatePlane[i]-origin[i]) / dir[i];
+		if (quadrant[i] != MIDDLE && dir[i] != 0.)					// V550 An odd precise comparison: dir[i] != 0.. It's probably better to use a comparison with defined precision: fabs(A - B) > Epsilon. 
+			maxT[i] = (candidatePlane[i] - origin[i]) / dir[i];
 		else
 			maxT[i] = -1.;
 

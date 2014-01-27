@@ -27,12 +27,22 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\Source\Makedefs" />
+    <None Include="..\Source\Makefile" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
     <ClCompile Include="..\Source\assignment1.cpp" />
     <ClCompile Include="..\Source\BLPatch.cpp" />
     <ClCompile Include="..\Source\BVH.cpp" />
     <ClCompile Include="..\Source\Camera.cpp" />
     <ClCompile Include="..\Source\Console.cpp" />
-    <ClCompile Include="..\Source\FresnelMaterial.cpp" />
     <ClCompile Include="..\Source\HDRMaterial.cpp" />
     <ClCompile Include="..\Source\Image.cpp" />
     <ClCompile Include="..\Source\Lambert.cpp" />
@@ -41,24 +51,18 @@
     <ClCompile Include="..\Source\MiroWindow.cpp" />
     <ClCompile Include="..\Source\Node.cpp" />
     <ClCompile Include="..\Source\PFMLoader.cpp" />
-    <ClCompile Include="..\Source\ReflectionMaterial.cpp" />
-    <ClCompile Include="..\Source\RefractionMaterial.cpp" />
     <ClCompile Include="..\Source\Scene.cpp" />
     <ClCompile Include="..\Source\Sphere.cpp" />
-    <ClCompile Include="..\Source\Triangle.cpp">
-      <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Disabled</Optimization>
-    </ClCompile>
+    <ClCompile Include="..\Source\Triangle.cpp" />
     <ClCompile Include="..\Source\TriangleMesh.cpp" />
     <ClCompile Include="..\Source\TriangleMeshLoad.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Source\assignment1.h" />
-    <ClInclude Include="..\Source\Bbox.h" />
     <ClInclude Include="..\Source\BLPatch.h" />
     <ClInclude Include="..\Source\BVH.h" />
     <ClInclude Include="..\Source\Camera.h" />
     <ClInclude Include="..\Source\Console.h" />
-    <ClInclude Include="..\Source\FresnelMaterial.h" />
     <ClInclude Include="..\Source\HDRMaterial.h" />
     <ClInclude Include="..\Source\Image.h" />
     <ClInclude Include="..\Source\Lambert.h" />
@@ -72,25 +76,12 @@
     <ClInclude Include="..\Source\PFMLoader.h" />
     <ClInclude Include="..\Source\PointLight.h" />
     <ClInclude Include="..\Source\Ray.h" />
-    <ClInclude Include="..\Source\ReflectionMaterial.h" />
-    <ClInclude Include="..\Source\RefractionMaterial.h" />
     <ClInclude Include="..\Source\Scene.h" />
     <ClInclude Include="..\Source\Sphere.h" />
     <ClInclude Include="..\Source\Triangle.h" />
     <ClInclude Include="..\Source\TriangleMesh.h" />
     <ClInclude Include="..\Source\Vector3.h" />
     <ClInclude Include="..\Source\Vector4.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="..\Source\Makedefs" />
-    <None Include="..\Source\Makefile" />
-  </ItemGroup>
-  <ItemGroup>
-    <Reference Include="System" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Drawing" />
-    <Reference Include="System.Windows.Forms" />
-    <Reference Include="System.Xml" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{E3CA780F-6F88-4844-8010-4C97B1C82F5A}</ProjectGuid>
@@ -108,6 +99,7 @@
     <UseDebugLibraries>false</UseDebugLibraries>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v110</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='smallpt|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
@@ -181,7 +173,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>glew32.lib;glloadD.lib;glimgD.lib;freeglutD.lib;glfwD.lib;glu32.lib;opengl32.lib;gdi32.lib;winmm.lib;user32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>glew32.lib;glloadD.lib;glimgD.lib;freeglutD.lib;glfwD.lib;glu32.lib;opengl32.lib;gdi32.lib;winmm.lib;user32.lib;freeglut.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>C:\Program Files\Common Files\freeglut\lib;..\..\SDK\glload\lib;..\..\SDK\glimg\lib;..\..\SDK\freeglut\lib;..\..\SDK\glfw\library;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>

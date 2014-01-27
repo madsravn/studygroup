@@ -5,13 +5,14 @@
 #include "Console.h"
 #include "PFMLoader.h"
 #include <iostream>
+#include <thread>
 
 Scene * g_scene = 0;
 
 const int recDepth = 4;
 const int camRays = 1;
 
-Vector3 Scene::getHDRColorFromVector(const Vector3 direction) const {
+Vector3 Scene::getHDRColorFromVector(const Vector3 &direction) const {
 
 	Vector3 ret;
 	int pfmWidth = 1500, pfmHeight = 1500;
@@ -60,12 +61,12 @@ Vector3 clamp(Vector3 vector, float lowerBound, float upperBound) {
 	return vector;
 }
 
-Vector3 exp(Vector3 x) {
+Vector3 exp(const Vector3 x) {
 	return Vector3(exp(x.x), exp(x.y), exp(x.z));
 }
 
 // Can't remember where I found this algorithm, I took it from a project I made two years ago
-bool isPointInPolygon(Vector3 point, const int polygonSides) {
+bool isPointInPolygon(const Vector3 point, const int polygonSides) {
 	Vector3* points = new Vector3[polygonSides];
 	for (int i = 0; i < polygonSides; i++) {
 		points[i] = Vector3(
@@ -104,13 +105,13 @@ void
 	Scene::preCalc()
 {
 	Objects::iterator it;
-	for (it = m_objects.begin(); it != m_objects.end(); it++)
+	for (it = m_objects.begin(); it != m_objects.end(); ++it)
 	{
 		Object* pObject = *it;
 		pObject->preCalc();
 	}
 	Lights::iterator lit;
-	for (lit = m_lights.begin(); lit != m_lights.end(); lit++)
+	for (lit = m_lights.begin(); lit != m_lights.end(); ++lit)
 	{
 		PointLight* pLight = *lit;
 		pLight->preCalc();
@@ -134,68 +135,10 @@ void
 	{
 		for (int i = 0; i < img->width(); ++i)
 		{
+			ray = cam->eyeRay(i, j, img->width(), img->height());					
+			shadeResult = basicShading(ray);
 
-			Ray referenceRay = cam->eyeRay(i, j, img->width(), img->height());	// TODO: make a plane instead of just distance			
-
-			// camRays control depth of field
-			for (int camRayCounter = 0; camRayCounter < camRays; camRayCounter++) {
-
-				Vector3 point = Vector3(1.f,1.f,0);
-
-				//Random points on a disc
-				/*while(point.length() > cam->lensSize) {
-					point.x = (2.0 * (float)rand()/(float)RAND_MAX - 1);
-					point.y = (2.0 * (float)rand()/(float)RAND_MAX - 1);
-				}*/
-
-
-				int polygonSides = 5;
-					
-				//Random points in a polygon
-				while(!isPointInPolygon(point, polygonSides)) {
-					point.x = (2.0 * (float)rand()/(float)RAND_MAX - 1);
-					point.y = (2.0 * (float)rand()/(float)RAND_MAX - 1);
-				}
-
-				point *= cam->lensSize/cam->fNumber;
-
-				ray = cam->eyeRay(i,j,img->width(), img->height());
-
-				Vector3 crossproduct = cross(ray.d, referenceRay.d);
-				float dotProduct = dot(ray.d, cam->viewDir());
-				float focusDistance = 1/dotProduct * cam->focusDistance;
-
-				ray.o += cam->up() * point.x + cross(cam->up(), -cam->viewDir()).normalize()*point.y;
-
-				ray.d = ((referenceRay.o + referenceRay.d*focusDistance) - ray.o)/ray.d.length();
-				ray.d.normalize();
-
-				if (trace(hitInfo, ray))
-				{
-					shadeResult += (hitInfo.material->shade(ray, hitInfo, *this, recDepth));
-				}
-				else {
-					//Image based
-					shadeResult += getHDRColorFromVector(ray.d);
-				}
-			}
-
-			shadeResult = shadeResult/camRays;
-			/* TONE MAPPING */
-			
-			// Film response
-			/*float c = 2.0f;
-			
-			shadeResult = Vector3(1.0) - exp(-c*shadeResult);
-
-
-			// Gamma correction
-			float g = 0.1f;
-			shadeResult = shadeResult^(1/g);
-						
-						*/
 			img->setPixel(i, j, shadeResult);
-			shadeResult = 0;
 		}
 		img->drawScanline(j);
 		glFinish();
@@ -207,6 +150,24 @@ void
 
 	debug("done Raytracing!\n");
 }
+
+Vector3 Scene::basicShading(const Ray ray) {
+	
+	HitInfo hitInfo;
+	Vector3 shadeResult = 0;
+	
+	if (trace(hitInfo, ray))
+	{
+		shadeResult += (hitInfo.material->shade(ray, hitInfo, *this, recDepth));
+	}
+	else {
+		//Image based
+		shadeResult += getHDRColorFromVector(ray.d);
+	}			
+
+	return shadeResult;
+}
+
 
 bool
 Scene::trace(HitInfo& minHit, const Ray& ray, float tMin, float tMax) const

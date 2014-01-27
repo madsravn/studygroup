@@ -62,7 +62,7 @@ Camera::click(Scene* pScene, Image* pImage)
         }
         
         g_image->draw();
-        std::cout << float( clock () - begin_time ) /  CLOCKS_PER_SEC << std::endl;
+        std::cout << "Rendering time: " << float( clock () - begin_time ) /  CLOCKS_PER_SEC << "seconds" << std::endl;
     }
 }
 
