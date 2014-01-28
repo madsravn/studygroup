@@ -11,6 +11,7 @@ Scene * g_scene = 0;
 
 const int recDepth = 3;
 const int pathBounces = 3;
+const int pathSamples = 8;
 
 Vector3 Scene::getHDRColorFromVector(const Vector3 &direction) const {
 
@@ -143,6 +144,28 @@ void
 		fflush(stdout);
 	}
 
+	// Add path tracing
+	// loop over all pixels in the image
+	/*int samples = 8;
+	for (int sample = 0; sample < samples; ++sample) {
+		for (int j = 0; j < img->height(); ++j)
+		{
+			for (int i = 0; i < img->width(); ++i)
+			{
+				ray = cam->eyeRay(i, j, img->width(), img->height());								
+				shadeResult = pathTraceShading(ray);
+				
+				Vector3 pixelColor = img->getPixel(i, j);
+				Vector3 newColor = (pixelColor + shadeResult) * (1.0f/(sample+2));
+				img->setPixel(i, j, newColor);
+			}
+			img->drawScanline(j);
+			glFinish();
+			printf("Rendering Progress: %.3f%%\r", j/float(img->height())*100.0f);
+			fflush(stdout);
+		}
+	}*/
+
 	printf("Rendering Progress: 100.000%\n");
 
 	debug("done Raytracing!\n");
@@ -205,14 +228,14 @@ Vector3 Scene::tracePath(const Ray ray, int recDepth) {
 Vector3 Scene::pathTraceShading(const Ray ray) {
 	HitInfo hitInfo;
 	Vector3 shadeResult = 0;
-	const int samples = 1;
+	
 
 	if (trace(hitInfo, ray)) {
-		shadeResult += (hitInfo.material->shade(ray, hitInfo, *this, recDepth)) * .5f;
+		//shadeResult += (hitInfo.material->shade(ray, hitInfo, *this, recDepth)) * .5f;
 
 		Vector3 traceResult = 0;
 
-		for (int i = 0; i < samples; ++i) {
+		for (int i = 0; i < pathSamples; ++i) {
 			
 			// Generate random ray
 			Vector3 direction = generateRandomRayDirection(hitInfo.N);
@@ -221,7 +244,7 @@ Vector3 Scene::pathTraceShading(const Ray ray) {
 			// Trace new ray
 			traceResult += tracePath(randomRay, 0);			
 		}
-		shadeResult += traceResult * (1.0f / samples);
+		shadeResult += traceResult * (1.0f / pathSamples);
 	} else {
 		shadeResult += getHDRColorFromVector(ray.d);
 	}

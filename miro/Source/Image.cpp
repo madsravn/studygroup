@@ -61,6 +61,15 @@ void Image::setPixel(int x, int y, const Vector3& p)
     }
 }
 
+Vector3& Image::getPixel(int x, int y)
+{
+    if (x >= 0 && x < m_width && y < m_height && y >= 0)
+    {
+		Pixel pixel = m_pixels[y*m_width+x];
+		return Vector3(pixel.r, pixel.g, pixel.b);
+    }
+}
+
 void Image::setPixel(int x, int y, const Pixel& p)
 {
     // do some tone mapping
