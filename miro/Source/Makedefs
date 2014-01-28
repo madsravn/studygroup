@@ -14,7 +14,7 @@ LIBS	 	= -lm -lX11 -lXmu -lXi -lXext -lGL -lGLU -lglut
 LIBDIRS 	= -L. -L/usr/X11R6/lib -L/usr/lib
 LDFLAGS		= -O3 $(LIBDIRS) $(LIBS)
 CFLAGS          = $(INCDIRS) -O3 -fomit-frame-pointer \
--Wno-deprecated -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_GNU_SOURCE -msse -msse2 -msse3 -msse4
+-Wno-deprecated -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_GNU_SOURCE -msse -msse2 -msse3 -msse4 -std=c++11
 
 .SUFFIXES: .cpp .h .d .o
 
