@@ -116,6 +116,14 @@ makeTeapotScene()
 	material = new Lambert(0, 1, 0, 300, Vector3(0, 0, 0));
     addMeshTrianglesToScene(mesh, material);*/
 
+	xform.setIdentity();
+	xform *= scale(1, 1, 1);
+    xform *= translate(0, 3, 0);
+    mesh = new TriangleMesh;
+    mesh->load("mesh/sphere.obj", xform);
+	material = new Lambert(1, 0, 0, 300, Vector3(0, 0, 1));
+    addMeshTrianglesToScene(mesh, material);
+
 	TriangleMesh * plane = new TriangleMesh;	
     plane->createSingleTriangle();
     plane->setV1(Vector3(-10, 0, -10));

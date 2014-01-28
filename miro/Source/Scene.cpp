@@ -192,7 +192,7 @@ Vector3 generateRandomRayDirection(Vector3 normal){
 	Vector3 rayDirection = Vector3(s*t, temp2, c*t);
 	
 	rayDirection.normalize();
-	if(dot(rayDirection, -normal)) 
+	if(dot(rayDirection, normal) < 0) 
 		rayDirection = -rayDirection;
 
 	return rayDirection;
@@ -231,7 +231,8 @@ Vector3 Scene::pathTraceShading(const Ray ray) {
 	
 
 	if (trace(hitInfo, ray)) {
-		//shadeResult += (hitInfo.material->shade(ray, hitInfo, *this, recDepth)) * .5f;
+		// First hit shading
+		// shadeResult += (hitInfo.material->shade(ray, hitInfo, *this, recDepth)) * .5f;
 
 		Vector3 traceResult = 0;
 
@@ -242,13 +243,18 @@ Vector3 Scene::pathTraceShading(const Ray ray) {
 			Ray randomRay = Ray(hitInfo.P, direction);
 
 			// Trace new ray
-			traceResult += tracePath(randomRay, 0);			
-		}
-		shadeResult += traceResult * (1.0f / pathSamples);
+			traceResult += tracePath(randomRay, 0);	
+
+			
+			/*if(traceResult.length() > 1.41421f)
+				std::cout << "Final color out of bounds: " << traceResult[0] << traceResult[1] << traceResult[2] << std::endl;
+		*/}
+		shadeResult += traceResult * (1.0f / (pathSamples + 1));
 	} else {
 		shadeResult += getHDRColorFromVector(ray.d);
 	}
-	return shadeResult;
+
+	return shadeResult;	
 }
 
 Vector3 Scene::basicShading(const Ray ray) {

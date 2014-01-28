@@ -20,7 +20,6 @@ public:
     void resize(int width, int height);
     void setPixel(int x, int y, const Vector3& p);
     void setPixel(int x, int y, const Pixel& p);
-	Vector3& getPixel(int x, int y);
 
     void draw();
     void drawScanline(int y);
