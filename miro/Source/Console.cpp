@@ -12,7 +12,7 @@
 // disable useless warnings
 #pragma warning(disable:4996)
 #endif
- 
+
 static char __internal_console_buffer__[8192] = {'\0'};
 
 #define TEXT_NORMAL   "\033[0m"
@@ -87,7 +87,7 @@ void warning(const char *fmt,...)
 	_vsnprintf(__internal_console_buffer__, 8191, fmt, msg);
 	va_end (msg);
 
-  cprintf(TEXT_PINK"warning: "TEXT_NORMAL);
+  cprintf(TEXT_PINK "warning: " TEXT_NORMAL);
   cprintf(__internal_console_buffer__);
 }
 
@@ -98,7 +98,7 @@ void error(const char *fmt,...)
 	_vsnprintf(__internal_console_buffer__, 8191, fmt, msg);
 	va_end (msg);
 
-  cprintf(TEXT_RED"error: "TEXT_NORMAL);
+  cprintf(TEXT_RED "error: " TEXT_NORMAL);
   cprintf(__internal_console_buffer__);
 }
 
@@ -109,7 +109,7 @@ void debug(const char *fmt,...)
 	_vsnprintf(__internal_console_buffer__, 8191, fmt, msg);
 	va_end (msg);
 
-  cprintf(TEXT_GREEN"debug: "TEXT_NORMAL);
+  cprintf(TEXT_GREEN "debug: " TEXT_NORMAL);
   cprintf(__internal_console_buffer__);
 }
 
@@ -120,7 +120,7 @@ void fatal(const char *fmt,...)
 	_vsnprintf(__internal_console_buffer__, 8191, fmt, msg);
 	va_end (msg);
 
-  cprintf(TEXT_RED"fatal error: "TEXT_NORMAL);
+  cprintf(TEXT_RED "fatal error: " TEXT_NORMAL);
   cprintf(__internal_console_buffer__);
   exit(-1);
 }
