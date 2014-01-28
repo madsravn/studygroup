@@ -148,7 +148,7 @@ makeTeapotScene()
     t->setMesh(floor);
     t->setMaterial(material); 
     g_scene->addObject(t);
-		
+	
     // let objects do pre-calculations if needed
     g_scene->preCalc();
 }
