@@ -35,7 +35,7 @@ makeTeapotScene()
     // set up the camera
     g_camera->setBGColor(Vector3(0.0f, 0.0f, 0.3f));
     g_camera->setEye(Vector3(0, 3, 6));
-    g_camera->setLookAt(Vector3(0, 0, 0));
+    g_camera->setLookAt(Vector3(0, .5, 0));
     g_camera->setUp(Vector3(0, 1, 0));
     g_camera->setFOV(45);
 	g_camera->lensSize = 0.001f;
@@ -99,6 +99,7 @@ makeTeapotScene()
 	material = new Lambert(Vector3(1, 0, 0));
     addMeshTrianglesToScene(mesh, material);	
 
+	/*
 	xform.setIdentity();
 	xform *= scale(1, 1, 1);
     xform *= translate(0, 1, 0);
@@ -113,19 +114,19 @@ makeTeapotScene()
     mesh = new TriangleMesh;
     mesh->load("mesh/sphere.obj", xform);
 	material = new Lambert(0, 1, 0, 300, Vector3(0, 0, 0));
-    addMeshTrianglesToScene(mesh, material);
+    addMeshTrianglesToScene(mesh, material);*/
 
 	TriangleMesh * plane = new TriangleMesh;	
     plane->createSingleTriangle();
-    plane->setV1(Vector3(-1, 2, 0));
-    plane->setV2(Vector3( 1, 2, 2));
-    plane->setV3(Vector3( 1, 2, 0));
-    plane->setN1(Vector3(0, 1, 0));
-    plane->setN2(Vector3(0, 1, 0));
-    plane->setN3(Vector3(0, 1, 0));
+    plane->setV1(Vector3(-10, 0, -10));
+    plane->setV2(Vector3(  0, 10, -10));
+    plane->setV3(Vector3( 10, 0, -10));
+    plane->setN1(Vector3(0, 0, 1));
+    plane->setN2(Vector3(0, 0, 1));
+    plane->setN3(Vector3(0, 0, 1));
     
 	Triangle* t;
-	material = new Lambert(0, 0, 1, 1000, Vector3(0, 0, 0));
+	material = new Lambert(1, 0, 0, 1000, Vector3(0, 0, 0));
     t = new Triangle;
     t->setIndex(0);
     t->setMesh(plane);

@@ -26,6 +26,8 @@ public:
     bool trace(HitInfo& minHit, const Ray& ray,
                float tMin = 0.0f, float tMax = MIRO_TMAX) const;
 	Vector3 basicShading(Ray ray);
+	Vector3 pathTraceShading(const Ray ray);
+	Vector3 tracePath(const Ray ray, int recDepth);
 protected:
     Objects m_objects;
     BVH m_bvh;
