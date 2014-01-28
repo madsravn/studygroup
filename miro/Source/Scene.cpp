@@ -234,6 +234,8 @@ Vector3 Scene::pathTraceShading(const Ray ray) {
 		// First hit shading
 		// shadeResult += (hitInfo.material->shade(ray, hitInfo, *this, recDepth)) * .5f;
 
+		shadeResult += (hitInfo.material->shade(ray, hitInfo, *this, recDepth)) * .5f;
+
 		Vector3 traceResult = 0;
 
 		for (int i = 0; i < pathSamples; ++i) {
@@ -253,8 +255,8 @@ Vector3 Scene::pathTraceShading(const Ray ray) {
 	} else {
 		shadeResult += getHDRColorFromVector(ray.d);
 	}
-
-	return shadeResult;	
+    
+	return shadeResult;
 }
 
 Vector3 Scene::basicShading(const Ray ray) {
