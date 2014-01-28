@@ -6,6 +6,7 @@
 #include "PFMLoader.h"
 #include <iostream>
 #include <thread>
+#include "PointLight.h"
 
 Scene * g_scene = 0;
 
@@ -144,28 +145,6 @@ void
 		fflush(stdout);
 	}
 
-	// Add path tracing
-	// loop over all pixels in the image
-	/*int samples = 8;
-	for (int sample = 0; sample < samples; ++sample) {
-		for (int j = 0; j < img->height(); ++j)
-		{
-			for (int i = 0; i < img->width(); ++i)
-			{
-				ray = cam->eyeRay(i, j, img->width(), img->height());								
-				shadeResult = pathTraceShading(ray);
-				
-				Vector3 pixelColor = img->getPixel(i, j);
-				Vector3 newColor = (pixelColor + shadeResult) * (1.0f/(sample+2));
-				img->setPixel(i, j, newColor);
-			}
-			img->drawScanline(j);
-			glFinish();
-			printf("Rendering Progress: %.3f%%\r", j/float(img->height())*100.0f);
-			fflush(stdout);
-		}
-	}*/
-
 	printf("Rendering Progress: 100.000%\n");
 
 	debug("done Raytracing!\n");
@@ -222,6 +201,45 @@ Vector3 Scene::tracePath(const Ray ray, int recDepth) {
 		//shadeResult += getHDRColorFromVector(ray.d);
 	}
 
+	return shadeResult;
+}
+
+Vector3 Scene::biPathTraceShading(const Ray ray) {
+	HitInfo hitInfo;
+	Vector3 shadeResult = 0;
+	
+	// Walk from eye
+	if (trace(hitInfo, ray)) {		
+		for(int i = 0; i < pathBounces; ++i) {
+
+			//TODO: Do something
+
+			Vector3 direction = generateRandomRayDirection(hitInfo.N);
+			Ray randomRay = Ray(hitInfo.P, direction);
+		}
+	} else {
+
+	}
+
+
+	// Walk from lights
+	for (int i = 0; i < g_scene->lights()->size(); ++i) {
+		const PointLight *light = (g_scene->lights())->at(i);
+
+		Vector3 direction = generateRandomRayDirection(hitInfo.N);
+		Ray randomRay = Ray(light->position(), direction);
+
+		for(int i = 0; i < pathBounces; ++i) {
+
+			if (trace(hitInfo, ray)) {
+				
+				// TODO: Do something
+
+				Vector3 direction = generateRandomRayDirection(hitInfo.N);
+				Ray randomRay = Ray(hitInfo.P, direction);
+			}		
+		}
+	}
 	return shadeResult;
 }
 

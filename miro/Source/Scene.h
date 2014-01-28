@@ -28,7 +28,9 @@ public:
 	Vector3 basicShading(Ray ray);
 	Vector3 pathTraceShading(const Ray ray);
 	Vector3 tracePath(const Ray ray, int recDepth);
+	Vector3 biPathTraceShading(const Ray ray);
 protected:
+
     Objects m_objects;
     BVH m_bvh;
     Lights m_lights;
