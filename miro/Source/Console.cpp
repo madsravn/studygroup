@@ -12,7 +12,7 @@
 // disable useless warnings
 #pragma warning(disable:4996)
 #endif
-
+ 
 static char __internal_console_buffer__[8192] = {'\0'};
 
 #define TEXT_NORMAL   "\033[0m"
