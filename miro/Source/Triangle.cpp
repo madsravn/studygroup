@@ -166,6 +166,13 @@ Triangle::intersect(HitInfo& result, const Ray& ray,float tMin, float tMax)
         result.N = alpha*na + beta*nb + gamma*nc;
         result.N.normalize();
 
+        /*Vector3 normal = cross(a-b,a-c);
+        if(dot(normal, alpha*na + beta*b + gamma*nc) < 0) {
+            normal = -normal;
+        }
+        
+        result.N = normal.normalize();*/
+
         // Shading material
         result.material = this->m_material;
         
