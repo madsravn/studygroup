@@ -4,6 +4,7 @@
 #include <vector>
 #include "Vector3.h"
 #include "Ray.h"
+#include "Utils.h"
 
 class PointLight
 {
@@ -55,6 +56,18 @@ public:
 
         return true;
     }
+
+
+    Ray RayFromPointToLight(const Vector3& point) {
+        Vector3 normal = point-m_position;
+        normal.normalize();
+        Vector3 random = generateRandomRayDirection(normal);
+        Ray ray(point, (random-point).normalize());
+        return ray;
+
+    }
+        
+
 
     float wattage() const               {return m_wattage;}
     float radius() const                {return m_radius;}
