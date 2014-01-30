@@ -138,8 +138,8 @@ void
 		for (int i = 0; i < img->width(); ++i)
 		{
 			ray = cam->eyeRay(i, j, img->width(), img->height());					
-			//shadeResult = basicShading(ray);
-			shadeResult = pathTraceShading(ray);
+			shadeResult = basicShading(ray);
+			//shadeResult = pathTraceShading(ray);
 
 			img->setPixel(i, j, shadeResult);
 		}
@@ -153,72 +153,6 @@ void
 
 	debug("done Raytracing!\n");
 }
-
-//void
-//Scene::raytraceImage(Camera *cam, Image *img)
-//{
-//    Ray ray;
-//    HitInfo hitInfo;
-//    Vector3 shadeResult;
-//    // loop over all pixels in the image
-//    long tri = 0;
-//    for (unsigned int j = 0; j < img->height(); ++j)
-//    {
-//        for (unsigned int i = 0; i < img->width(); ++i)
-//        {
-//            ray = cam->eyeRay(i, j, img->width(), img->height());
-//            if (trace(hitInfo, ray))
-//            {
-//                //shadeResult = hitInfo.material->shade(ray, hitInfo, *this, 4);
-//                shadeResult = Vector3(0.0,0.0,0.0);
-//                float factor = 1.0f;
-//                float exp = 0.5;
-//                Ray newR;
-//                HitInfo newHit = hitInfo;
-//                bool running = true;
-//                int samplesPerPixel = 16;
-//                float invSPP = 1.0f/samplesPerPixel;
-//                for(int k = 0; k < samplesPerPixel; k++) {
-//                    factor = 1.0f;
-//                    running = true;
-//                    for(unsigned int h = 0; h < random(i)*10; h++) {
-//                        factor = factor*exp;
-//                        Vector3 newDir = Vector3(random(h*k), random(i*k), random(j*k));
-//                        newR.o = newHit.P;
-//                        if(dot(newDir,hitInfo.N) < 0) {
-//                            //reflect(newDir, hitInfo.N);
-//                            newDir = -newDir;
-//                        }
-//                        newR.d = newDir;
-//                        // We need an empty hitinfo
-//                        newHit = HitInfo();
-//                        if(trace(newHit, newR)) {
-//                            //std::cout << "Adding path color" << std::endl;
-//                            //std::cout << invSPP*shadeResult << std::endl;
-//                            //std::cout << invSPP << " - " << factor << std::endl;
-//                            shadeResult += factor*newHit.material->shade(newR, newHit, *this, 4);
-//                            //std::cout << factor*newHit.material->shade(newR, newHit, *this, 4) << std::endl << std::endl;
-//                        } else {
-//                            running = false;
-//                            h = 15;
-//                        }
-//
-//                    }
-//                }
-//                img->setPixel(i, j, invSPP*shadeResult);
-//            }
-//        }
-//        img->drawScanline(j);
-//        glFinish();
-//        printf("Rendering Progress: %.3f%%\r", j/float(img->height())*100.0f);
-//        fflush(stdout);
-//    }
-//    printf("Rendering Progress: 100.000%\n");
-//    debug("done Raytracing!\n");
-//}
-
-
-
 
 Vector3 Scene::tracePath(const Ray ray, int recDepth) {
 	if (recDepth > pathBounces) {

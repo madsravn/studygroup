@@ -54,7 +54,7 @@ void makeCornellBox() {
     light->setPosition(Vector3(0, 1.0, .5));
     light->setColor(Vector3(.73, 0.596, 0.357));
     light->setWattage(100);
-    light->setRadius(2);
+    light->setRadius(0.0000001f);
     g_scene->addLight(light);
 
 	// create the floor triangles
@@ -147,6 +147,36 @@ void makeCornellBox() {
     t->setMaterial(material); 
     g_scene->addObject(t);
 
+	// create the frontwall triangles
+    /*TriangleMesh * frontwall1 = new TriangleMesh;
+    frontwall1->createSingleTriangle();
+    frontwall1->setV1(Vector3(-1, 0, 1));
+    frontwall1->setV2(Vector3( 1, 0, 1));
+    frontwall1->setV3(Vector3( 1, 2, 1));
+    frontwall1->setN1(Vector3(0, 0, -1));
+    frontwall1->setN2(Vector3(0, 0, -1));
+    frontwall1->setN3(Vector3(0, 0, -1));
+    
+	TriangleMesh * frontwall2 = new TriangleMesh;
+    frontwall2->createSingleTriangle();    
+    frontwall2->setV1(Vector3( 1, 2, 1));
+    frontwall2->setV2(Vector3(-1, 2, 1));
+	frontwall2->setV3(Vector3(-1, 0, 1));
+    frontwall2->setN1(Vector3( 0, 0, -1));
+    frontwall2->setN2(Vector3( 0, 0, -1));
+    frontwall2->setN3(Vector3( 0, 0, -1));
+
+	material = new Lambert();
+	t = new Triangle;
+    t->setMesh(frontwall1);
+    t->setMaterial(material); 
+    g_scene->addObject(t);
+	
+	t = new Triangle;
+    t->setMesh(frontwall2);
+    t->setMaterial(material); 
+    g_scene->addObject(t);*/
+
 	// create the rightwall triangles
     TriangleMesh * rightwall1 = new TriangleMesh;
     rightwall1->createSingleTriangle();
@@ -206,7 +236,7 @@ void makeCornellBox() {
     t->setMesh(leftwall2);
     t->setMaterial(material); 
     g_scene->addObject(t);
-
+	/*
 	TriangleMesh * mesh;
     xform.setIdentity();
 	xform *= scale(.2, .2, .2);
@@ -216,7 +246,7 @@ void makeCornellBox() {
     mesh->load("mesh/teapot.obj", xform);
 	material = new Lambert(Vector3(1, 1, 1));
     addMeshTrianglesToScene(mesh, material);
-
+	*/
 	/*
     xform.setIdentity();
 	xform *= scale(.3, .3, .3);
@@ -226,7 +256,7 @@ void makeCornellBox() {
     bunny->load("mesh\\bunny.obj", xform);
     addMeshTrianglesToScene(bunny, material);
 	*/
-
+	/*
 	xform.setIdentity();
 	xform *= scale(.4, .4, .4);
     xform *= translate(.5, 1.0, -.5);
@@ -243,7 +273,7 @@ void makeCornellBox() {
 	material = new ReflectionMaterial();
     addMeshTrianglesToScene(mesh, material);
 
-
+	*/
 	// let objects do pre-calculations if needed
     g_scene->preCalc();
 }
