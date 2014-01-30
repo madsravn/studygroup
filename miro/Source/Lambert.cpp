@@ -58,16 +58,18 @@ Lambert::shade(const Ray& ray, const HitInfo& hit, const Scene& scene, const int
     
     const Lights *lightlist = scene.lights();
     
-    // loop over all of the lights
-    Lights::const_iterator lightIter;
-    for (lightIter = lightlist->begin(); lightIter != lightlist->end(); ++lightIter) {
+    if (diffuseCoefficient > 0) {
+		// loop over all of the lights
+		Lights::const_iterator lightIter;
 
-		PointLight* pLight = *lightIter;
-		
-		Vector3 l = pLight->position() - hit.P;
+		for (lightIter = lightlist->begin(); lightIter != lightlist->end(); ++lightIter) {
 
-		if (diffuseCoefficient > 0) {
-			
+			PointLight* pLight = *lightIter;
+
+			Vector3 l = pLight->position() - hit.P;
+
+
+
 			// Check for shadows
 			HitInfo lightHit;
 			Ray lightRay = Ray(hit.P, l);
@@ -76,12 +78,13 @@ Lambert::shade(const Ray& ray, const HitInfo& hit, const Scene& scene, const int
 				double llength = (pLight->position() - hit.P).length();
 				if(lightHit.t < llength)
 					lightBlocked = true;
+
 			}
-			
+
 			if(!lightBlocked) {
 				// the inverse-squared falloff
 				float falloff = l.length2();
-				
+
 				// normalize the light direction
 				l /= sqrt(falloff);
 
@@ -96,10 +99,10 @@ Lambert::shade(const Ray& ray, const HitInfo& hit, const Scene& scene, const int
 				diffuseColor += pLight->color() * pow(std::max((dot(vHalf, hit.N)), 0.0f), glossiness);
 				//std::cout << "Glossiness: " << glossiness << std::endl;
 				//std::cout << "pLight->wattage(): " << pLight->wattage() << std::endl;
-				
+
 			}
 		}
-    }
+	}
 
 	if (recDepth > 0) {
 

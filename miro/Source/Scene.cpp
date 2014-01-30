@@ -44,17 +44,6 @@ Vector3 Scene::getHDRColorFromVector(const Vector3 &direction) const {
 }
 
 
-// Return value is in [0.0,1.0] (uniformly)
-float random(unsigned int i) {
-    unsigned short a = (-(i >> 16) >> 16) | i;
-    unsigned short Xi[3]={0,0,a*a*a};
-    return erand48(Xi);
-    //float v = (rand() % 1000)/1000.0f;
-    //return v;
-}
-
-
-
 Vector3 clamp(Vector3 vector, float lowerBound, float upperBound) {
 	if (vector.x > upperBound)
 		vector.x = upperBound;
@@ -130,7 +119,7 @@ void
 	m_bvh.build(&m_objects);
 }
 
-/*void
+void
 	Scene::raytraceImage(Camera *cam, Image *img)
 {
 	Ray ray;
@@ -146,8 +135,8 @@ void
 		for (int i = 0; i < img->width(); ++i)
 		{
 			ray = cam->eyeRay(i, j, img->width(), img->height());					
-			shadeResult = basicShading(ray);
-			//shadeResult = pathTraceShading(ray);
+			//shadeResult = basicShading(ray);
+			shadeResult = pathTraceShading(ray);
 
 			img->setPixel(i, j, shadeResult);
 		}
@@ -160,72 +149,70 @@ void
 	printf("Rendering Progress: 100.000%\n");
 
 	debug("done Raytracing!\n");
-}*/
-
-void
-Scene::raytraceImage(Camera *cam, Image *img)
-{
-    Ray ray;
-    HitInfo hitInfo;
-    Vector3 shadeResult;
-    // loop over all pixels in the image
-    long tri = 0;
-    for (unsigned int j = 0; j < img->height(); ++j)
-    {
-        for (unsigned int i = 0; i < img->width(); ++i)
-        {
-            ray = cam->eyeRay(i, j, img->width(), img->height());
-            if (trace(hitInfo, ray))
-            {
-                //shadeResult = hitInfo.material->shade(ray, hitInfo, *this, 4);
-                shadeResult = Vector3(0.0,0.0,0.0);
-                float factor = 1.0f;
-                float exp = 0.5;
-                Ray newR;
-                HitInfo newHit = hitInfo;
-                bool running = true;
-                int samplesPerPixel = 16;
-                float invSPP = 1.0f/samplesPerPixel;
-                for(int k = 0; k < samplesPerPixel; k++) {
-                    factor = 1.0f;
-                    running = true;
-                    for(unsigned int h = 0; h < random(i)*10; h++) {
-                        factor = factor*exp;
-                        Vector3 newDir = Vector3(random(h*k), random(i*k), random(j*k));
-                        newR.o = newHit.P;
-                        if(dot(newDir,hitInfo.N) < 0) {
-                            //reflect(newDir, hitInfo.N);
-                            newDir = -newDir;
-                        }
-                        newR.d = newDir;
-                        // We need an empty hitinfo
-                        newHit = HitInfo();
-                        if(trace(newHit, newR)) {
-                            //std::cout << "Adding path color" << std::endl;
-                            //std::cout << invSPP*shadeResult << std::endl;
-                            //std::cout << invSPP << " - " << factor << std::endl;
-                            shadeResult += factor*newHit.material->shade(newR, newHit, *this, 4);
-                            //std::cout << factor*newHit.material->shade(newR, newHit, *this, 4) << std::endl << std::endl;
-                        } else {
-                            running = false;
-                            h = 15;
-                        }
-
-                    }
-                }
-                img->setPixel(i, j, invSPP*shadeResult);
-            }
-        }
-        img->drawScanline(j);
-        glFinish();
-        printf("Rendering Progress: %.3f%%\r", j/float(img->height())*100.0f);
-        fflush(stdout);
-    }
-    printf("Rendering Progress: 100.000%\n");
-    debug("done Raytracing!\n");
 }
 
-
+//void
+//Scene::raytraceImage(Camera *cam, Image *img)
+//{
+//    Ray ray;
+//    HitInfo hitInfo;
+//    Vector3 shadeResult;
+//    // loop over all pixels in the image
+//    long tri = 0;
+//    for (unsigned int j = 0; j < img->height(); ++j)
+//    {
+//        for (unsigned int i = 0; i < img->width(); ++i)
+//        {
+//            ray = cam->eyeRay(i, j, img->width(), img->height());
+//            if (trace(hitInfo, ray))
+//            {
+//                //shadeResult = hitInfo.material->shade(ray, hitInfo, *this, 4);
+//                shadeResult = Vector3(0.0,0.0,0.0);
+//                float factor = 1.0f;
+//                float exp = 0.5;
+//                Ray newR;
+//                HitInfo newHit = hitInfo;
+//                bool running = true;
+//                int samplesPerPixel = 16;
+//                float invSPP = 1.0f/samplesPerPixel;
+//                for(int k = 0; k < samplesPerPixel; k++) {
+//                    factor = 1.0f;
+//                    running = true;
+//                    for(unsigned int h = 0; h < random(i)*10; h++) {
+//                        factor = factor*exp;
+//                        Vector3 newDir = Vector3(random(h*k), random(i*k), random(j*k));
+//                        newR.o = newHit.P;
+//                        if(dot(newDir,hitInfo.N) < 0) {
+//                            //reflect(newDir, hitInfo.N);
+//                            newDir = -newDir;
+//                        }
+//                        newR.d = newDir;
+//                        // We need an empty hitinfo
+//                        newHit = HitInfo();
+//                        if(trace(newHit, newR)) {
+//                            //std::cout << "Adding path color" << std::endl;
+//                            //std::cout << invSPP*shadeResult << std::endl;
+//                            //std::cout << invSPP << " - " << factor << std::endl;
+//                            shadeResult += factor*newHit.material->shade(newR, newHit, *this, 4);
+//                            //std::cout << factor*newHit.material->shade(newR, newHit, *this, 4) << std::endl << std::endl;
+//                        } else {
+//                            running = false;
+//                            h = 15;
+//                        }
+//
+//                    }
+//                }
+//                img->setPixel(i, j, invSPP*shadeResult);
+//            }
+//        }
+//        img->drawScanline(j);
+//        glFinish();
+//        printf("Rendering Progress: %.3f%%\r", j/float(img->height())*100.0f);
+//        fflush(stdout);
+//    }
+//    printf("Rendering Progress: 100.000%\n");
+//    debug("done Raytracing!\n");
+//}
 
 
 double rnd(void) { 
@@ -327,10 +314,10 @@ Vector3 Scene::pathTraceShading(const Ray ray) {
 	
 	if (trace(hitInfo, ray)) {
 		// First hit shading
-		shadeResult += (hitInfo.material->shade(ray, hitInfo, *this, recDepth)) * 1.0f;
+		shadeResult += (hitInfo.material->shade(ray, hitInfo, *this, recDepth)) * 1.0f;		
 
 		Vector3 traceResult = 0;
-
+		
 		for (int i = 0; i < pathSamples; ++i) {
 			
 			// Generate random ray
@@ -339,8 +326,7 @@ Vector3 Scene::pathTraceShading(const Ray ray) {
 			Ray randomRay = Ray(origin, direction);
 
 			// Trace new ray
-			traceResult += tracePath(randomRay, 0);	
-			
+			traceResult += tracePath(randomRay, 0);				
 		}
 		shadeResult += (traceResult * (1.0f / (pathSamples)));
 	} else {

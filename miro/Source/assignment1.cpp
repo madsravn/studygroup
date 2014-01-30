@@ -229,7 +229,7 @@ void makeCornellBox() {
     xform *= translate(.5, 1.0, -.5);
     mesh = new TriangleMesh;
     mesh->load("mesh/sphere.obj", xform);
-	material = new Lambert(0, 1, 0, 1000, Vector3(0, 0, 0));
+	material = new Lambert(0, 0, 1, 500, Vector3(1, 1, 1));
     addMeshTrianglesToScene(mesh, material);
 
 	xform.setIdentity();
@@ -237,7 +237,7 @@ void makeCornellBox() {
     xform *= translate(-2, 4, 2);
     mesh = new TriangleMesh;
     mesh->load("mesh/sphere.obj", xform);
-	material = new Lambert(0, 0, 1, 1000, Vector3(0, 0, 0));
+	material = new Lambert(0, 1, 0, 1000, Vector3(0, 0, 0));
     addMeshTrianglesToScene(mesh, material);
 
 
