@@ -12,6 +12,7 @@
 #include "Lambert.h"
 #include "MiroWindow.h"
 #include "assignment1.h"
+
 void
 makeSpiralScene()
 {
@@ -58,19 +59,25 @@ makeSpiralScene()
     g_scene->preCalc();
 }
 
-
-
-int
-main(int argc, char*argv[])
-{
-    // create a scene
+int startMiro(int argc, char*argv[]) {
+	// create a scene
     //makeTeapotScene();
     //makeBunny1Scene();
     //makeSponzaScene();
 	makeCornellBox();
     MiroWindow miro(&argc, argv);
     miro.mainLoop();
+	
+	return 0;
+}
 
+
+int
+main(int argc, char*argv[])
+{
+	
+	startMiro(argc, argv);
+    
     return 0; // never executed
 }
 
