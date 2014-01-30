@@ -12,7 +12,7 @@ Scene * g_scene = 0;
 
 const int recDepth = 3;
 const int pathBounces = 3;
-const int pathSamples = 4;
+const int pathSamples = 8;
 
 Vector3 Scene::getHDRColorFromVector(const Vector3 &direction) const {
 
@@ -217,7 +217,7 @@ void
 //}
 
 
-double rnd(void) { 
+double Scene::rnd(void) { 
 	static unsigned int x = 123456789, y = 362436069, z = 521288629, w = 88675123; 
 	unsigned int t = x ^ (x << 11); x = y; y = z; z = w; 
 	return ( w = (w ^ (w >> 19)) ^ (t ^ (t >> 8)) ) * (1.0 / 4294967296.0); 
@@ -226,8 +226,8 @@ double rnd(void) {
 // Based on Toshiyas smallpsmlt
 // theory: http://people.cs.kuleuven.be/~philip.dutre/GI/TotalCompendium.pdf  
 Vector3 generateRandomRayDirection(Vector3 normal){
-	float rand1 = rnd();
-	float rand2 = rnd();
+	float rand1 = Scene::rnd();
+	float rand2 = Scene::rnd();
 
 	const float temp1 = 2.0 * PI * rand1;
 	const float temp2 = pow(rand2, 1.0f / (rand1 + 1.0f));
