@@ -14,7 +14,7 @@ public:
     void setWattage(float f)            {m_wattage = f;}
     void setRadius(float f)             {m_radius = f;}
 
-    bool
+    inline bool
     intersect(HitInfo& result, const Ray& ray,
                       float tMin = 0.0f, float tMax = MIRO_TMAX)
     {
@@ -58,7 +58,7 @@ public:
     }
 
 
-    Ray RayFromPointToLight(const Vector3& point) {
+    inline Ray RayFromPointToLight(const Vector3& point) {
         Vector3 normal = point-m_position;
         normal.normalize();
         Vector3 random = generateRandomRayDirection(normal);
