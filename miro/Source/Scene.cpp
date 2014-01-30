@@ -6,8 +6,8 @@
 #include "PFMLoader.h"
 #include <iostream>
 #include <thread>
-#include "PointLight.h"
 #include "Utils.h"
+#include "PointLight.h"
 
 Scene * g_scene = 0;
 
