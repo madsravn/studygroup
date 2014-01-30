@@ -58,13 +58,16 @@ public:
     }
 
 
-    inline Ray RayFromPointToLight(const Vector3& point) {
-        Vector3 normal = point-m_position;
+	inline Vector3 randomPointonLight(const Vector3& point) {
+		Vector3 normal = point - m_position;
         normal.normalize();
-        Vector3 random = generateRandomRayDirection(normal);
-        Ray ray(point, (random-point).normalize());
-        return ray;
+		Vector3 random = generateRandomRayDirection(normal) * m_radius;
+        return random;
+	}
 
+    inline Ray RayFromPointToLight(const Vector3& point) {
+        Ray ray(point, (randomPointonLight(point) - point).normalize());
+        return ray;
     }
         
 

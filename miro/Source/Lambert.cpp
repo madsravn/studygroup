@@ -56,14 +56,32 @@ Vector3	Lambert::shade(const Ray& ray, const HitInfo& hit, const Scene& scene, c
 
 		PointLight* pLight = *lightIter;
 
-		Vector3 l = pLight->position() - hit.P;
+		
+		
 
 		// Check for shadows
 		HitInfo lightHit;
-		Ray lightRay = Ray(hit.P, l);
 		bool lightBlocked = false;
+
+		/*
+		Vector3 lightDistance = pLight->position() - hit.P;
+		Ray lightRay = Ray(hit.P, lightDistance);
+		
 		if(scene.trace(lightHit, lightRay, 0.001f)) {
 			double llength = (pLight->position() - hit.P).length();
+			if(lightHit.t < llength)
+				lightBlocked = true;
+		}*/
+		
+		Vector3 fakeLightPosition = pLight->randomPointonLight(hit.P);
+		float realLightDistance = (pLight->position() - hit.P).length();
+		Vector3 lightDistance = fakeLightPosition - hit.P;
+		Ray lightRay = Ray(hit.P, lightDistance);
+
+		if(scene.trace(lightHit, lightRay, 0.001f)) {
+			double llength = lightDistance.length();
+			std::cout << "llength: \t" << llength << "\t>\tlightHit.t: \t" << lightHit.t << "\t=\t" << (lightHit.t < llength) << std::endl;
+			std::cout << "realLightDistance:\t" << realLightDistance << std::endl << std::endl;
 			if(lightHit.t < llength)
 				lightBlocked = true;
 		}
@@ -71,19 +89,19 @@ Vector3	Lambert::shade(const Ray& ray, const HitInfo& hit, const Scene& scene, c
 		if(!lightBlocked) {
 
 			// the inverse-squared falloff
-			float falloff = l.length2();
+			float falloff = lightDistance.length2();
 
 			// normalize the light direction
-			l /= sqrt(falloff);
+			lightDistance /= sqrt(falloff);
 
 			// get the diffuse component
-			float nDotL = dot(hit.N, l);
+			float nDotL = dot(hit.N, lightDistance);
 
 			// Standard diffuse lighting
 			diffuseColor += std::max(0.0f, nDotL/falloff * pLight->wattage() / (4 * PI * PI)) * (pLight->color() * m_kd);
 
 			// Specular highlight
-			Vector3 vHalf = (l + viewDir)/(l + viewDir).length();
+			Vector3 vHalf = (lightDistance + viewDir)/(lightDistance + viewDir).length();
 			diffuseColor += pLight->color() * pow(std::max((dot(vHalf, hit.N)), 0.0f), glossiness);
 			
 		}
