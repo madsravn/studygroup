@@ -8,21 +8,10 @@ Lambert::Lambert(const Vector3 & kd, const Vector3 & ka) :
     m_kd(kd), m_ka(ka)
 {
 	this->diffuseCoefficient = 1;
-	this->reflectionCoefficient = 0;
-	this->refractionCoefficient = 0;
 	this->glossiness = 1000;
 	int pfmWidth = 1500, pfmHeight = 1500;
 	pfmImage = readPFMImage("hdr/stpeters_probe.pfm", &pfmWidth, &pfmHeight);
 
-}
-Lambert::Lambert(float diffuseCoefficient, float reflectionCoefficient, float refractionCoefficient, float glossiness, const Vector3 & kd, const Vector3 & ka) :
-	m_kd(kd), m_ka(ka) {
-		this->diffuseCoefficient = diffuseCoefficient;
-		this->reflectionCoefficient = reflectionCoefficient;
-		this->refractionCoefficient = refractionCoefficient;
-		this->glossiness = glossiness;
-			int pfmWidth = 1500, pfmHeight = 1500;
-		pfmImage = readPFMImage("hdr/stpeters_probe.pfm", &pfmWidth, &pfmHeight);
 }
 
 Vector3 Lambert::getHDRColorFromVector(const Vector3 &direction) const {
@@ -43,16 +32,12 @@ Lambert::~Lambert()
 }
 
 Vector3
-Lambert::shade(const Ray& ray, const HitInfo& hit, const Scene& scene, const int recDepth) const
-{
-
+Lambert::shade(const Ray& ray, const HitInfo& hit, const Scene& scene, const int recDepth) const {
 	const int numberOfHDRSamples = 128;
 
     Vector3 L = Vector3(0.0f);
 
 	Vector3 diffuseColor = Vector3(0.0f);
-	Vector3 reflectionColor = Vector3(0.0f);
-	Vector3 refractionColor = Vector3(0.0f);
     
     const Vector3 viewDir = -ray.d; // d is a unit vector
     
@@ -68,8 +53,6 @@ Lambert::shade(const Ray& ray, const HitInfo& hit, const Scene& scene, const int
 
 			Vector3 l = pLight->position() - hit.P;
 
-
-
 			// Check for shadows
 			HitInfo lightHit;
 			Ray lightRay = Ray(hit.P, l);
@@ -78,7 +61,6 @@ Lambert::shade(const Ray& ray, const HitInfo& hit, const Scene& scene, const int
 				double llength = (pLight->position() - hit.P).length();
 				if(lightHit.t < llength)
 					lightBlocked = true;
-
 			}
 
 			if(!lightBlocked) {
@@ -97,74 +79,11 @@ Lambert::shade(const Ray& ray, const HitInfo& hit, const Scene& scene, const int
 				// Specular highlight
 				Vector3 vHalf = (l + viewDir)/(l + viewDir).length();
 				diffuseColor += pLight->color() * pow(std::max((dot(vHalf, hit.N)), 0.0f), glossiness);
-				//std::cout << "Glossiness: " << glossiness << std::endl;
-				//std::cout << "pLight->wattage(): " << pLight->wattage() << std::endl;
-
-			}
-		}
-	}
-
-	if (recDepth > 0) {
-
-		// specular reflection
-		if(reflectionCoefficient > 0){
-			reflectionColor = Vector3(1.0f) - m_kd;
-			HitInfo reflectionHit;
-			Vector3 vReflect = ray.d - 2.0f * dot(ray.d, hit.N) * hit.N;
-			Ray rayReflect = Ray(Vector3(hit.P), vReflect);
-					
-			if(scene.trace(reflectionHit, rayReflect, 0.001f, 100.0f)) {
-				reflectionColor *= reflectionHit.material->shade(rayReflect, reflectionHit, scene, recDepth - 1);
-			}
-			else {
-					//Image based
-				reflectionColor *= getHDRColorFromVector(rayReflect.d);
-			}
-
-		}
-
-		// specular refraction
-		if(refractionCoefficient > 0) {
-			refractionColor = Vector3(1.0f) - m_kd;
-			HitInfo refractionHit;
-
-			// Taken from Wikipedia.org, taken from An Introduction to Ray Tracing by Andrew S. Glassner
-			float my1 = 1, my2 = 1.31;
-			float costheta1 = dot(hit.N, viewDir);
-			float costheta2 = 1 - pow(my1/my2, 2) * (1 - pow(costheta1, 2));
-			if (costheta2 >= 0) {
-				costheta2 = sqrt(costheta2);
-			} else {
-				costheta2 = 0;
-				std::cout << "costheta2 sqrt error. Component is negative" << std::endl;
-			}
-			
-			Vector3 vRefract;
-			if (costheta1 >= 0) {	// Going in
-				float my = my1/my2;
-				vRefract = my * ray.d + (my * costheta1 - costheta2) * hit.N;
-			} else {				// Going out
-				float my = my2/my1;
-				vRefract = my * ray.d - (my * costheta1 - costheta2) * hit.N;
-			}
-
-			Ray rayRefract = Ray(Vector3(hit.P), vRefract);
-				
-			if(scene.trace(refractionHit, rayRefract, 0.001f, 100.0f)) {
-				refractionColor *= refractionHit.material->shade(rayRefract, refractionHit, scene, recDepth - 1);
-			}
-			else {
-					//Image based
-
-				refractionColor *= getHDRColorFromVector(rayRefract.d);
-
 			}
 		}
 	}
 
 	L += diffuseColor*diffuseCoefficient;
-	L += refractionColor*refractionCoefficient; 
-	L += reflectionColor*reflectionCoefficient;
     
     // add the ambient component
     L += m_ka;

@@ -51,6 +51,8 @@
     <ClCompile Include="..\Source\MiroWindow.cpp" />
     <ClCompile Include="..\Source\Node.cpp" />
     <ClCompile Include="..\Source\PFMLoader.cpp" />
+    <ClCompile Include="..\Source\ReflectionMaterial.cpp" />
+    <ClCompile Include="..\Source\RefractionMaterial.cpp" />
     <ClCompile Include="..\Source\Scene.cpp" />
     <ClCompile Include="..\Source\Sphere.cpp" />
     <ClCompile Include="..\Source\Triangle.cpp" />
@@ -76,6 +78,8 @@
     <ClInclude Include="..\Source\PFMLoader.h" />
     <ClInclude Include="..\Source\PointLight.h" />
     <ClInclude Include="..\Source\Ray.h" />
+    <ClInclude Include="..\Source\ReflectionMaterial.h" />
+    <ClInclude Include="..\Source\RefractionMaterial.h" />
     <ClInclude Include="..\Source\Scene.h" />
     <ClInclude Include="..\Source\Sphere.h" />
     <ClInclude Include="..\Source\Triangle.h" />

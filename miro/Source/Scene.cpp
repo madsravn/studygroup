@@ -44,6 +44,8 @@ Vector3 Scene::getHDRColorFromVector(const Vector3 &direction) const {
 }
 
 
+
+
 Vector3 clamp(Vector3 vector, float lowerBound, float upperBound) {
 	if (vector.x > upperBound)
 		vector.x = upperBound;

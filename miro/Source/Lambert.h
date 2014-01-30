@@ -8,13 +8,6 @@ class Lambert : public Material
 public:
     Lambert(const Vector3 & kd = Vector3(1),
             const Vector3 & ka = Vector3(0));
-	Lambert(float diffuseCoefficient, 
-			float reflectionCoefficient, 
-			float refractionCoefficient,
-			float glossiness,
-			const Vector3 & kd = Vector3(1),
-            const Vector3 & ka = Vector3(0) 
-			);
     virtual ~Lambert();
 
     const Vector3 & kd() const {return m_kd;}
@@ -28,10 +21,7 @@ public:
     virtual Vector3 shade(const Ray& ray, const HitInfo& hit,
                           const Scene& scene, const int recDepth) const;
 	Vector3 getHDRColorFromVector(const Vector3 &direction) const;
-	float diffuseCoefficient, 
-		reflectionCoefficient, 
-		refractionCoefficient,
-		glossiness;
+	float diffuseCoefficient, glossiness;
 
 protected:
     Vector3 m_kd;
