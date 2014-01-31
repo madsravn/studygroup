@@ -65,6 +65,10 @@ Triangle::renderGL()
     glEnd();
 }
 
+float determinant(const Vector3& a, const Vector3& b, const Vector3& c) {
+	return dot(cross(a,b),c);
+}
+
 bool
 Triangle::intersect(HitInfo& result, const Ray& ray,float tMin, float tMax)
 {
@@ -73,7 +77,7 @@ Triangle::intersect(HitInfo& result, const Ray& ray,float tMin, float tMax)
     const Vector3 & b = m_mesh->vertices()[ti3.y]; //vertex b of triangle
     const Vector3 & c = m_mesh->vertices()[ti3.z]; //vertex c of triangle
 
-    /*
+    
     // Cramers rule triangle intersection
     // The three vectors used in cramers rule along with ray.d
     const Vector3 aminuso(a-ray.o);
@@ -90,8 +94,8 @@ Triangle::intersect(HitInfo& result, const Ray& ray,float tMin, float tMax)
     const float gamma = determinant(aminusb,aminuso,ray.d)*det;
     const float t = determinant(aminusb,aminusc,aminuso)*det;
     const float alpha = 1 - beta - gamma;
-    */
-
+    
+	/*
     // Cramers rule using intrinsics
     const __m128 ia = _mm_setr_ps(a.x, a.y,a.z,0.0f);
     const __m128 ib = _mm_setr_ps(b.x,b.y,b.z,0.0f);
@@ -130,7 +134,7 @@ Triangle::intersect(HitInfo& result, const Ray& ray,float tMin, float tMax)
     const float beta = a_u[0];
     //const float t = a_t[0];
     const float alpha = 1-gamma-beta;
-
+	*/
 
     /*
     // Signed volumes triangle intersection
@@ -143,9 +147,12 @@ Triangle::intersect(HitInfo& result, const Ray& ray,float tMin, float tMax)
     const float beta = Vb/(Va+Vb+Vc);
     const float gamma = Vc/(Va+Vb+Vc);
     */
-    // To find p and t with signed volumes
-    const Vector3 p = alpha*a+beta*b+gamma*c;
-    const float t = dot(p-ray.o,ray.d);
+    
+	
+	
+	// To find p and t with signed volumes
+    //const Vector3 p = alpha*a+beta*b+gamma*c;
+    //const float t = dot(p-ray.o,ray.d);
     //const float t = (p-ray.o).length();
         
     // Checking constraints 

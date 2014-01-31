@@ -169,7 +169,7 @@ Vector3 Scene::tracePath(const Ray ray, int recDepth, bool log) {
 	Vector3 shadeResult = 0;
 
     if(log) std::cout << "Ray is " << ray << std::endl;
-	if (trace(hitInfo, ray)) {
+	if (trace(hitInfo, ray, 0.001f)) {
 		shadeResult += (hitInfo.material->shade(ray, hitInfo, *this, recDepth)) * .5f;		
 
 		// Bounce
@@ -180,6 +180,10 @@ Vector3 Scene::tracePath(const Ray ray, int recDepth, bool log) {
 
 		// Trace new ray
 		Vector3 traceResult = tracePath(randomRay, recDepth + 1, log);
+		
+		
+		if (!(traceResult.x >= 0))
+			std::cout << "traceResult:\t" << traceResult << std::endl;	
 
 		shadeResult += traceResult * .5f;
 		
@@ -242,6 +246,8 @@ Vector3 Scene::pathTraceShading(const Ray ray, bool log) {
 
 		Vector3 traceResult = 0;
 		
+		float inversePathSamples = 1.0f / (float)(pathSamples);
+
 		for (int i = 0; i < pathSamples; ++i) {
 			
 			// Generate random ray
@@ -251,13 +257,13 @@ Vector3 Scene::pathTraceShading(const Ray ray, bool log) {
             if(log) std::cout << "Ray hit at: " << hitInfo.P << " and gave a new random ray: " << randomRay << std::endl;
 
 			// Trace new ray
-			traceResult += tracePath(randomRay, 0, log) * (1.0f / (float)(pathSamples));	
+
+			Vector3 tracedPath = tracePath(randomRay, 0, log);
 			
-			std::cout << "traceResult:\t" << traceResult << std::endl;
 		}
 		
 		shadeResult += traceResult;
-		std::cout << "shadeResult:\t" << shadeResult << std::endl << std::endl;
+		//std::cout << "shadeResult:\t" << shadeResult << std::endl << std::endl;
 	} else {
 		shadeResult += getHDRColorFromVector(ray.d);
 	}
