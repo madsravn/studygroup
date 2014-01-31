@@ -12,7 +12,6 @@
 #include "Lambert.h"
 #include "MiroWindow.h"
 #include "assignment1.h"
-#include <fenv.h>
 
 void
 makeSpiralScene()
@@ -65,7 +64,9 @@ int startMiro(int argc, char*argv[]) {
     //makeTeapotScene();
     //makeBunny1Scene();
     //makeSponzaScene();
-    feenableexcept(FE_DIVBYZERO);
+
+    //feenableexcept(FE_INVALID | FE_OVERFLOW);
+
 	makeCornellBox();
     MiroWindow miro(&argc, argv);
     miro.mainLoop();
