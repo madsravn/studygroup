@@ -13,7 +13,7 @@ Scene * g_scene = 0;
 
 const int recDepth = 3;
 const int pathBounces = 3;
-const int pathSamples = 8;
+const int pathSamples = 512;
 
 Vector3 Scene::getHDRColorFromVector(const Vector3 &direction) const {
 
@@ -138,8 +138,8 @@ void
 		for (int i = 0; i < img->width(); ++i)
 		{
 			ray = cam->eyeRay(i, j, img->width(), img->height());					
-			shadeResult = basicShading(ray);
-			//shadeResult = pathTraceShading(ray);
+			//shadeResult = basicShading(ray);
+			shadeResult = pathTraceShading(ray);
 
 			img->setPixel(i, j, shadeResult);
 		}
@@ -155,6 +155,7 @@ void
 }
 
 Vector3 Scene::tracePath(const Ray ray, int recDepth) {
+
 	if (recDepth > pathBounces) {
 		return 0;
 	}
@@ -240,7 +241,7 @@ Vector3 Scene::pathTraceShading(const Ray ray) {
 			// Trace new ray
 			traceResult += tracePath(randomRay, 0);				
 		}
-		shadeResult += (traceResult * (1.0f / (pathSamples)));
+		shadeResult += (traceResult * (1.0f / (pathSamples + 1)));
 	} else {
 		shadeResult += getHDRColorFromVector(ray.d);
 	}

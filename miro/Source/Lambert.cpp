@@ -2,6 +2,7 @@
 #include "Ray.h"
 #include "Scene.h"
 #include "PFMLoader.h"
+#include "Utils.h"
 
 #if defined(_WIN32)
 
@@ -12,7 +13,6 @@
 Lambert::Lambert(const Vector3 & kd, const Vector3 & ka) :
 	m_kd(kd), m_ka(ka)
 {
-	this->diffuseCoefficient = 1;
 	this->glossiness = 1000;
 	int pfmWidth = 1500, pfmHeight = 1500;
 	pfmImage = readPFMImage("hdr/stpeters_probe.pfm", &pfmWidth, &pfmHeight);
@@ -56,23 +56,10 @@ Vector3	Lambert::shade(const Ray& ray, const HitInfo& hit, const Scene& scene, c
 
 		PointLight* pLight = *lightIter;
 
-		
-		
-
 		// Check for shadows
 		HitInfo lightHit;
 		bool lightBlocked = false;
 
-		/*
-		Vector3 lightDistance = pLight->position() - hit.P;
-		Ray lightRay = Ray(hit.P, lightDistance);
-		
-		if(scene.trace(lightHit, lightRay, 0.001f)) {
-			double llength = (pLight->position() - hit.P).length();
-			if(lightHit.t < llength)
-				lightBlocked = true;
-		}*/
-		
 		Vector3 fakeLightPosition = pLight->randomPointonLight(hit.P);
 		float realLightDistance = (pLight->position() - hit.P).length();
 		Vector3 lightDistance = fakeLightPosition - hit.P;
@@ -80,10 +67,9 @@ Vector3	Lambert::shade(const Ray& ray, const HitInfo& hit, const Scene& scene, c
 
 		if(scene.trace(lightHit, lightRay, 0.001f)) {
 			double llength = lightDistance.length();
-			std::cout << "llength: \t" << llength << "\t>\tlightHit.t: \t" << lightHit.t << "\t=\t" << (lightHit.t < llength) << std::endl;
-			std::cout << "realLightDistance:\t" << realLightDistance << std::endl << std::endl;
-			if(lightHit.t < llength)
+			if(lightHit.t < llength) {
 				lightBlocked = true;
+			}
 		}
 
 		if(!lightBlocked) {
@@ -103,14 +89,13 @@ Vector3	Lambert::shade(const Ray& ray, const HitInfo& hit, const Scene& scene, c
 			// Specular highlight
 			Vector3 vHalf = (lightDistance + viewDir)/(lightDistance + viewDir).length();
 			diffuseColor += pLight->color() * pow(std::max((dot(vHalf, hit.N)), 0.0f), glossiness);
-			
 		}
 	}	
 
-	L += diffuseColor*diffuseCoefficient;
+	L += diffuseColor;
 
 	// add the ambient component
-	L += m_ka;
+	//L += m_ka;
 
 	return L;
 }

@@ -21,7 +21,7 @@ public:
     virtual Vector3 shade(const Ray& ray, const HitInfo& hit,
                           const Scene& scene, const int recDepth) const;
 	Vector3 getHDRColorFromVector(const Vector3 &direction) const;
-	float diffuseCoefficient, glossiness;
+	float glossiness;
 
 protected:
     Vector3 m_kd;

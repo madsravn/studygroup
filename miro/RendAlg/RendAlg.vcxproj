@@ -58,6 +58,7 @@
     <ClCompile Include="..\Source\Triangle.cpp" />
     <ClCompile Include="..\Source\TriangleMesh.cpp" />
     <ClCompile Include="..\Source\TriangleMeshLoad.cpp" />
+    <ClCompile Include="..\Source\Utils.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Source\assignment1.h" />
@@ -84,6 +85,7 @@
     <ClInclude Include="..\Source\Sphere.h" />
     <ClInclude Include="..\Source\Triangle.h" />
     <ClInclude Include="..\Source\TriangleMesh.h" />
+    <ClInclude Include="..\Source\Utils.h" />
     <ClInclude Include="..\Source\Vector3.h" />
     <ClInclude Include="..\Source\Vector4.h" />
   </ItemGroup>

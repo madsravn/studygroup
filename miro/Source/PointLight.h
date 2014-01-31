@@ -57,20 +57,18 @@ public:
         return true;
     }
 
-
-	Vector3 randomPointonLight(const Vector3& point) {
+	Vector3 randomPointonLight(const Vector3& point) {  // TODO: Works like shit
 		Vector3 normal = point - m_position;
         normal.normalize();
 		Vector3 random = generateRandomRayDirection(normal) * m_radius;
-        return random;
+
+		return random + m_position;
 	}
 
     Ray RayFromPointToLight(const Vector3& point) {
         Ray ray(point, (randomPointonLight(point) - point).normalize());
         return ray;
-    }
-        
-
+    }       
 
     float wattage() const               {return m_wattage;}
     float radius() const                {return m_radius;}
