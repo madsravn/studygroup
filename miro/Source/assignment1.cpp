@@ -238,7 +238,7 @@ void makeCornellBox() {
     t->setMaterial(material); 
     g_scene->addObject(t);
 	
-	/*
+	
 	TriangleMesh * mesh;
     xform.setIdentity();
 	xform *= scale(.2, .2, .2);
@@ -264,7 +264,7 @@ void makeCornellBox() {
     mesh->load("mesh/sphere.obj", xform);
 	material = new ReflectionMaterial();
     addMeshTrianglesToScene(mesh, material);
-	*/
+	
 
 	/*
     xform.setIdentity();
