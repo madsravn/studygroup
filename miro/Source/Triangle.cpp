@@ -145,8 +145,8 @@ Triangle::intersect(HitInfo& result, const Ray& ray,float tMin, float tMax)
     */
     // To find p and t with signed volumes
     const Vector3 p = alpha*a+beta*b+gamma*c;
-    const float t = dot(p-ray.o,ray.d);
-    
+    //const float t = dot(p-ray.o,ray.d);
+    const float t = (p-ray.o).length();
         
     // Checking constraints 
     if(1 > beta && beta > 0 && 1 > gamma && gamma > 0 && t > tMin && tMax > t && alpha > 0 && 1 > alpha ) {
