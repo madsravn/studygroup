@@ -19,7 +19,7 @@ public:
     virtual void preCalc() {}
     
     virtual Vector3 shade(const Ray& ray, const HitInfo& hit,
-                          const Scene& scene, const int recDepth) const;
+                          const Scene& scene, const int recDepth, bool log = false) const;
 	Vector3 getHDRColorFromVector(const Vector3 &direction) const;
 	float glossiness;
 

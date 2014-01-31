@@ -35,7 +35,7 @@ Lambert::~Lambert()
 {
 }
 
-Vector3	Lambert::shade(const Ray& ray, const HitInfo& hit, const Scene& scene, const int recDepth) const {	
+Vector3	Lambert::shade(const Ray& ray, const HitInfo& hit, const Scene& scene, const int recDepth, bool log) const {	
 
 	if (recDepth <= 0) {
 		return m_kd;

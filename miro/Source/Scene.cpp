@@ -138,8 +138,12 @@ void
 		for (int i = 0; i < img->width(); ++i)
 		{
 			ray = cam->eyeRay(i, j, img->width(), img->height());					
+            bool log = false;
 			//shadeResult = basicShading(ray);
-			shadeResult = pathTraceShading(ray);
+            if(i == 10 && j == img->height()/2) {
+                log = true;
+            }
+			shadeResult = pathTraceShading(ray, log);
 
 			img->setPixel(i, j, shadeResult);
 		}
@@ -154,7 +158,7 @@ void
 	debug("done Raytracing!\n");
 }
 
-Vector3 Scene::tracePath(const Ray ray, int recDepth) {
+Vector3 Scene::tracePath(const Ray ray, int recDepth, bool log) {
 
 	if (recDepth > pathBounces) {
 		return 0;
@@ -172,7 +176,7 @@ Vector3 Scene::tracePath(const Ray ray, int recDepth) {
 		Ray randomRay = Ray(hitInfo.P, direction);
 
 		// Trace new ray
-		Vector3 traceResult = tracePath(randomRay, recDepth + 1);
+		Vector3 traceResult = tracePath(randomRay, recDepth + 1, log);
 
 		shadeResult += traceResult * .5f;
 	} else {
@@ -221,7 +225,7 @@ Vector3 Scene::biPathTraceShading(const Ray ray) {
 	return shadeResult;
 }
 
-Vector3 Scene::pathTraceShading(const Ray ray) {
+Vector3 Scene::pathTraceShading(const Ray ray, bool log) {
 	HitInfo hitInfo;
 	Vector3 shadeResult = 0;
 	
