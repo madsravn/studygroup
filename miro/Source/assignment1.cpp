@@ -244,10 +244,10 @@ void makeCornellBox() {
 	xform *= scale(.2, .2, .2);
 	xform *= rotate(30, 0, 1, 0);
     xform *= translate(-1, 0, 3);
-    /*mesh = new TriangleMesh;
+    mesh = new TriangleMesh;
     mesh->load("mesh/teapot.obj", xform);
 	material = new Lambert(Vector3(1, 1, 1));
-    addMeshTrianglesToScene(mesh, material);*/
+    addMeshTrianglesToScene(mesh, material);
 	
 	xform.setIdentity();
 	xform *= scale(.4, .4, .4);
