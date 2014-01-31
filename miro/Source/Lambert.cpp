@@ -78,19 +78,22 @@ Vector3	Lambert::shade(const Ray& ray, const HitInfo& hit, const Scene& scene, c
 			float falloff = lightDistance.length2();
 
 			// normalize the light direction
-			lightDistance /= sqrt(falloff);
+			lightDistance /= falloff;			// Ændret fra sqrt(falloff)
 
 			// get the diffuse component
 			float nDotL = dot(hit.N, lightDistance);
 
 			// Standard diffuse lighting
-			diffuseColor += std::max(0.0f, nDotL/falloff * pLight->wattage() / (4 * PI * PI)) * (pLight->color() * m_kd);
-
+			//diffuseColor += std::max(0.0f, nDotL/falloff * pLight->wattage() / (4 * PI * PI)) * (pLight->color() * m_kd);
+			diffuseColor += m_kd * pLight->color() * std::max(nDotL, 0.0f);
+	
 			// Specular highlight
 			Vector3 vHalf = (lightDistance + viewDir)/(lightDistance + viewDir).length();
 			diffuseColor += pLight->color() * pow(std::max((dot(vHalf, hit.N)), 0.0f), glossiness);
 		}
 	}	
+
+	
 
 	L += diffuseColor;
 

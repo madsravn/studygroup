@@ -13,7 +13,7 @@ Scene * g_scene = 0;
 
 const int recDepth = 3;
 const int pathBounces = 3;
-const int pathSamples = 512;
+const int pathSamples = 8;
 
 Vector3 Scene::getHDRColorFromVector(const Vector3 &direction) const {
 
@@ -250,7 +250,7 @@ Vector3 Scene::pathTraceShading(const Ray ray, bool log) {
 
 
 			// Trace new ray
-			traceResult += tracePath(randomRay, 0, log);				
+			traceResult += tracePath(randomRay, 0, log);	
 		}
 		shadeResult += (traceResult * (1.0f / (pathSamples + 1)));
 	} else {

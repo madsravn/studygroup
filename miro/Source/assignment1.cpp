@@ -55,7 +55,7 @@ void makeCornellBox() {
     light->setColor(Vector3(.73, 0.596, 0.357));
 	//light->setColor(Vector3(1.0f));
     light->setWattage(100);
-    light->setRadius(0.00001f);
+    light->setRadius(0.01f);
     g_scene->addLight(light);
 
 	// create the floor triangles
