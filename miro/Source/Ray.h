@@ -20,6 +20,14 @@ public:
     }
 };
 
+inline std::ostream &
+operator<<(std::ostream& out, const Ray& r)
+{
+    return out << "[" << r.o << " <=> " << r.d << "]";
+}
+
+
+
 
 //! Contains information about a ray hit with a surface.
 /*!

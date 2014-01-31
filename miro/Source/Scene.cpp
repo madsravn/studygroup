@@ -167,6 +167,7 @@ Vector3 Scene::tracePath(const Ray ray, int recDepth, bool log) {
 	HitInfo hitInfo;
 	Vector3 shadeResult = 0;
 
+    if(log) std::cout << "Ray is " << ray << std::endl;
 	if (trace(hitInfo, ray)) {
 		shadeResult += (hitInfo.material->shade(ray, hitInfo, *this, recDepth)) * .5f;
 
@@ -174,6 +175,7 @@ Vector3 Scene::tracePath(const Ray ray, int recDepth, bool log) {
 		// Generate random ray			// TODO: Extract this to separate function
 		Vector3 direction = generateRandomRayDirection(hitInfo.N);
 		Ray randomRay = Ray(hitInfo.P, direction);
+        if(log) std::cout << "Ray hit at: " << hitInfo.P << " and gave a new random ray: " << randomRay << std::endl;
 
 		// Trace new ray
 		Vector3 traceResult = tracePath(randomRay, recDepth + 1, log);
@@ -228,6 +230,9 @@ Vector3 Scene::biPathTraceShading(const Ray ray) {
 Vector3 Scene::pathTraceShading(const Ray ray, bool log) {
 	HitInfo hitInfo;
 	Vector3 shadeResult = 0;
+
+    if(log) std::cout << "Ray is " << ray << std::endl;
+
 	
 	if (trace(hitInfo, ray)) {
 		// First hit shading
@@ -241,9 +246,11 @@ Vector3 Scene::pathTraceShading(const Ray ray, bool log) {
 			Vector3 direction = generateRandomRayDirection(hitInfo.N);					
 			Vector3 origin = hitInfo.P + (direction.normalized() * 0.01);
 			Ray randomRay = Ray(origin, direction);
+            if(log) std::cout << "Ray hit at: " << hitInfo.P << " and gave a new random ray: " << randomRay << std::endl;
+
 
 			// Trace new ray
-			traceResult += tracePath(randomRay, 0);				
+			traceResult += tracePath(randomRay, 0, log);				
 		}
 		shadeResult += (traceResult * (1.0f / (pathSamples + 1)));
 	} else {

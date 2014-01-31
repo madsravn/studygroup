@@ -4,6 +4,7 @@
 #include <math.h>
 #include <float.h>
 #include <iostream>
+#include <iomanip>
 
 #ifdef WIN32
 #pragma warning(disable:4305) // disable useless warnings
@@ -279,7 +280,7 @@ Vector3::rotated(float theta, const Vector3 & w) const
 inline std::ostream &
 operator<<(std::ostream& out, const Vector3& v)
 {
-    return out << v.x << " " << v.y << " " << v.z ;
+    return out << std::setprecision(4) << "(" << v.x << ", " << v.y << ", " << v.z << ")" ;
 }
 
 #endif // CSE168_VECTOR3_H_INCLUDED
