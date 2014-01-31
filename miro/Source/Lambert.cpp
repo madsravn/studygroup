@@ -68,15 +68,15 @@ Vector3	Lambert::shade(const Ray& ray, const HitInfo& hit, const Scene& scene, c
 
 		if(scene.trace(lightHit, lightRay, 0.001f)) {
 			double llength = lightDistance.length();
-			if(lightHit.t < llength && (lightHit.P - hit.P).length() < llength ) {
-				std::cout << std::endl;
+			if(lightHit.t < llength /*&& (lightHit.P - hit.P).length() < llength*/ ) {
+				/*std::cout << std::endl;
 				std::cout << "hit.P:             \t" << hit.P << std::endl;				
 				std::cout << "lightHit.P:        \t" << lightHit.P << std::endl;
 				std::cout << "lightHit.t:        \t" << lightHit.t << std::endl;	
 				std::cout << "(lightHit.P - hit.P).length():\t" << (lightHit.P - hit.P).length() << std::endl;
 				std::cout << "llength:           \t" << llength << std::endl;
 				std::cout << "lightDistance:	 \t" << lightDistance << std::endl;
-				std::cout << "realLightDistance: \t" << realLightDistance << std::endl;
+				std::cout << "realLightDistance: \t" << realLightDistance << std::endl;*/
 				lightBlocked = true;
 			}
 		}
