@@ -128,7 +128,7 @@ Triangle::intersect(HitInfo& result, const Ray& ray,float tMin, float tMax)
     // a_t[0] = t
     const float gamma = a_v[0];
     const float beta = a_u[0];
-    const float t = a_t[0];
+    //const float t = a_t[0];
     const float alpha = 1-gamma-beta;
 
 
@@ -142,10 +142,11 @@ Triangle::intersect(HitInfo& result, const Ray& ray,float tMin, float tMax)
     const float alpha = Va/(Va+Vb+Vc);
     const float beta = Vb/(Va+Vb+Vc);
     const float gamma = Vc/(Va+Vb+Vc);
+    */
     // To find p and t with signed volumes
     const Vector3 p = alpha*a+beta*b+gamma*c;
     const float t = dot(p-ray.o,ray.d);
-    */
+    
         
     // Checking constraints 
     if(1 > beta && beta > 0 && 1 > gamma && gamma > 0 && t > tMin && tMax > t && alpha > 0 && 1 > alpha ) {
