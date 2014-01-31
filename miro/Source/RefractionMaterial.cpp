@@ -5,7 +5,7 @@
 
 static float globalIoR = 1.0f;
 
-Vector3 RefractionMaterial::shade(const Ray& ray, const HitInfo& hit, const Scene& scene, int recDepth) const {
+Vector3 RefractionMaterial::shade(const Ray& ray, const HitInfo& hit, const Scene& scene, int recDepth, bool log) const {
 	if (recDepth <= 0) {
 		return Vector3(0.0f);
 	}

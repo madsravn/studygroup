@@ -3,7 +3,7 @@
 #include "Scene.h"
 #include "PFMLoader.h"
 
-Vector3 ReflectionMaterial::shade(const Ray& ray, const HitInfo& hit, const Scene& scene, int recDepth) const {
+Vector3 ReflectionMaterial::shade(const Ray& ray, const HitInfo& hit, const Scene& scene, int recDepth, bool log) const {
 
 	if (recDepth <= 0) {
 		return Vector3(0,0,0);

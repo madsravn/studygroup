@@ -10,7 +10,7 @@ public:
     ReflectionMaterial() {}
 	~ReflectionMaterial() {}
     virtual Vector3 shade(const Ray& ray, const HitInfo& hit,
-                          const Scene& scene, const int recDepth) const;
+                          const Scene& scene, const int recDepth, bool log = false) const;
 };
 
 #endif
