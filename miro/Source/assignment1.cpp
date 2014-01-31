@@ -51,11 +51,11 @@ void makeCornellBox() {
 
 	// create and place a point light source
     PointLight * light = new PointLight;
-    light->setPosition(Vector3(0, 1, .5));
+    light->setPosition(Vector3(0, 1.8, 0));
     light->setColor(Vector3(.73, 0.596, 0.357));
 	//light->setColor(Vector3(1.0f));
     light->setWattage(100);
-    light->setRadius(0.01f);
+    light->setRadius(0.1f);
     g_scene->addLight(light);
 
 	// create the floor triangles

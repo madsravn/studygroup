@@ -61,13 +61,22 @@ Vector3	Lambert::shade(const Ray& ray, const HitInfo& hit, const Scene& scene, c
 		bool lightBlocked = false;
 
 		Vector3 fakeLightPosition = pLight->randomPointonLight(hit.P);
+		//fakeLightPosition = pLight->position();
 		float realLightDistance = (pLight->position() - hit.P).length();
 		Vector3 lightDistance = fakeLightPosition - hit.P;
 		Ray lightRay = Ray(hit.P, lightDistance);
 
 		if(scene.trace(lightHit, lightRay, 0.001f)) {
 			double llength = lightDistance.length();
-			if(lightHit.t < llength) {
+			if(lightHit.t < llength && (lightHit.P - hit.P).length() < llength ) {
+				std::cout << std::endl;
+				std::cout << "hit.P:             \t" << hit.P << std::endl;				
+				std::cout << "lightHit.P:        \t" << lightHit.P << std::endl;
+				std::cout << "lightHit.t:        \t" << lightHit.t << std::endl;	
+				std::cout << "(lightHit.P - hit.P).length():\t" << (lightHit.P - hit.P).length() << std::endl;
+				std::cout << "llength:           \t" << llength << std::endl;
+				std::cout << "lightDistance:	 \t" << lightDistance << std::endl;
+				std::cout << "realLightDistance: \t" << realLightDistance << std::endl;
 				lightBlocked = true;
 			}
 		}
@@ -86,6 +95,8 @@ Vector3	Lambert::shade(const Ray& ray, const HitInfo& hit, const Scene& scene, c
 			// Standard diffuse lighting
 			//diffuseColor += std::max(0.0f, nDotL/falloff * pLight->wattage() / (4 * PI * PI)) * (pLight->color() * m_kd);
 			diffuseColor += m_kd * pLight->color() * std::max(nDotL, 0.0f);
+
+			//std::cout << diffuseColor << std::endl;
 	
 			// Specular highlight
 			Vector3 vHalf = (lightDistance + viewDir)/(lightDistance + viewDir).length();
