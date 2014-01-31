@@ -142,6 +142,8 @@ void
 			
             if(i == 10 && j == img->height()/2) {
                 log = true;
+            } else {
+                log = false;
             }
 			//shadeResult = basicShading(ray);
 			shadeResult = pathTraceShading(ray, log);
