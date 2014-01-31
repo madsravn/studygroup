@@ -240,7 +240,7 @@ Vector3 Scene::pathTraceShading(const Ray ray, bool log) {
 	
 	if (trace(hitInfo, ray)) {
 		// First hit shading
-		shadeResult += (hitInfo.material->shade(ray, hitInfo, *this, recDepth)) * 1.0f;		
+		shadeResult += hitInfo.material->shade(ray, hitInfo, *this, recDepth);		
 
 		Vector3 traceResult = 0;
 		
@@ -253,9 +253,13 @@ Vector3 Scene::pathTraceShading(const Ray ray, bool log) {
             if(log) std::cout << "Ray hit at: " << hitInfo.P << " and gave a new random ray: " << randomRay << std::endl;
 
 			// Trace new ray
-			traceResult += tracePath(randomRay, 0, log);	
+			traceResult += tracePath(randomRay, 0, log) * (1.0f / (float)(pathSamples));	
+			
+			std::cout << "traceResult:\t" << traceResult << std::endl;
 		}
-		shadeResult += (traceResult * (1.0f / (pathSamples)));
+		
+		shadeResult += traceResult;
+		std::cout << "shadeResult:\t" << shadeResult << std::endl << std::endl;
 	} else {
 		shadeResult += getHDRColorFromVector(ray.d);
 	}
