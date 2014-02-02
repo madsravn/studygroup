@@ -10,6 +10,15 @@ double rnd(void) {
 // Based on Toshiyas smallpsmlt
 // theory: http://people.cs.kuleuven.be/~philip.dutre/GI/TotalCompendium.pdf  
 Vector3 generateRandomRayDirection(Vector3 normal){
+	Vector3 rayDirection = generateRandomRayDirection();
+
+	if(dot(rayDirection, normal) < 0) 
+		rayDirection = -rayDirection;
+
+	return rayDirection;
+}
+
+Vector3 generateRandomRayDirection(){
 	float rand1 = rnd();
 	float rand2 = rnd();
 
@@ -22,9 +31,11 @@ Vector3 generateRandomRayDirection(Vector3 normal){
 	Vector3 rayDirection = Vector3(s*t, temp2, c*t);
 	
 	rayDirection.normalize();
-	if(dot(rayDirection, normal) < 0) 
-		rayDirection = -rayDirection;
 
 	return rayDirection;
+}
+
+double maxVectorValue(Vector3 vector) {
+	return std::max(vector.x, std::max(vector.y, vector.z));
 }
 

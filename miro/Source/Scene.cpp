@@ -12,8 +12,8 @@
 Scene * g_scene = 0;
 
 const int recDepth = 3;
-const int pathBounces = 3;
-const int pathSamples = 16;
+const int pathBounces = 5;
+const int pathSamples = 4;
 
 Vector3 Scene::getHDRColorFromVector(const Vector3 &direction) const {
 
@@ -43,9 +43,6 @@ Vector3 Scene::getHDRColorFromVector(const Vector3 &direction) const {
 
 	return ret;
 }
-
-
-
 
 Vector3 clamp(Vector3 vector, float lowerBound, float upperBound) {
 	if (vector.x > upperBound)
@@ -147,6 +144,7 @@ void
             }
 			//shadeResult = basicShading(ray);
 			shadeResult = pathTraceShading(ray, log);
+			//shadeResult = biPathTraceShading(ray);
 
 			img->setPixel(i, j, shadeResult);
 		}
@@ -164,14 +162,14 @@ void
 Vector3 Scene::tracePath(const Ray ray, int recDepth, bool log) {
 
 	if (recDepth > pathBounces) {
-		return 0;
+		return Vector3(0);
 	}
 
 	HitInfo hitInfo;
 	Vector3 shadeResult = 0;
 
     if(log) std::cout << "Ray is " << ray << std::endl;
-	if (trace(hitInfo, ray, 0.001f)) {
+	if (trace(hitInfo, ray, 0.0001f)) {
 		shadeResult += (hitInfo.material->shade(ray, hitInfo, *this, recDepth)) * .5f;		
 
 		// Bounce
@@ -182,12 +180,8 @@ Vector3 Scene::tracePath(const Ray ray, int recDepth, bool log) {
 
 		// Trace new ray
 		Vector3 traceResult = tracePath(randomRay, recDepth + 1, log);
-		
-		
-		if (!(traceResult.x >= 0))
-			std::cout << "traceResult:\t" << traceResult << std::endl;	
-
-		shadeResult += traceResult * .5f;
+				
+		shadeResult += traceResult;
 		
 	} else {
 		//shadeResult += getHDRColorFromVector(ray.d);
@@ -200,30 +194,43 @@ Vector3 Scene::biPathTraceShading(const Ray ray) {
 	HitInfo hitInfo;
 	Vector3 shadeResult = 0;
 	
+	HitInfo eyePath[pathBounces];
 	// Walk from eye
-	if (trace(hitInfo, ray)) {		
+	if (trace(hitInfo, ray, 0.0001f)) {	
+		Vector3 direction = generateRandomRayDirection(hitInfo.N);
+		Ray randomRay = Ray(hitInfo.P, direction);
 		for(int i = 0; i < pathBounces; ++i) {
 
-			//TODO: Do something
+			eyePath[i] = hitInfo;
 
-			Vector3 direction = generateRandomRayDirection(hitInfo.N);
-			Ray randomRay = Ray(hitInfo.P, direction);
+			if (trace(hitInfo, randomRay, 0.0001f)) {
+			
+			
+
+			//TODO: Do something
+			}
 		}
 	} else {
 
 	}
 
-
 	// Walk from lights
 	for (int i = 0; i < g_scene->lights()->size(); ++i) {
+		HitInfo lightPath[pathBounces];		
+
 		const PointLight *light = (g_scene->lights())->at(i);
 
-		Vector3 direction = generateRandomRayDirection(hitInfo.N);
+		// First entry is the light's own position				// Maybe find an alternative to this
+		lightPath[0] = HitInfo(0.0f, light->position());
+
+		Vector3 direction = generateRandomRayDirection();
 		Ray randomRay = Ray(light->position(), direction);
 
-		for(int i = 0; i < pathBounces; ++i) {
+		for(int i = 1; i < pathBounces; ++i) {
 
-			if (trace(hitInfo, ray)) {
+			lightPath[i] = hitInfo;
+
+			if (trace(hitInfo, ray, 0.0001f)) {
 				
 				// TODO: Do something
 
@@ -242,9 +249,15 @@ Vector3 Scene::pathTraceShading(const Ray ray, bool log) {
     if(log) std::cout << "Ray is " << ray << std::endl;
 
 	
-	if (trace(hitInfo, ray)) {
+	if (trace(hitInfo, ray, 0.0001f)) {
 		// First hit shading
-		shadeResult += hitInfo.material->shade(ray, hitInfo, *this, recDepth);		
+
+		Vector3 firstShade = hitInfo.material->shade(ray, hitInfo, *this, recDepth);
+		shadeResult += firstShade;
+
+		if (maxVectorValue(shadeResult) <= 0) {
+			int a = 1;
+		}
 
 		Vector3 traceResult = 0;
 		
@@ -254,18 +267,17 @@ Vector3 Scene::pathTraceShading(const Ray ray, bool log) {
 			
 			// Generate random ray
 			Vector3 direction = generateRandomRayDirection(hitInfo.N);					
-			Vector3 origin = hitInfo.P + (direction.normalized() * 0.01);
+			Vector3 origin = hitInfo.P;
 			Ray randomRay = Ray(origin, direction);
             if(log) std::cout << "Ray hit at: " << hitInfo.P << " and gave a new random ray: " << randomRay << std::endl;
 
 			// Trace new ray
-
 			Vector3 tracedPath = tracePath(randomRay, 0, log);
-			
+
+			traceResult +=( tracedPath * inversePathSamples + firstShade * maxVectorValue(tracedPath)) * 0.5f;
 		}
 		
 		shadeResult += traceResult;
-		//std::cout << "shadeResult:\t" << shadeResult << std::endl << std::endl;
 	} else {
 		shadeResult += getHDRColorFromVector(ray.d);
 	}
@@ -278,7 +290,7 @@ Vector3 Scene::basicShading(const Ray ray) {
 	HitInfo hitInfo;
 	Vector3 shadeResult = 0;
 	
-	if (trace(hitInfo, ray))
+	if (trace(hitInfo, ray, 0.0001f))
 	{
 		shadeResult += (hitInfo.material->shade(ray, hitInfo, *this, recDepth));
 	}

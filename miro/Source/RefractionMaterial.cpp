@@ -24,9 +24,9 @@ Vector3 RefractionMaterial::shade(const Ray& ray, const HitInfo& hit, const Scen
 
 	float costheta2 = 1 - pow(my, 2) * (1 - pow(costheta1, 2));
 
-	if (costheta2 < 0) {
+	if (costheta2 <= 0) {
 		// Reflect instead
-		// return;
+		return Vector3(0.0f);
 	}
 
 	int p = (into ? 1 : -1);

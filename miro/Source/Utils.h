@@ -5,5 +5,7 @@ double rnd(void);
 // Based on Toshiyas smallpsmlt
 // theory: http://people.cs.kuleuven.be/~philip.dutre/GI/TotalCompendium.pdf  
 Vector3 generateRandomRayDirection(Vector3 normal);
+Vector3 generateRandomRayDirection();
+double maxVectorValue(Vector3 vector);
 
 #endif
