@@ -274,7 +274,7 @@ Vector3 Scene::pathTraceShading(const Ray ray, bool log) {
 			// Trace new ray
 			Vector3 tracedPath = tracePath(randomRay, 0, log);
 
-			traceResult +=( tracedPath * inversePathSamples + firstShade * maxVectorValue(tracedPath)) * 0.5f;
+			traceResult +=( tracedPath * inversePathSamples /*+ firstShade * maxVectorValue(tracedPath)*/) * 0.5f;
 		}
 		
 		shadeResult += traceResult;

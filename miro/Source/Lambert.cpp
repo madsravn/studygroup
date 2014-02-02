@@ -13,7 +13,7 @@
 Lambert::Lambert(const Vector3 & kd, const Vector3 & ka) :
 	m_kd(kd), m_ka(ka)
 {
-	this->glossiness = 1000;
+	glossiness = 1000;
 	int pfmWidth = 1500, pfmHeight = 1500;
 	pfmImage = readPFMImage("hdr/stpeters_probe.pfm", &pfmWidth, &pfmHeight);
 }
