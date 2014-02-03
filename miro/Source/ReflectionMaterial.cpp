@@ -9,7 +9,7 @@ Vector3 ReflectionMaterial::shade(const Ray& ray, const HitInfo& hit, const Scen
 		return Vector3(0,0,0);
 	}
 
-	Vector3 reflectionColor = Vector3(1.0f);
+	Vector3 reflectionColor = Vector3(0.0f);
 
 	// specular reflection
 	HitInfo reflectionHit;

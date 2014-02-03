@@ -53,19 +53,19 @@ void makeCornellBox() {
     PointLight * light = new PointLight;
     light->setPosition(Vector3(0, 1.8, -.5));
     light->setColor(Vector3(.73, 0.596, 0.357));
-	//light->setColor(Vector3(0.5));
-    light->setWattage(100);
+	light->setColor(Vector3(1.0f));
+    light->setWattage(2);
     light->setRadius(0.1f);
     g_scene->addLight(light);
 
 		// create and place a point light source
-    /*light = new PointLight;
-    light->setPosition(Vector3(.5, .5, 1));
-    light->setColor(Vector3(.73, 0.596, 0.357));
-	//light->setColor(Vector3(1.0f));
-    light->setWattage(200);
-    light->setRadius(0.02f);
-    g_scene->addLight(light);*/
+ //   light = new PointLight;
+ //   light->setPosition(Vector3(.5, .5, 1));
+ //   light->setColor(Vector3(.73, 0.596, 0.357));
+	////light->setColor(Vector3(1.0f));
+ //   light->setWattage(2);
+ //   light->setRadius(0.02f);
+ //   g_scene->addLight(light);
 
 
 	// create the floor triangles
@@ -87,7 +87,7 @@ void makeCornellBox() {
     floor2->setN2(Vector3(0, 1, 0));
     floor2->setN3(Vector3(0, 1, 0));
 	
-	material = new Lambert(Vector3(0,1,1));
+	material = new Lambert(Vector3(0,0.5f,0.5f));
 	t = new Triangle;
     t->setMesh(floor1);
     t->setMaterial(material); 
@@ -117,7 +117,7 @@ void makeCornellBox() {
     ceiling2->setN2(Vector3(0, -1, 0));
     ceiling2->setN3(Vector3(0, -1, 0));
 
-	material = new Lambert(Vector3(1,0,1));
+	material = new Lambert(Vector3(0.5f,0,0.5f));
 	t = new Triangle;
     t->setMesh(ceiling1);
     t->setMaterial(material); 
@@ -147,7 +147,7 @@ void makeCornellBox() {
     backwall2->setN2(Vector3( 0, 0, 1));
     backwall2->setN3(Vector3( 0, 0, 1));
 
-	material = new Lambert(Vector3(1,1,0));
+	material = new Lambert(Vector3(0.5f,0.5f,0));
 	t = new Triangle;
     t->setMesh(backwall1);
     t->setMaterial(material); 
@@ -207,7 +207,7 @@ void makeCornellBox() {
     rightwall2->setN2(Vector3(-1, 0, 0));
     rightwall2->setN3(Vector3(-1, 0, 0));
 
-	material = new Lambert(Vector3(0,1,0));
+	material = new Lambert(Vector3(0,0.5f,0));
 	t = new Triangle;
     t->setMesh(rightwall1);
     t->setMaterial(material); 
@@ -237,7 +237,7 @@ void makeCornellBox() {
     leftwall2->setN2(Vector3( 1, 0, 0));
     leftwall2->setN3(Vector3( 1, 0, 0));
 
-	material = new Lambert(Vector3(1, 0, 0));
+	material = new Lambert(Vector3(0.5f, 0, 0));
 	t = new Triangle;
     t->setMesh(leftwall1);
     t->setMaterial(material); 
@@ -248,7 +248,7 @@ void makeCornellBox() {
     t->setMaterial(material); 
     g_scene->addObject(t);
 	
-	
+	/*
 	TriangleMesh * mesh;
     xform.setIdentity();
 	xform *= scale(.2, .2, .2);
@@ -256,7 +256,7 @@ void makeCornellBox() {
     xform *= translate(-1, 0, 3);
     mesh = new TriangleMesh;
     mesh->load("mesh/teapot.obj", xform);
-	material = new Lambert(Vector3(0, 0, 1));
+	material = new Lambert(Vector3(0, 0, 0.5f));
     addMeshTrianglesToScene(mesh, material);
 	
 	xform.setIdentity();
@@ -264,7 +264,7 @@ void makeCornellBox() {
     xform *= translate(.5, 1.0, -.5);
     mesh = new TriangleMesh;
     mesh->load("mesh/sphere.obj", xform);
-	material = new RefractionMaterial(2.419f);
+	material = new RefractionMaterial(1.31f);
     addMeshTrianglesToScene(mesh, material);
 
 	xform.setIdentity();
@@ -274,7 +274,7 @@ void makeCornellBox() {
     mesh->load("mesh/sphere.obj", xform);
 	material = new ReflectionMaterial();
     addMeshTrianglesToScene(mesh, material);
-	
+	*/
 
 	/*
     xform.setIdentity();
