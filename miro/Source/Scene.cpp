@@ -13,7 +13,7 @@ Scene * g_scene = 0;
 
 const int recDepth = 3;
 const int pathBounces = 5;
-const int pathSamples = 4;
+const int pathSamples = 16;
 
 Vector3 Scene::getHDRColorFromVector(const Vector3 &direction) const {
 
@@ -60,12 +60,12 @@ Vector3 clamp(Vector3 vector, float lowerBound, float upperBound) {
 	return vector;
 }
 
-Vector3 exp(const Vector3 x) {
-	return Vector3(exp(x.x), exp(x.y), exp(x.z));
+Vector3 exp(const Vector3 *x) {
+	return Vector3(exp(x->x), exp(x->y), exp(x->z));
 }
 
 // Can't remember where I found this algorithm, I took it from a project I made two years ago
-bool isPointInPolygon(const Vector3 point, const int polygonSides) {
+bool isPointInPolygon(const Vector3 &point, const int polygonSides) {
 	Vector3* points = new Vector3[polygonSides];
 	for (int i = 0; i < polygonSides; i++) {
 		points[i] = Vector3(
@@ -159,7 +159,7 @@ void
 	debug("done Raytracing!\n");
 }
 
-Vector3 Scene::tracePath(const Ray ray, int recDepth, bool log) {
+Vector3 Scene::tracePath(const Ray &ray, int recDepth, bool log) {
 
 	if (recDepth > pathBounces) {
 		return Vector3(0);
@@ -170,7 +170,7 @@ Vector3 Scene::tracePath(const Ray ray, int recDepth, bool log) {
 
     if(log) std::cout << "Ray is " << ray << std::endl;
 	if (trace(hitInfo, ray, 0.0001f)) {
-		shadeResult += (hitInfo.material->shade(ray, hitInfo, *this, recDepth)) * .5f;		
+		shadeResult += (hitInfo.material->shade(ray, hitInfo, *this, recDepth));		
 
 		// Bounce
 		// Generate random ray			// TODO: Extract this to separate function
@@ -179,8 +179,8 @@ Vector3 Scene::tracePath(const Ray ray, int recDepth, bool log) {
         if(log) std::cout << "Ray hit at: " << hitInfo.P << " and gave a new random ray: " << randomRay << std::endl;
 
 		// Trace new ray
-		Vector3 traceResult = tracePath(randomRay, recDepth + 1, log);
-				
+		Vector3 traceResult = dot(hitInfo.N, randomRay.d) * tracePath(randomRay, recDepth + 1, log);
+		
 		shadeResult += traceResult;
 		
 	} else {
@@ -190,7 +190,7 @@ Vector3 Scene::tracePath(const Ray ray, int recDepth, bool log) {
 	return shadeResult;
 }
 
-Vector3 Scene::biPathTraceShading(const Ray ray) {
+Vector3 Scene::biPathTraceShading(const Ray &ray) {
 	HitInfo hitInfo;
 	Vector3 shadeResult = 0;
 	
@@ -204,8 +204,6 @@ Vector3 Scene::biPathTraceShading(const Ray ray) {
 			eyePath[i] = hitInfo;
 
 			if (trace(hitInfo, randomRay, 0.0001f)) {
-			
-			
 
 			//TODO: Do something
 			}
@@ -235,57 +233,41 @@ Vector3 Scene::biPathTraceShading(const Ray ray) {
 				// TODO: Do something
 
 				Vector3 direction = generateRandomRayDirection(hitInfo.N);
-				Ray randomRay = Ray(hitInfo.P, direction);
+				randomRay = Ray(hitInfo.P, direction);
 			}		
 		}
 	}
 	return shadeResult;
 }
 
-Vector3 Scene::pathTraceShading(const Ray ray, bool log) {
+Vector3 Scene::pathTraceShading(const Ray &ray, bool log) {
 	HitInfo hitInfo;
 	Vector3 shadeResult = 0;
 
     if(log) std::cout << "Ray is " << ray << std::endl;
-
-	
+		
 	if (trace(hitInfo, ray, 0.0001f)) {
 		// First hit shading
-
-		Vector3 firstShade = hitInfo.material->shade(ray, hitInfo, *this, recDepth);
-		shadeResult += firstShade;
-
-		if (maxVectorValue(shadeResult) <= 0) {
-			int a = 1;
-		}
-
-		Vector3 traceResult = 0;
-		
 		float inversePathSamples = 1.0f / (float)(pathSamples);
-
+		Vector3 firstShade = hitInfo.material->shade(ray, hitInfo, *this, recDepth);
+		shadeResult += firstShade * inversePathSamples;
+		Vector3 traceResult = 0;		
 		for (int i = 0; i < pathSamples; ++i) {
 			
-			// Generate random ray
-			Vector3 direction = generateRandomRayDirection(hitInfo.N);					
-			Vector3 origin = hitInfo.P;
-			Ray randomRay = Ray(origin, direction);
+			// Generate random ray			
+			Ray randomRay = Ray(hitInfo.P, generateRandomRayDirection(hitInfo.N));
             if(log) std::cout << "Ray hit at: " << hitInfo.P << " and gave a new random ray: " << randomRay << std::endl;
-
-			// Trace new ray
-			Vector3 tracedPath = tracePath(randomRay, 0, log);
-
-			traceResult +=( tracedPath * inversePathSamples + firstShade * maxVectorValue(tracedPath)) * 0.5f;
-		}
-		
+			// Trace new ray			
+			traceResult += inversePathSamples * tracePath(randomRay, 0, log);
+		}		
 		shadeResult += traceResult;
 	} else {
 		shadeResult += getHDRColorFromVector(ray.d);
-	}
-    
+	}    
 	return shadeResult;
 }
 
-Vector3 Scene::basicShading(const Ray ray) {
+Vector3 Scene::basicShading(const Ray &ray) {
 	
 	HitInfo hitInfo;
 	Vector3 shadeResult = 0;

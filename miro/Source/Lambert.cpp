@@ -40,18 +40,12 @@ Vector3	Lambert::shade(const Ray& ray, const HitInfo& hit, const Scene& scene, c
 	if (recDepth <= 0) {
 		return m_kd;
 	}
-
 	Vector3 L = Vector3(0.0f);
-
-	Vector3 diffuseColor = Vector3(0.0f);
-
-	const Vector3 viewDir = -ray.d; // d is a unit vector
-
+	const Vector3 viewDir = -ray.d;
 	const Lights *lightlist = scene.lights();
 
 	// loop over all of the lights
 	Lights::const_iterator lightIter;
-
 	for (lightIter = lightlist->begin(); lightIter != lightlist->end(); ++lightIter) {
 
 		PointLight* pLight = *lightIter;
@@ -71,33 +65,21 @@ Vector3	Lambert::shade(const Ray& ray, const HitInfo& hit, const Scene& scene, c
 				lightBlocked = true;
 			}
 		}
-
 		if(!lightBlocked) {
-			// the inverse-squared falloff
-			float falloff = realLightDistance.length2();
 
-			// normalize the light direction
-			realLightDistance /= falloff;			// Ændret fra sqrt(falloff)
+			// Dot of normal and light vector
+			float nDotL = std::max(dot(hit.N, realLightDistance), 0.0f);
 
-			// get the diffuse component
-			float nDotL = dot(hit.N, realLightDistance);
-
-			// Standard diffuse lighting
-			//diffuseColor += std::max(0.0f, nDotL/falloff * pLight->wattage() / (4 * PI * PI)) * (pLight->color() * m_kd);
-			diffuseColor += m_kd * pLight->color() * std::max(nDotL, 0.0f);			
-
-			//std::cout << diffuseColor << std::endl;
+			// Diffuse color
+			Vector3 I_d = m_kd * pLight->color() * 1/(2*M_PI);
 			
-			// Specular highlight
-			/*Vector3 vHalf = (lightDistance + viewDir)/(lightDistance + viewDir).length();
-			diffuseColor += pLight->color() * pow(std::max((dot(vHalf, hit.N)), 0.0f), glossiness);*/
+			// Specular highlight color
+			//Vector3 vHalf = (lightDistance + viewDir).normalized();
+			//Vector3 I_s = pLight->color() * pow(std::max((dot(vHalf, hit.N)), 0.0f), glossiness);
+
+			L += nDotL * (luminance(m_kd) * I_d)/(1 + luminance(m_kd));
 		}
 	}
-
-	L += diffuseColor;
-
-	// add the ambient component
-	//L += m_ka;
 
 	return L;
 }

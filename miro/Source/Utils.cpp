@@ -35,7 +35,10 @@ Vector3 generateRandomRayDirection(){
 	return rayDirection;
 }
 
-double maxVectorValue(Vector3 vector) {
+double maxVectorValue(Vector3 &vector) {
 	return std::max(vector.x, std::max(vector.y, vector.z));
 }
 
+double luminance(Vector3 color) {
+	return color.x * 0.2126f + color.y * 0.7152f + color.z * 0.0722f;
+}

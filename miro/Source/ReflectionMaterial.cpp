@@ -21,10 +21,8 @@ Vector3 ReflectionMaterial::shade(const Ray& ray, const HitInfo& hit, const Scen
 	}
 	else {
 		//Image based
-		reflectionColor *= scene.getHDRColorFromVector(rayReflect.d);
+		//reflectionColor *= scene.getHDRColorFromVector(rayReflect.d);
 	}
-
-	//std::cout << reflectionColor<< std::endl;
 
 	return reflectionColor;
 }

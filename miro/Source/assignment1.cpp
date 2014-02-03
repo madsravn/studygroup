@@ -53,7 +53,7 @@ void makeCornellBox() {
     PointLight * light = new PointLight;
     light->setPosition(Vector3(0, 1.8, -.5));
     light->setColor(Vector3(.73, 0.596, 0.357));
-	light->setColor(Vector3(1.0f));
+	//light->setColor(Vector3(0.5));
     light->setWattage(100);
     light->setRadius(0.1f);
     g_scene->addLight(light);
