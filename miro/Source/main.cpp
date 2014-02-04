@@ -41,7 +41,8 @@ makeSpiralScene()
     Material* mat = new Lambert(Vector3(1.0f, 0.0f, 0.0f));
     const int maxI = 200;
     const float a = 0.15f;
-    for (int i = 1; i < maxI; ++i) {
+    for (int i = 1; i < maxI; ++i)
+    {
         float t = i/float(maxI);
         float theta = 4*PI*t;
         float r = a*theta;
@@ -65,10 +66,8 @@ int startMiro(int argc, char*argv[]) {
     //makeBunny1Scene();
     //makeSponzaScene();
    // feenableexcept(FE_DIVBYZERO);
-
-    //feenableexcept(FE_INVALID | FE_OVERFLOW);
-
-	makeCornellBox();
+	//makeCornellBox();
+	makeCornellBox2();
     MiroWindow miro(&argc, argv);
     miro.mainLoop();
 	

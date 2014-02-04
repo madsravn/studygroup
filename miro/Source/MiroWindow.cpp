@@ -90,6 +90,7 @@ MiroWindow::motion(int x, int y)
 
     if (m_activeButton & LEFT)
     {
+		
         float xfact = -ANGFACT*dy;
         float yfact = -ANGFACT*dx;
         // construct a coordinate system from up and viewdir
@@ -135,6 +136,7 @@ MiroWindow::mouse(int button, int state, int x, int y)
     {
         m_mouseX = x;
         m_mouseY = y;
+		std::cout << x << ", " << y << std::endl;
         m_activeButton |= b;       /* set the proper bit   */
     }
     else

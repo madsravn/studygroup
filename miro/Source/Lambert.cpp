@@ -6,8 +6,8 @@
 
 #if defined(_WIN32)
 
-    double M_PI = 3.14159265358979;
-    double M_1_PI = 1.0/M_PI;
+double M_PI = 3.14159265358979;
+double M_1_PI = 1.0/M_PI;
 #endif
 
 Lambert::Lambert(const Vector3 & kd, const Vector3 & ka) :
@@ -37,67 +37,48 @@ Lambert::~Lambert()
 
 Vector3	Lambert::shade(const Ray& ray, const HitInfo& hit, const Scene& scene, const int recDepth, bool log) const {	
 
-	if (recDepth <= 0) {
-		return m_kd;
-	}
+	float rr_weight = 1.0f;
 
-	Vector3 L = Vector3(0.0f);
+	Vector3 objectColor = m_kd;
 
-	Vector3 diffuseColor = Vector3(0.0f);
-
-	const Vector3 viewDir = -ray.d; // d is a unit vector
-
+	float m = maxVectorValue(objectColor);
+	if (recDepth > 5) 		// Efter 5 bounces, eller hvis p er nul
+		if (rnd() < m) 
+			objectColor = objectColor*(1/m); 						// Hvorfor gør den dette? Skalerer farven til p = 1
+		else 
+			return Vector3(0.0f);
+	
 	const Lights *lightlist = scene.lights();
 
-	// loop over all of the lights
-	Lights::const_iterator lightIter;
+	// Current point light selected at random
+	PointLight* pLight = lightlist->at(rand() % lightlist->size());
+	// Hit point
+	Vector3 p = hit.P;
+	// Light color
+	Vector3 color_light = pLight->color();
+	// Hit point normal
+	Vector3 n = hit.N;
+	// Light vector
+	Vector3 lv = (pLight->position() - p).normalized();
+	
+	Vector3 illumination_direct = Vector3(0.0f);
+	Vector3 illumination_indirect = Vector3(0.0f);
 
-	for (lightIter = lightlist->begin(); lightIter != lightlist->end(); ++lightIter) {
+	// Shadow ray test
+	HitInfo lightHit;
+	scene.trace(lightHit, Ray(hit.P, lv), 0.001f);	
+	if (Vector3(pLight->position() - p).length() <= lightHit.t)
+		illumination_direct = (m_kd * color_light * std::max(dot(lv, n), 0.0f)) / (pLight->position() - p).length();	
+	
+	Ray randomRay = Ray(p, generateRandomRayDirection(n));
+	HitInfo randomRayHit;
 
-		PointLight* pLight = *lightIter;
-
-		// Check for shadows
-		HitInfo lightHit;
-		bool lightBlocked = false;
-
-		Vector3 fakeLightPosition = pLight->randomPointonLight(hit.P);
-		Vector3 realLightDistance = pLight->position() - hit.P;
-		Vector3 lightDistance = fakeLightPosition - hit.P;		
-		Ray lightRay = Ray(hit.P, lightDistance);
-
-		if(scene.trace(lightHit, lightRay, 0.001f)) {
-			double llength = lightDistance.length();
-			if(lightHit.t < llength && (lightHit.P - hit.P).length() < llength ) {
-				lightBlocked = true;
-			}
-		}
-
-		if(!lightBlocked) {
-			// the inverse-squared falloff
-			float falloff = realLightDistance.length2();
-
-			// normalize the light direction
-			realLightDistance /= falloff;			// Ændret fra sqrt(falloff)
-
-			// get the diffuse component
-			float nDotL = dot(hit.N, realLightDistance);
-
-			// Standard diffuse lighting
-			//diffuseColor += std::max(0.0f, nDotL/falloff * pLight->wattage() / (4 * PI * PI)) * (pLight->color() * m_kd);
-			diffuseColor += m_kd * pLight->color() * std::max(nDotL, 0.0f);			
-
-			//std::cout << diffuseColor << std::endl;
-			
-			// Specular highlight
-			/*Vector3 vHalf = (lightDistance + viewDir)/(lightDistance + viewDir).length();
-			diffuseColor += pLight->color() * pow(std::max((dot(vHalf, hit.N)), 0.0f), glossiness);*/
-		}
+	// Next ray bounce
+	if(scene.trace(randomRayHit, randomRay, 0.001f)) {
+		Vector3 randomRayColor = randomRayHit.material->shade(randomRay,randomRayHit, scene, recDepth + 1);
+		float nDotD = dot(n, randomRay.d);
+		illumination_indirect = m_kd * randomRayColor * nDotD * M_1_PI * 10;
 	}
 
-	L += diffuseColor;
-
-	// add the ambient component
-	//L += m_ka;
-
-	return L;
+	return illumination_direct + illumination_indirect;
 }

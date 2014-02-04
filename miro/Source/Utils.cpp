@@ -1,6 +1,8 @@
 #include "Utils.h"
 #include "Miro.h"
 #include <cmath>
+
+
 double rnd(void) { 
 	static unsigned int x = 123456789, y = 362436069, z = 521288629, w = 88675123; 
 	unsigned int t = x ^ (x << 11); x = y; y = z; z = w; 
@@ -35,7 +37,10 @@ Vector3 generateRandomRayDirection(){
 	return rayDirection;
 }
 
-double maxVectorValue(Vector3 vector) {
+double maxVectorValue(Vector3 &vector) {
 	return std::max(vector.x, std::max(vector.y, vector.z));
 }
 
+double luminance(Vector3 color) {
+	return color.x * 0.2126f + color.y * 0.7152f + color.z * 0.0722f;
+}
