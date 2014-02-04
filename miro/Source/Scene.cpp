@@ -135,15 +135,8 @@ void
 		for (int i = 0; i < img->width(); ++i)
 		{
 			ray = cam->eyeRay(i, j, img->width(), img->height());					
-            bool log = false;
-			
-			if(i == 250 && j == img->height() - 100) {
-                log = true;
-            } else {
-                log = false;
-            }
 			//shadeResult = basicShading(ray);
-			shadeResult = pathTraceShading(ray, log);
+			shadeResult = pathTraceShading(ray);
 			//shadeResult = biPathTraceShading(ray);
 
 			img->setPixel(i, j, shadeResult);
