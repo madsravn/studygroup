@@ -68,7 +68,7 @@ Vector3	Lambert::shade(const Ray& ray, const HitInfo& hit, const Scene& scene, c
 	HitInfo lightHit;
 	scene.trace(lightHit, Ray(hit.P, lv), 0.001f);	
 	if (Vector3(pLight->position() - p).length() <= lightHit.t)
-		illumination_direct = (m_kd * color_light * std::max(dot(lv, n), 0.0f)) / (pLight->position() - p).length();	
+		illumination_direct = (m_kd * color_light * std::max(dot(lv, n), 0.0f)) / pow((pLight->position() - p).length(), 2);	
 	
 	Ray randomRay = Ray(p, generateRandomRayDirection(n));
 	HitInfo randomRayHit;
