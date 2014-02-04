@@ -12,7 +12,7 @@
 Scene * g_scene = 0;
 const int recDepth = 3;
 const int pathBounces = 5;
-const int pathSamples = 32;
+const int pathSamples = 8;
 
 Vector3 Scene::getHDRColorFromVector(const Vector3 &direction) const {
 
@@ -40,7 +40,8 @@ Vector3 Scene::getHDRColorFromVector(const Vector3 &direction) const {
     area = (realx-estimatedx)*(estimatedy-realy);
     ret += area*pfmImage[estimatedx + estimatedy*pfmWidth];
 
-	return ret;
+	//return ret;
+    return Vector3(0,0,0);
 }
 
 Vector3 clamp(Vector3 vector, float lowerBound, float upperBound) {
