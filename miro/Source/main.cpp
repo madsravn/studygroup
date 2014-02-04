@@ -66,7 +66,8 @@ int startMiro(int argc, char*argv[]) {
     //makeBunny1Scene();
     //makeSponzaScene();
    // feenableexcept(FE_DIVBYZERO);
-	makeCornellBox();
+	//makeCornellBox();
+	makeCornellBox2();
     MiroWindow miro(&argc, argv);
     miro.mainLoop();
 	

@@ -291,6 +291,240 @@ void makeCornellBox() {
 }
 
 
+void makeCornellBox2() {
+	g_camera = new Camera;
+    g_scene = new Scene;
+    g_image = new Image;
+	Triangle* t;
+
+    g_image->resize(512, 512);
+    
+    // set up the camera
+    g_camera->setBGColor(Vector3(0.0f, 0.0f, 0.3f));
+    g_camera->setEye(Vector3(0, 1, 3));
+    g_camera->setLookAt(Vector3(0, 1, 0));
+    g_camera->setUp(Vector3(0, 1, 0));
+    g_camera->setFOV(45);
+	g_camera->lensSize = 0.001f;
+	g_camera->focusDistance = 4; 
+	g_camera->aperture = 0.01;
+	g_camera->focalLength = 0.04;
+	g_camera->fNumber = 3.5;
+
+	Matrix4x4 xform;
+    Matrix4x4 xform2;
+	Material* material;
+
+	// create and place a point light source
+    PointLight * light = new PointLight;
+    light->setPosition(Vector3(0, 1.8, -.5));
+    light->setColor(Vector3(.73, 0.596, 0.357));
+	light->setColor(Vector3(1.0f));
+    light->setWattage(2);
+    light->setRadius(0.1f);
+    g_scene->addLight(light);
+
+		// create and place a point light source
+    light = new PointLight;
+    light->setPosition(Vector3(.5, .5, 1));
+    light->setColor(Vector3(.73, 0.596, 0.357));
+	//light->setColor(Vector3(1.0f));
+    light->setWattage(2);
+    light->setRadius(0.02f);
+    g_scene->addLight(light);
+
+
+	// create the floor triangles
+    TriangleMesh * floor1 = new TriangleMesh;
+    floor1->createSingleTriangle();
+    floor1->setV1(Vector3(-1, 0, 1));
+    floor1->setV2(Vector3( 1, 0, 1));
+    floor1->setV3(Vector3( 1, 0,-1));
+    floor1->setN1(Vector3( 0, 1, 0));
+    floor1->setN2(Vector3( 0, 1, 0));
+    floor1->setN3(Vector3( 0, 1, 0));
+    
+	TriangleMesh * floor2 = new TriangleMesh;
+    floor2->createSingleTriangle();    
+    floor2->setV1(Vector3( 1, 0,-1));
+    floor2->setV2(Vector3(-1, 0,-1));
+	floor2->setV3(Vector3(-1, 0, 1));
+    floor2->setN1(Vector3(0, 1, 0));
+    floor2->setN2(Vector3(0, 1, 0));
+    floor2->setN3(Vector3(0, 1, 0));
+	
+	material = new Lambert(Vector3(0.2f,0.1f,0.6f));
+	t = new Triangle;
+    t->setMesh(floor1);
+    t->setMaterial(material); 
+    g_scene->addObject(t);
+	
+	t = new Triangle;
+    t->setMesh(floor2);
+    t->setMaterial(material); 
+    g_scene->addObject(t);
+
+	// create the ceiling triangles
+    TriangleMesh * ceiling1 = new TriangleMesh;
+    ceiling1->createSingleTriangle();
+    ceiling1->setV1(Vector3(-1, 2, 1));
+    ceiling1->setV2(Vector3(-1, 2,-1));
+    ceiling1->setV3(Vector3( 1, 2,-1));
+    ceiling1->setN1(Vector3(0, -1, 0));
+    ceiling1->setN2(Vector3(0, -1, 0));
+    ceiling1->setN3(Vector3(0, -1, 0));
+    
+	TriangleMesh * ceiling2 = new TriangleMesh;
+    ceiling2->createSingleTriangle();    
+    ceiling2->setV1(Vector3( 1, 2,-1));
+    ceiling2->setV2(Vector3( 1, 2, 1));
+	ceiling2->setV3(Vector3(-1, 2, 1));
+    ceiling2->setN1(Vector3(0, -1, 0));
+    ceiling2->setN2(Vector3(0, -1, 0));
+    ceiling2->setN3(Vector3(0, -1, 0));
+
+	material = new Lambert(Vector3(0.7f, 0.3, 0.65f));
+	t = new Triangle;
+    t->setMesh(ceiling1);
+    t->setMaterial(material); 
+    g_scene->addObject(t);
+	
+	t = new Triangle;
+    t->setMesh(ceiling2);
+    t->setMaterial(material); 
+    g_scene->addObject(t);
+
+	// create the backwall triangles
+    TriangleMesh * backwall1 = new TriangleMesh;
+    backwall1->createSingleTriangle();
+    backwall1->setV1(Vector3(-1, 0,-1));
+    backwall1->setV2(Vector3( 1, 0,-1));
+    backwall1->setV3(Vector3( 1, 2,-1));
+    backwall1->setN1(Vector3(0, 0, 1));
+    backwall1->setN2(Vector3(0, 0, 1));
+    backwall1->setN3(Vector3(0, 0, 1));
+    
+	TriangleMesh * backwall2 = new TriangleMesh;
+    backwall2->createSingleTriangle();    
+    backwall2->setV1(Vector3( 1, 2,-1));
+    backwall2->setV2(Vector3(-1, 2,-1));
+	backwall2->setV3(Vector3(-1, 0,-1));
+    backwall2->setN1(Vector3( 0, 0, 1));
+    backwall2->setN2(Vector3( 0, 0, 1));
+    backwall2->setN3(Vector3( 0, 0, 1));
+
+	material = new Lambert(Vector3(0.9f,0.5f,0.3f));
+	t = new Triangle;
+    t->setMesh(backwall1);
+    t->setMaterial(material); 
+    g_scene->addObject(t);
+	
+	t = new Triangle;
+    t->setMesh(backwall2);
+    t->setMaterial(material); 
+    g_scene->addObject(t);
+
+	// create the rightwall triangles
+    TriangleMesh * rightwall1 = new TriangleMesh;
+    rightwall1->createSingleTriangle();
+    rightwall1->setV1(Vector3( 1, 0,-1));
+    rightwall1->setV2(Vector3( 1, 0, 1));
+    rightwall1->setV3(Vector3( 1, 2, 1));
+    rightwall1->setN1(Vector3(-1, 0, 0));
+    rightwall1->setN2(Vector3(-1, 0, 0));
+    rightwall1->setN3(Vector3(-1, 0, 0));
+    
+	TriangleMesh * rightwall2 = new TriangleMesh;
+    rightwall2->createSingleTriangle();    
+    rightwall2->setV1(Vector3( 1, 2, 1));
+    rightwall2->setV2(Vector3( 1, 2,-1));
+	rightwall2->setV3(Vector3( 1, 0,-1));
+    rightwall2->setN1(Vector3(-1, 0, 0));
+    rightwall2->setN2(Vector3(-1, 0, 0));
+    rightwall2->setN3(Vector3(-1, 0, 0));
+
+	material = new Lambert(Vector3(0.1f,0.5f,0.1f));
+	t = new Triangle;
+    t->setMesh(rightwall1);
+    t->setMaterial(material); 
+    g_scene->addObject(t);
+	
+	t = new Triangle;
+    t->setMesh(rightwall2);
+    t->setMaterial(material); 
+    g_scene->addObject(t);
+
+	// create the leftwall triangles
+    TriangleMesh * leftwall1 = new TriangleMesh;
+    leftwall1->createSingleTriangle();
+    leftwall1->setV1(Vector3(-1, 0, 1));
+    leftwall1->setV2(Vector3(-1, 0,-1));
+    leftwall1->setV3(Vector3(-1, 2,-1));
+    leftwall1->setN1(Vector3( 1, 0, 0));
+    leftwall1->setN2(Vector3( 1, 0, 0));
+    leftwall1->setN3(Vector3( 1, 0, 0));
+    
+	TriangleMesh * leftwall2 = new TriangleMesh;
+    leftwall2->createSingleTriangle();    
+    leftwall2->setV1(Vector3(-1, 2,-1));
+    leftwall2->setV2(Vector3(-1, 2, 1));
+	leftwall2->setV3(Vector3(-1, 0, 1));
+    leftwall2->setN1(Vector3( 1, 0, 0));
+    leftwall2->setN2(Vector3( 1, 0, 0));
+    leftwall2->setN3(Vector3( 1, 0, 0));
+
+	material = new Lambert(Vector3(0.8f, 0.1f, 0.1f));
+	t = new Triangle;
+    t->setMesh(leftwall1);
+    t->setMaterial(material); 
+    g_scene->addObject(t);
+	
+	t = new Triangle;
+    t->setMesh(leftwall2);
+    t->setMaterial(material); 
+    g_scene->addObject(t);
+	
+	
+	TriangleMesh * mesh;
+    xform.setIdentity();
+	xform *= scale(.2, .2, .2);
+	xform *= rotate(30, 0, 1, 0);
+    xform *= translate(-1, 0, 3);
+    mesh = new TriangleMesh;
+    mesh->load("mesh/teapot.obj", xform);
+	material = new Lambert(Vector3(0, 0, 0.5f));
+    addMeshTrianglesToScene(mesh, material);
+	
+	xform.setIdentity();
+	xform *= scale(.4, .4, .4);
+    xform *= translate(.5, 1.0, -.5);
+    mesh = new TriangleMesh;
+    mesh->load("mesh/sphere.obj", xform);
+	material = new RefractionMaterial(1.31f);
+    addMeshTrianglesToScene(mesh, material);
+
+	xform.setIdentity();
+	xform *= scale(.3, .3, .3);
+    xform *= translate(-2, 4, 2);
+    mesh = new TriangleMesh;
+    mesh->load("mesh/sphere.obj", xform);
+	material = new ReflectionMaterial();
+    addMeshTrianglesToScene(mesh, material);	
+
+	/*
+    xform.setIdentity();
+	xform *= scale(.3, .3, .3);
+    xform *= translate(1.5, -.5, 1);
+	material = new Lambert(Vector3(128, 255, 128));
+    TriangleMesh * bunny = new TriangleMesh;
+    bunny->load("mesh\\bunny.obj", xform);
+    addMeshTrianglesToScene(bunny, material);
+	*/
+
+	// let objects do pre-calculations if needed
+    g_scene->preCalc();
+}
+
 void
 makeTeapotScene()
 {
@@ -372,7 +606,7 @@ makeTeapotScene()
     xform *= translate(0, 1, 0);
     mesh = new TriangleMesh;
     mesh->load("mesh/sphere.obj", xform);
-	material = new RefractionMaterial(2.5f);
+	material = new RefractionMaterial(0.7f);
     addMeshTrianglesToScene(mesh, material);
 
 	xform.setIdentity();

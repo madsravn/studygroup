@@ -5,11 +5,9 @@
 
 Vector3 ReflectionMaterial::shade(const Ray& ray, const HitInfo& hit, const Scene& scene, int recDepth, bool log) const {
 
-	if (recDepth <= 0) {
+	if (recDepth > 5) {
 		return Vector3(0,0,0);
 	}
-
-	Vector3 reflectionColor = Vector3(0.0f);
 
 	// specular reflection
 	HitInfo reflectionHit;
@@ -17,12 +15,10 @@ Vector3 ReflectionMaterial::shade(const Ray& ray, const HitInfo& hit, const Scen
 	Ray rayReflect = Ray(Vector3(hit.P), vReflect);
 
 	if(scene.trace(reflectionHit, rayReflect, 0.001f, 100.0f)) {
-		reflectionColor *= reflectionHit.material->shade(rayReflect, reflectionHit, scene, recDepth - 1);
+		return reflectionHit.material->shade(rayReflect, reflectionHit, scene, recDepth + 1);
 	}
 	else {
 		//Image based
-		//reflectionColor *= scene.getHDRColorFromVector(rayReflect.d);
+		return scene.getHDRColorFromVector(rayReflect.d);
 	}
-
-	return reflectionColor;
 }

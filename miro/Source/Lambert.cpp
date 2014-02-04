@@ -38,32 +38,17 @@ Lambert::~Lambert()
 Vector3	Lambert::shade(const Ray& ray, const HitInfo& hit, const Scene& scene, const int recDepth, bool log) const {	
 
 	float rr_weight = 1.0f;
-	/*if (recDepth > 2) {
-		if (random() < rr_probability)
-			return Vector3(0.0f);
-		else
-			rr_weight /= 1 - rr_probability;
-	}*/
 
 	Vector3 objectColor = m_kd;
 
-	if (recDepth > 5) {
-		
-	}
-
 	float m = maxVectorValue(objectColor);
-	if (recDepth > 5 || !m) 		// Efter 5 bounces, eller hvis p er nul
+	if (recDepth > 5) 		// Efter 5 bounces, eller hvis p er nul
 		if (rnd() < m) 
 			objectColor = objectColor*(1/m); 						// Hvorfor gør den dette? Skalerer farven til p = 1
 		else 
 			return Vector3(0.0f);
-
-	Vector3 L = Vector3(0.0f);
-	const Vector3 viewDir = -ray.d;
+	
 	const Lights *lightlist = scene.lights();
-
-	// loop over all of the lights
-	Lights::const_iterator lightIter;
 
 	// Current point light selected at random
 	PointLight* pLight = lightlist->at(rand() % lightlist->size());
@@ -76,23 +61,23 @@ Vector3	Lambert::shade(const Ray& ray, const HitInfo& hit, const Scene& scene, c
 	// Light vector
 	Vector3 lv = (pLight->position() - p).normalized();
 	
-	Vector3 illumination_direct;
-	Vector3 illumination_indirect;
+	Vector3 illumination_direct = Vector3(0.0f);
+	Vector3 illumination_indirect = Vector3(0.0f);
 
+	// Shadow ray test
 	HitInfo lightHit;
-	if (scene.trace(lightHit, Ray(hit.P, lv), 0.001f) ){
-		if (Vector3(pLight->position() - p).length() <= lightHit.t)
-			illumination_direct = m_kd * color_light * std::max(dot(lv, n), 0.0f);
-	} else { // If it doesn't hit everything, it's shot past the light
-		illumination_direct = m_kd * color_light * std::max(dot(lv, n), 0.0f);
-	}
+	scene.trace(lightHit, Ray(hit.P, lv), 0.001f);	
+	if (Vector3(pLight->position() - p).length() <= lightHit.t)
+		illumination_direct = (m_kd * color_light * std::max(dot(lv, n), 0.0f)) / (pLight->position() - p).length();	
 	
 	Ray randomRay = Ray(p, generateRandomRayDirection(n));
 	HitInfo randomRayHit;
 
+	// Next ray bounce
 	if(scene.trace(randomRayHit, randomRay, 0.001f)) {
 		Vector3 randomRayColor = randomRayHit.material->shade(randomRay,randomRayHit, scene, recDepth + 1);
-		illumination_indirect = m_kd * randomRayColor * dot(n, randomRay.d) * M_1_PI;
+		float nDotD = dot(n, randomRay.d);
+		illumination_indirect = m_kd * randomRayColor * nDotD * M_1_PI * 10;
 	}
 
 	return illumination_direct + illumination_indirect;

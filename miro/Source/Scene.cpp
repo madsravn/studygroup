@@ -10,10 +10,9 @@
 #include "PointLight.h"
 
 Scene * g_scene = 0;
-
 const int recDepth = 3;
 const int pathBounces = 5;
-const int pathSamples = 128;
+const int pathSamples = 32;
 
 Vector3 Scene::getHDRColorFromVector(const Vector3 &direction) const {
 
@@ -229,10 +228,10 @@ Vector3 Scene::pathTraceShading(const Ray &ray, bool log) {
     if(log) std::cout << "Ray is " << ray << std::endl;		
 
 	float inversePathSamples = 1.0f / (float)(pathSamples);
-	for (int i = 0; i < pathSamples; ++i) {		
-		// Trace new ray			
+	for (int i = 0; i < pathSamples; ++i) {	
+		// Trace new ray
 		if (trace(hitInfo, ray, 0.0001f)) {
-			shadeResult += hitInfo.material->shade(ray, hitInfo, *this, recDepth) * inversePathSamples;		
+			shadeResult += hitInfo.material->shade(ray, hitInfo, *this, 0) * inversePathSamples;		
 		} 
 	}		
 

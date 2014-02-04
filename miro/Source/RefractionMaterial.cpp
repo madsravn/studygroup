@@ -6,7 +6,7 @@
 static float globalIoR = 1.0f;
 
 Vector3 RefractionMaterial::shade(const Ray& ray, const HitInfo& hit, const Scene& scene, int recDepth, bool log) const {
-	if (recDepth <= 0) {
+	if (recDepth > 5) {
 		return Vector3(0.0f);
 	}
 
@@ -37,11 +37,11 @@ Vector3 RefractionMaterial::shade(const Ray& ray, const HitInfo& hit, const Scen
 	Ray rayRefract = Ray(Vector3(hit.P), vRefract);
 	HitInfo refractionHit;
 	if(scene.trace(refractionHit, rayRefract, 0.001f)) {
-		refractionColor *= refractionHit.material->shade(rayRefract, refractionHit, scene, recDepth - 1);
+		refractionColor *= refractionHit.material->shade(rayRefract, refractionHit, scene, recDepth + 1);
 	}
 	else {
 		//Image based
-		//refractionColor *= scene.getHDRColorFromVector(rayRefract.d);
+		refractionColor *= scene.getHDRColorFromVector(rayRefract.d);
 	}
 
 	return refractionColor;
