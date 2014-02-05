@@ -126,6 +126,7 @@ void Scene::multithread( Ray ray, Camera* cam, Image* img, int i, int j) {
     ray = cam->eyeRay(i, j, img->width(), img->height());					
     Vector3 shadeResult = pathTraceShading(ray);
     img->setPixel(i, j, shadeResult);
+    img->drawPixel(i,j);
 
 
 
