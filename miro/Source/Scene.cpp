@@ -12,9 +12,9 @@
 #include <exception>
 
 Scene * g_scene = 0;
-const int recDepth = 3;
+const int recDepth = 5;
 const int pathBounces = 5;
-const int pathSamples = 8;
+const int pathSamples = 10;
 
 Vector3 Scene::getHDRColorFromVector(const Vector3 &direction) const {
 
@@ -126,7 +126,7 @@ void Scene::multithread( Ray ray, Camera* cam, Image* img, int i, int j) {
     ray = cam->eyeRay(i, j, img->width(), img->height());					
     Vector3 shadeResult = pathTraceShading(ray);
     img->setPixel(i, j, shadeResult);
-    img->drawPixel(i,j);
+    //img->drawPixel(i,j);
 
 
 

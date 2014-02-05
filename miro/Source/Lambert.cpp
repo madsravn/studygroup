@@ -42,23 +42,30 @@ Vector3	Lambert::shade(const Ray& ray, const HitInfo& hit, const Scene& scene, c
 	Vector3 objectColor = m_kd;
 
 	float m = maxVectorValue(objectColor);
-	if (recDepth > 5) 		// Efter 5 bounces, eller hvis p er nul
-		if (rnd() < m) 
+
+    
+	if (recDepth > 7){ 		// Efter 7 bounces, eller hvis p er nul
+		if (rnd() < m) { 
 			objectColor = objectColor*(1/m); 						// Hvorfor gør den dette? Skalerer farven til p = 1
-		else 
+        } else {
 			return Vector3(0.0f);
-	
+        }
+    }	
 	const Lights *lightlist = scene.lights();
 
 	// Current point light selected at random
 	PointLight* pLight = lightlist->at(rand() % lightlist->size());
-	// Hit point
+	
+    // Hit point
 	Vector3 p = hit.P;
-	// Light color
+	
+    // Light color
 	Vector3 color_light = pLight->color();
-	// Hit point normal
+	
+    // Hit point normal
 	Vector3 n = hit.N;
-	// Light vector
+	
+    // Light vector
 	Vector3 lv = (pLight->position() - p).normalized();
 	
 	Vector3 illumination_direct = Vector3(0.0f);
@@ -66,9 +73,11 @@ Vector3	Lambert::shade(const Ray& ray, const HitInfo& hit, const Scene& scene, c
 
 	// Shadow ray test
 	HitInfo lightHit;
+
+    //TODO: Kan vi ramme nogle fejl med 0.0001f?
 	scene.trace(lightHit, Ray(hit.P, lv), 0.001f);	
 	if (Vector3(pLight->position() - p).length() <= lightHit.t)
-		illumination_direct = (m_kd * color_light * std::max(dot(lv, n), 0.0f)) / (pLight->position() - p).length();	
+		illumination_direct = (color_light * std::max(dot(lv, n), 0.0f)) / (pLight->position() - p).length();	
 	
 	Ray randomRay = Ray(p, generateRandomRayDirection(n));
 	HitInfo randomRayHit;
@@ -77,8 +86,8 @@ Vector3	Lambert::shade(const Ray& ray, const HitInfo& hit, const Scene& scene, c
 	if(scene.trace(randomRayHit, randomRay, 0.001f)) {
 		Vector3 randomRayColor = randomRayHit.material->shade(randomRay,randomRayHit, scene, recDepth + 1);
 		float nDotD = dot(n, randomRay.d);
-		illumination_indirect = m_kd * randomRayColor * nDotD * M_1_PI * 10;
+		illumination_indirect = randomRayColor * nDotD * M_1_PI * 10;
 	}
 
-	return illumination_direct + illumination_indirect;
+	return m_kd*(illumination_direct + illumination_indirect);
 }
