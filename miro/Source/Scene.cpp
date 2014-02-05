@@ -8,6 +8,8 @@
 #include <thread>
 #include "Utils.h"
 #include "PointLight.h"
+#include <future>
+#include <exception>
 
 Scene * g_scene = 0;
 const int recDepth = 3;
@@ -70,8 +72,7 @@ bool isPointInPolygon(const Vector3 &point, const int polygonSides) {
 	for (int i = 0; i < polygonSides; i++) {
 		points[i] = Vector3(
 			cos(2*(PI/polygonSides) * i),	//Polar to cartesian coordinates
-			sin(2*(PI/polygonSides) * i),
-			0);
+			sin(2*(PI/polygonSides) * i), 0);
 	}
 
 	int i, j = polygonSides - 1;
@@ -119,6 +120,17 @@ void
 	m_bvh.build(&m_objects);
 }
 
+void Scene::multithread( Ray ray, Camera* cam, Image* img, int i, int j) {
+    
+    
+    ray = cam->eyeRay(i, j, img->width(), img->height());					
+    Vector3 shadeResult = pathTraceShading(ray);
+    img->setPixel(i, j, shadeResult);
+
+
+
+}
+
 void
 	Scene::raytraceImage(Camera *cam, Image *img)
 {
@@ -129,6 +141,32 @@ void
 	int pfmWidth = 1500, pfmHeight = 1500;
 	pfmImage = readPFMImage("hdr/stpeters_probe.pfm", &pfmWidth, &pfmWidth);
 
+    std::vector<std::future<void>> futures;
+    for(int j = 0; j < img->height(); ++j) {
+        for(int i = 0; i < img->width(); ++i) {
+            futures.push_back(std::async(&Scene::multithread, this, ray, cam, img, i, j));
+        }
+    }
+
+    for(auto &e : futures) {
+        try {
+            e.get();
+        } catch (const std::exception& e) {
+            std::cerr << "EXCEPTION: " << e.what() << std::endl;
+        }
+    }
+
+    for(int j = 0; j < img->height(); ++j) {
+        img->drawScanline(j);
+    }
+    glFinish();
+
+
+
+
+
+    //OLD STUFF
+    /*
 	// loop over all pixels in the image
 	for (int j = 0; j < img->height(); ++j)
 	{
@@ -145,7 +183,7 @@ void
 		glFinish();
 		printf("Rendering Progress: %.3f%%\r", j/float(img->height())*100.0f);
 		fflush(stdout);
-	}
+	}*/
 
 	printf("Rendering Progress: 100.000%\n");
 
