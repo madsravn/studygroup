@@ -147,10 +147,15 @@ void
             futures.push_back(std::async(&Scene::multithread, this, ray, cam, img, i, j));
         }
     }
-
+    auto size = futures.size();
+    int progress = 0;
     for(auto &e : futures) {
         try {
             e.get();
+            progress++;
+            printf("Rendering Progress: %.3f%%\r", progress/float(size)*100.0f);
+            fflush(stdout);
+
         } catch (const std::exception& e) {
             std::cerr << "EXCEPTION: " << e.what() << std::endl;
         }
