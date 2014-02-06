@@ -40,7 +40,8 @@ Vector3 Scene::getHDRColorFromVector(const Vector3 &direction) const {
     area = (realx-estimatedx)*(estimatedy-realy);
     ret += area*pfmImage[estimatedx + estimatedy*pfmWidth];
 
-	return ret;
+	//return ret;
+    return Vector3(0,0,0);
 }
 
 Vector3 clamp(Vector3 vector, float lowerBound, float upperBound) {
@@ -133,8 +134,10 @@ void
 	{
 		for (int i = 0; i < img->width(); ++i)
 		{
-			ray = cam->eyeRay(i, j, img->width(), img->height());					            
-			shadeResult = pathTraceShading(ray, false);			
+			ray = cam->eyeRay(i, j, img->width(), img->height());					            			
+			//shadeResult = basicShading(ray);
+			shadeResult = pathTraceShading(ray);
+			//shadeResult = biPathTraceShading(ray);
 			img->setPixel(i, j, shadeResult);
 		}
 		img->drawScanline(j);

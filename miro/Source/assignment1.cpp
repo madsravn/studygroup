@@ -324,14 +324,14 @@ void makeCornellBox2() {
     light->setRadius(0.1f);
     g_scene->addLight(light);
 
-		// create and place a point light source
+/*		// create and place a point light source
     light = new PointLight;
     light->setPosition(Vector3(.5, .5, 1));
     light->setColor(Vector3(.73, 0.596, 0.357));
 	//light->setColor(Vector3(1.0f));
     light->setWattage(2);
     light->setRadius(0.02f);
-    g_scene->addLight(light);
+    g_scene->addLight(light);*/
 
 
 	// create the floor triangles
@@ -485,6 +485,7 @@ void makeCornellBox2() {
     g_scene->addObject(t);
 	
 	
+    // teapot
 	TriangleMesh * mesh;
     xform.setIdentity();
 	xform *= scale(.2, .2, .2);
@@ -495,6 +496,8 @@ void makeCornellBox2() {
 	material = new Lambert(Vector3(0, 0, 0.5f));
     addMeshTrianglesToScene(mesh, material);
 	
+
+    // Sphere
 	xform.setIdentity();
 	xform *= scale(.4, .4, .4);
     xform *= translate(.5, 1.0, -.5);
@@ -503,9 +506,10 @@ void makeCornellBox2() {
 	material = new RefractionMaterial(1.31f);
     addMeshTrianglesToScene(mesh, material);
 
+    // Sphere
 	xform.setIdentity();
 	xform *= scale(.3, .3, .3);
-    xform *= translate(-2, 4, 2);
+    xform *= translate(-2, 4, 1);
     mesh = new TriangleMesh;
     mesh->load("mesh/sphere.obj", xform);
 	material = new ReflectionMaterial();
