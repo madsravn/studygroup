@@ -14,7 +14,7 @@
 Scene * g_scene = 0;
 const int recDepth = 5;
 const int pathBounces = 5;
-const int pathSamples = 128;
+const int pathSamples = 10;
 
 Vector3 Scene::getHDRColorFromVector(const Vector3 &direction) const {
 
@@ -120,16 +120,10 @@ void
 	m_bvh.build(&m_objects);
 }
 
-void Scene::multithread( Ray ray, Camera* cam, Image* img, int i, int j) {
-    
-    
+void Scene::multithread( Ray ray, Camera* cam, Image* img, int i, int j) {      
     ray = cam->eyeRay(i, j, img->width(), img->height());					
     Vector3 shadeResult = pathTraceShading(ray);
     img->setPixel(i, j, shadeResult);
-    //img->drawPixel(i,j);
-
-
-
 }
 
 void
@@ -178,11 +172,10 @@ void
 	{
 		for (int i = 0; i < img->width(); ++i)
 		{
-			ray = cam->eyeRay(i, j, img->width(), img->height());					
+			ray = cam->eyeRay(i, j, img->width(), img->height());					            			
 			//shadeResult = basicShading(ray);
 			shadeResult = pathTraceShading(ray);
 			//shadeResult = biPathTraceShading(ray);
-
 			img->setPixel(i, j, shadeResult);
 		}
 		img->drawScanline(j);
