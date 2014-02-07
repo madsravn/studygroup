@@ -125,16 +125,16 @@ void makeCornellBox() {
 	// create the leftwall triangles
     makeSquare(Vector3(-1,0,1), Vector3(-1,0,-1), Vector3(-1,2,1), Vector3(-1,2,-1), Vector3(1,0,0), new Lambert(Vector3(0.5f,0,0)), g_scene);
 	
-	/*
 	TriangleMesh * mesh;
     xform.setIdentity();
-	xform *= scale(.2, .2, .2);
+	xform *= scale(0.5, 0.5, 0.5);
 	xform *= rotate(30, 0, 1, 0);
-    xform *= translate(-1, 0, 3);
+    xform *= translate(-0.75, 0.5, 1);
     mesh = new TriangleMesh;
-    mesh->load("mesh/teapot.obj", xform);
+    mesh->load("mesh/cube.obj", xform);
 	material = new Lambert(Vector3(0, 0, 0.5f));
     addMeshTrianglesToScene(mesh, material);
+    /*
 	
 	xform.setIdentity();
 	xform *= scale(.4, .4, .4);
