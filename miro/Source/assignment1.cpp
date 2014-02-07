@@ -25,7 +25,6 @@ inline Matrix4x4 rotate(float angle, float x, float y, float z);
 } // namespace
 
 
-
 void makeSquare(Vector3 c1, Vector3 c2, Vector3 c3, Vector3 c4, Vector3 n,
         Material* mat, Scene* g_scene) {
 
@@ -60,36 +59,6 @@ void makeSquare(Vector3 c1, Vector3 c2, Vector3 c3, Vector3 c4, Vector3 n,
     g_scene->addObject(t);
 
 }
-
-
-void makeCube(std::vector<Vector3> corners, std::vector<Vector3> normals, const Matrix4x4& ctm, Material* mat, Scene* g_scene) {
-
-    Matrix4x4 nctm = ctm;
-    nctm.invert();
-    nctm.transpose();
-
-    for(int i = 0; i < corners.size(); ++i) {
-        corners.at(i) = ctm*corners.at(i);
-    }
-    for(int i = 0; i < normals.size(); ++i) {
-        normals.at(i) = (nctm*corners.at(i)).normalize();
-    }
-
-    makeSquare(corners.at(0), corners.at(1), corners.at(2), corners.at(3), normals.at(0), mat, g_scene);
-
-    makeSquare(corners.at(2), corners.at(3), corners.at(6), corners.at(7), normals.at(1), mat, g_scene);
-
-    makeSquare(corners.at(1), corners.at(5), corners.at(3), corners.at(7), normals.at(2), mat, g_scene);
-
-    makeSquare(corners.at(4), corners.at(5), corners.at(0), corners.at(1), normals.at(3), mat, g_scene);
-
-    makeSquare(corners.at(5), corners.at(4), corners.at(7), corners.at(6), normals.at(4), mat, g_scene);
-
-    makeSquare(corners.at(4), corners.at(0), corners.at(6), corners.at(2), normals.at(5), mat, g_scene);
-
-}
-
-
 
 
 void makeCornellBox() {
@@ -142,10 +111,10 @@ void makeCornellBox() {
 	// create the ceiling triangles
 
     // c1, c2, c4 => c4, c3, c1
-    makeSquare(Vector3(-1,2,1), Vector3(-1,2,-1), Vector3(1,2,1), Vector3(1,2,-1), Vector3(0,-1,0), new Lambert(Vector3(0.5f,0.0f,0.5f)), g_scene);
+    makeSquare(Vector3(1,2,1), Vector3(-1,2,-1), Vector3(1,2,1), Vector3(1,2,-1), Vector3(0,-1,0), new Lambert(Vector3(0.5f,0.0f,0.5f)), g_scene);
 
 	// create the backwall triangles
-    makeSquare(Vector3(-1,0,-1), Vector3(1,0,-1), Vector3(-1,2,-1), Vector3(1,2,-1), Vector3(0,0,1), new Lambert(Vector3(0.5f,0.5f,0.0f)), g_scene);
+    makeSquare(Vector3(-1,0,-1), Vector3(1,0,-1), Vector3(-1,0,-1), Vector3(1,2,-1), Vector3(0,0,1), new Lambert(Vector3(0.5f,0.5f,0.0f)), g_scene);
 
 	// create the frontwall triangles
     //makeSquare(Vector3(-1,0,1), Vector3(1,0,1), Vector3(-1,2,1), Vector3(1,2,1), Vector3(0,0,-1), new Lambert(Vector3(0.0f,0.0f,0.0f)), g_scene);
@@ -155,31 +124,18 @@ void makeCornellBox() {
 
 	// create the leftwall triangles
     makeSquare(Vector3(-1,0,1), Vector3(-1,0,-1), Vector3(-1,2,1), Vector3(-1,2,-1), Vector3(1,0,0), new Lambert(Vector3(0.5f,0,0)), g_scene);
-
-    Matrix4x4 squarexform;
 	
-    squarexform.setIdentity();
-	squarexform *= scale(0.2, 0.2, 0.2);
-    squarexform *= rotate(30,0,1,0);
-    squarexform *= translate(2,0,1);
-
-    /*std::vector<Vector3> corners {Vector3(-1,0,1), Vector3(1,0,1), Vector3(-1,0,-1), Vector3(1,0,-1), Vector3(-1,2,1), Vector3(1,2,1), Vector3(-1,2,-1), Vector3(1,2,-1)};
-
-    std::vector<Vector3> normals {Vector3(0,-1,0), Vector3(0,-1,0), Vector3(1,0,0), Vector3(0,1,0), Vector3(0,-1,0), Vector3(-1,0,0)};
-
-    makeCube(corners,normals, squarexform, new Lambert(Vector3(1.0,0,0)), g_scene);*/
-
-	
+	/*
 	TriangleMesh * mesh;
     xform.setIdentity();
-	xform *= scale(.5, .5, 1);
+	xform *= scale(.2, .2, .2);
 	xform *= rotate(30, 0, 1, 0);
-    xform *= translate(-1, 0.5, 0);
+    xform *= translate(-1, 0, 3);
     mesh = new TriangleMesh;
-    mesh->load("mesh/cube.obj", xform);
+    mesh->load("mesh/teapot.obj", xform);
 	material = new Lambert(Vector3(0, 0, 0.5f));
     addMeshTrianglesToScene(mesh, material);
-/*	
+	
 	xform.setIdentity();
 	xform *= scale(.4, .4, .4);
     xform *= translate(.5, 1.0, -.5);
@@ -187,7 +143,7 @@ void makeCornellBox() {
     mesh->load("mesh/sphere.obj", xform);
 	material = new RefractionMaterial(1.31f);
     addMeshTrianglesToScene(mesh, material);
-    
+
 	xform.setIdentity();
 	xform *= scale(.3, .3, .3);
     xform *= translate(-2, 4, 2);
@@ -518,14 +474,14 @@ makeTeapotScene()
     mesh->load("mesh/teapot.obj", xform);
 	material = new Lambert(Vector3(0,1,0));
     addMeshTrianglesToScene(mesh, material);
-
+	/*
 	xform.setIdentity();
     xform *= translate(-2, 0, -2);
     mesh = new TriangleMesh;
     mesh->load("mesh/teapot.obj", xform);
 	material = new Lambert(Vector3(1, 0, 0));
     addMeshTrianglesToScene(mesh, material);	
-	
+	*/
 	xform.setIdentity();
 	xform *= scale(1, 1, 1);
     xform *= translate(0, 1, 0);

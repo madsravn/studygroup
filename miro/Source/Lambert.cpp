@@ -77,7 +77,7 @@ Vector3	Lambert::shade(const Ray& ray, const HitInfo& hit, const Scene& scene, c
     //TODO: Kan vi ramme nogle fejl med 0.0001f?
 	scene.trace(lightHit, Ray(hit.P, lv), 0.001f);	
 	if (Vector3(pLight->position() - p).length() <= lightHit.t)
-	illumination_direct = (color_light * std::max(dot(lv, n), 0.0f)) / pow((pLight->position() - p).length(), 2);
+	illumination_direct = (m_kd * color_light * std::max(dot(lv, n), 0.0f)) / pow((pLight->position() - p).length(), 2);
 	
 	Ray randomRay = Ray(p, generateRandomRayDirection(n));
 	HitInfo randomRayHit;
@@ -86,8 +86,8 @@ Vector3	Lambert::shade(const Ray& ray, const HitInfo& hit, const Scene& scene, c
 	if(scene.trace(randomRayHit, randomRay, 0.001f)) {
 		Vector3 randomRayColor = randomRayHit.material->shade(randomRay,randomRayHit, scene, recDepth + 1);
 		float nDotD = dot(n, randomRay.d);
-		illumination_indirect = randomRayColor * nDotD * M_1_PI * 10;
+		illumination_indirect = m_kd * randomRayColor * nDotD * M_1_PI;
 	}
 
-	return m_kd*(illumination_direct + illumination_indirect);
+	return illumination_direct + illumination_indirect;
 }
