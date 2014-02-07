@@ -103,7 +103,6 @@ TriangleMesh::loadObj(FILE* fp, const Matrix4x4& ctm)
     char line[81];
     while (fgets(line, 80, fp) != 0)
     {
-        printf("Reading line: %s \n", line);
         if (line[0] == 'v')
         {
             if (line[1] == 'n')

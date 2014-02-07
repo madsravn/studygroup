@@ -14,7 +14,7 @@
 Scene * g_scene = 0;
 const int recDepth = 5;
 const int pathBounces = 5;
-const int pathSamples = 10;
+const int pathSamples = 128;
 
 Vector3 Scene::getHDRColorFromVector(const Vector3 &direction) const {
 
@@ -142,6 +142,8 @@ void
 	int pfmWidth = 1500, pfmHeight = 1500;
 	pfmImage = readPFMImage("hdr/stpeters_probe.pfm", &pfmWidth, &pfmWidth);
 
+#if !defined (_WIN32)
+    std::cout << "Multithreaded" << std::endl;
     std::vector<std::future<void>> futures;
     for(int j = 0; j < img->height(); ++j) {
         for(int i = 0; i < img->width(); ++i) {
@@ -167,12 +169,10 @@ void
     }
     glFinish();
 
-
-
-
+#else
 
     //OLD STUFF
-    /*
+    
 	// loop over all pixels in the image
 	for (int j = 0; j < img->height(); ++j)
 	{
@@ -189,7 +189,8 @@ void
 		glFinish();
 		printf("Rendering Progress: %.3f%%\r", j/float(img->height())*100.0f);
 		fflush(stdout);
-	}*/
+	}
+#endif
 
 	printf("Rendering Progress: 100.000%\n");
 

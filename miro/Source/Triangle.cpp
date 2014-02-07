@@ -58,11 +58,26 @@ Triangle::renderGL()
     const Vector3 & v1 = m_mesh->vertices()[ti3.y]; //vertex b of triangle
     const Vector3 & v2 = m_mesh->vertices()[ti3.z]; //vertex c of triangle
 
+
+    // Normals from the three vertices
+    TriangleMesh::TupleI3 tn3 = m_mesh->nIndices()[m_index];
+    const Vector3 & na = m_mesh->normals()[tn3.x];
+    const Vector3 & nb = m_mesh->normals()[tn3.y];
+    const Vector3 & nc = m_mesh->normals()[tn3.z];
+
+
     glBegin(GL_TRIANGLES);
         glVertex3f(v0.x, v0.y, v0.z);
         glVertex3f(v1.x, v1.y, v1.z);
         glVertex3f(v2.x, v2.y, v2.z);
     glEnd();
+
+    /*
+    glBegin(GL_LINES);
+        glVertex3f(v0.x,v0.y,v0.z);
+        glVertex3f(v0.x+na.x, v0.y+na.y,v0.z+na.z);
+    glEnd();
+    */
 }
 
 float determinant(const Vector3& a, const Vector3& b, const Vector3& c) {
