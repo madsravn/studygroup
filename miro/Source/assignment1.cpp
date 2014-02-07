@@ -25,6 +25,42 @@ inline Matrix4x4 rotate(float angle, float x, float y, float z);
 } // namespace
 
 
+void makeSquare(Vector3 c1, Vector3 c2, Vector3 c3, Vector3 c4, Vector3 n,
+        Material* mat, Scene* g_scene) {
+
+
+    // create the floor triangles
+    TriangleMesh * floor1 = new TriangleMesh;
+    floor1->createSingleTriangle();
+    floor1->setV1(c1);
+    floor1->setV2(c2);
+    floor1->setV3(c4);
+    floor1->setN1(n);
+    floor1->setN2(n);
+    floor1->setN3(n);
+    
+	TriangleMesh * floor2 = new TriangleMesh;
+    floor2->createSingleTriangle();    
+    floor2->setV1(c4);
+    floor2->setV2(c3);
+	floor2->setV3(c1);
+    floor2->setN1(n);
+    floor2->setN2(n);
+    floor2->setN3(n);
+	
+	Triangle* t = new Triangle;
+    t->setMesh(floor1);
+    t->setMaterial(mat); 
+    g_scene->addObject(t);
+	
+	t = new Triangle;
+    t->setMesh(floor2);
+    t->setMaterial(mat); 
+    g_scene->addObject(t);
+
+}
+
+
 void makeCornellBox() {
 	g_camera = new Camera;
     g_scene = new Scene;
@@ -68,185 +104,26 @@ void makeCornellBox() {
  //   g_scene->addLight(light);
 
 
-	// create the floor triangles
-    TriangleMesh * floor1 = new TriangleMesh;
-    floor1->createSingleTriangle();
-    floor1->setV1(Vector3(-1, 0, 1));
-    floor1->setV2(Vector3( 1, 0, 1));
-    floor1->setV3(Vector3( 1, 0,-1));
-    floor1->setN1(Vector3( 0, 1, 0));
-    floor1->setN2(Vector3( 0, 1, 0));
-    floor1->setN3(Vector3( 0, 1, 0));
+   	// create the floor triangles
     
-	TriangleMesh * floor2 = new TriangleMesh;
-    floor2->createSingleTriangle();    
-    floor2->setV1(Vector3( 1, 0,-1));
-    floor2->setV2(Vector3(-1, 0,-1));
-	floor2->setV3(Vector3(-1, 0, 1));
-    floor2->setN1(Vector3(0, 1, 0));
-    floor2->setN2(Vector3(0, 1, 0));
-    floor2->setN3(Vector3(0, 1, 0));
-	
-	material = new Lambert(Vector3(0,0.5f,0.5f));
-	t = new Triangle;
-    t->setMesh(floor1);
-    t->setMaterial(material); 
-    g_scene->addObject(t);
-	
-	t = new Triangle;
-    t->setMesh(floor2);
-    t->setMaterial(material); 
-    g_scene->addObject(t);
+    makeSquare(Vector3(-1,0,1), Vector3(1,0,1), Vector3(-1,0,-1), Vector3(1,0,-1), Vector3(0,1,0), new Lambert(Vector3(0,0.5f,0.5f)), g_scene);
 
 	// create the ceiling triangles
-    TriangleMesh * ceiling1 = new TriangleMesh;
-    ceiling1->createSingleTriangle();
-    ceiling1->setV1(Vector3(-1, 2, 1));
-    ceiling1->setV2(Vector3(-1, 2,-1));
-    ceiling1->setV3(Vector3( 1, 2,-1));
-    ceiling1->setN1(Vector3(0, -1, 0));
-    ceiling1->setN2(Vector3(0, -1, 0));
-    ceiling1->setN3(Vector3(0, -1, 0));
-    
-	TriangleMesh * ceiling2 = new TriangleMesh;
-    ceiling2->createSingleTriangle();    
-    ceiling2->setV1(Vector3( 1, 2,-1));
-    ceiling2->setV2(Vector3( 1, 2, 1));
-	ceiling2->setV3(Vector3(-1, 2, 1));
-    ceiling2->setN1(Vector3(0, -1, 0));
-    ceiling2->setN2(Vector3(0, -1, 0));
-    ceiling2->setN3(Vector3(0, -1, 0));
 
-	material = new Lambert(Vector3(0.5f,0,0.5f));
-	t = new Triangle;
-    t->setMesh(ceiling1);
-    t->setMaterial(material); 
-    g_scene->addObject(t);
-	
-	t = new Triangle;
-    t->setMesh(ceiling2);
-    t->setMaterial(material); 
-    g_scene->addObject(t);
+    // c1, c2, c4 => c4, c3, c1
+    makeSquare(Vector3(1,2,1), Vector3(-1,2,-1), Vector3(1,2,1), Vector3(1,2,-1), Vector3(0,-1,0), new Lambert(Vector3(0.5f,0.0f,0.5f)), g_scene);
 
 	// create the backwall triangles
-    TriangleMesh * backwall1 = new TriangleMesh;
-    backwall1->createSingleTriangle();
-    backwall1->setV1(Vector3(-1, 0,-1));
-    backwall1->setV2(Vector3( 1, 0,-1));
-    backwall1->setV3(Vector3( 1, 2,-1));
-    backwall1->setN1(Vector3(0, 0, 1));
-    backwall1->setN2(Vector3(0, 0, 1));
-    backwall1->setN3(Vector3(0, 0, 1));
-    
-	TriangleMesh * backwall2 = new TriangleMesh;
-    backwall2->createSingleTriangle();    
-    backwall2->setV1(Vector3( 1, 2,-1));
-    backwall2->setV2(Vector3(-1, 2,-1));
-	backwall2->setV3(Vector3(-1, 0,-1));
-    backwall2->setN1(Vector3( 0, 0, 1));
-    backwall2->setN2(Vector3( 0, 0, 1));
-    backwall2->setN3(Vector3( 0, 0, 1));
-
-	material = new Lambert(Vector3(0.5f,0.5f,0));
-	t = new Triangle;
-    t->setMesh(backwall1);
-    t->setMaterial(material); 
-    g_scene->addObject(t);
-	
-	t = new Triangle;
-    t->setMesh(backwall2);
-    t->setMaterial(material); 
-    g_scene->addObject(t);
+    makeSquare(Vector3(-1,0,-1), Vector3(1,0,-1), Vector3(-1,0,-1), Vector3(1,2,-1), Vector3(0,0,1), new Lambert(Vector3(0.5f,0.5f,0.0f)), g_scene);
 
 	// create the frontwall triangles
-    /*TriangleMesh * frontwall1 = new TriangleMesh;
-    frontwall1->createSingleTriangle();
-    frontwall1->setV1(Vector3(-1, 0, 1));
-    frontwall1->setV2(Vector3( 1, 0, 1));
-    frontwall1->setV3(Vector3( 1, 2, 1));
-    frontwall1->setN1(Vector3(0, 0, -1));
-    frontwall1->setN2(Vector3(0, 0, -1));
-    frontwall1->setN3(Vector3(0, 0, -1));
-    
-	TriangleMesh * frontwall2 = new TriangleMesh;
-    frontwall2->createSingleTriangle();    
-    frontwall2->setV1(Vector3( 1, 2, 1));
-    frontwall2->setV2(Vector3(-1, 2, 1));
-	frontwall2->setV3(Vector3(-1, 0, 1));
-    frontwall2->setN1(Vector3( 0, 0, -1));
-    frontwall2->setN2(Vector3( 0, 0, -1));
-    frontwall2->setN3(Vector3( 0, 0, -1));
-
-	material = new Lambert();
-	t = new Triangle;
-    t->setMesh(frontwall1);
-    t->setMaterial(material); 
-    g_scene->addObject(t);
-	
-	t = new Triangle;
-    t->setMesh(frontwall2);
-    t->setMaterial(material); 
-    g_scene->addObject(t);*/
+    //makeSquare(Vector3(-1,0,1), Vector3(1,0,1), Vector3(-1,2,1), Vector3(1,2,1), Vector3(0,0,-1), new Lambert(Vector3(0.0f,0.0f,0.0f)), g_scene);
 
 	// create the rightwall triangles
-    TriangleMesh * rightwall1 = new TriangleMesh;
-    rightwall1->createSingleTriangle();
-    rightwall1->setV1(Vector3( 1, 0,-1));
-    rightwall1->setV2(Vector3( 1, 0, 1));
-    rightwall1->setV3(Vector3( 1, 2, 1));
-    rightwall1->setN1(Vector3(-1, 0, 0));
-    rightwall1->setN2(Vector3(-1, 0, 0));
-    rightwall1->setN3(Vector3(-1, 0, 0));
-    
-	TriangleMesh * rightwall2 = new TriangleMesh;
-    rightwall2->createSingleTriangle();    
-    rightwall2->setV1(Vector3( 1, 2, 1));
-    rightwall2->setV2(Vector3( 1, 2,-1));
-	rightwall2->setV3(Vector3( 1, 0,-1));
-    rightwall2->setN1(Vector3(-1, 0, 0));
-    rightwall2->setN2(Vector3(-1, 0, 0));
-    rightwall2->setN3(Vector3(-1, 0, 0));
-
-	material = new Lambert(Vector3(0,0.5f,0));
-	t = new Triangle;
-    t->setMesh(rightwall1);
-    t->setMaterial(material); 
-    g_scene->addObject(t);
-	
-	t = new Triangle;
-    t->setMesh(rightwall2);
-    t->setMaterial(material); 
-    g_scene->addObject(t);
+    makeSquare(Vector3(1,0,-1), Vector3(1,0,1), Vector3(1,2,-1), Vector3(1,2,1), Vector3(-1,0,0), new Lambert(Vector3(0.0,0.5f,0.0f)), g_scene);
 
 	// create the leftwall triangles
-    TriangleMesh * leftwall1 = new TriangleMesh;
-    leftwall1->createSingleTriangle();
-    leftwall1->setV1(Vector3(-1, 0, 1));
-    leftwall1->setV2(Vector3(-1, 0,-1));
-    leftwall1->setV3(Vector3(-1, 2,-1));
-    leftwall1->setN1(Vector3( 1, 0, 0));
-    leftwall1->setN2(Vector3( 1, 0, 0));
-    leftwall1->setN3(Vector3( 1, 0, 0));
-    
-	TriangleMesh * leftwall2 = new TriangleMesh;
-    leftwall2->createSingleTriangle();    
-    leftwall2->setV1(Vector3(-1, 2,-1));
-    leftwall2->setV2(Vector3(-1, 2, 1));
-	leftwall2->setV3(Vector3(-1, 0, 1));
-    leftwall2->setN1(Vector3( 1, 0, 0));
-    leftwall2->setN2(Vector3( 1, 0, 0));
-    leftwall2->setN3(Vector3( 1, 0, 0));
-
-	material = new Lambert(Vector3(0.5f, 0, 0));
-	t = new Triangle;
-    t->setMesh(leftwall1);
-    t->setMaterial(material); 
-    g_scene->addObject(t);
-	
-	t = new Triangle;
-    t->setMesh(leftwall2);
-    t->setMaterial(material); 
-    g_scene->addObject(t);
+    makeSquare(Vector3(-1,0,1), Vector3(-1,0,-1), Vector3(-1,2,1), Vector3(-1,2,-1), Vector3(1,0,0), new Lambert(Vector3(0.5f,0,0)), g_scene);
 	
 	/*
 	TriangleMesh * mesh;
