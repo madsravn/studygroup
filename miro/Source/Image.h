@@ -21,6 +21,7 @@ public:
     void setPixel(int x, int y, const Vector3& p);
     void setPixel(int x, int y, const Pixel& p);
 
+    void drawPixel(int x, int y);
     void draw();
     void drawScanline(int y);
     void clear(const Vector3& c);

@@ -76,6 +76,11 @@ void Image::drawScanline(int y)
     glDrawPixels(m_width, 1, GL_RGB, GL_UNSIGNED_BYTE, &m_pixels[y*m_width]);
 }
 
+void Image::drawPixel(int x, int y) {
+    glRasterPos2f(-1 + 2*x / (float)m_width, -1 + 2*y / (float)m_height);
+    glDrawPixels(1, 1, GL_RGB, GL_UNSIGNED_BYTE, &m_pixels[y*m_width + x]);
+}
+
 void Image::draw()
 {
     for (int i = 0; i < m_height; i++)

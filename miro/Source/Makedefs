@@ -8,7 +8,7 @@ MKDEP		= @mkdep
 ECHO		= @echo
 INCDIRS		= -I/usr/X11R6/include 
 #use the following LIBS line for GNU/Linux
-LIBS	 	= -lm -lX11 -lXmu -lXi -lXext -lGL -lGLU -lglut
+LIBS	 	= -lm -lX11 -lXmu -lXi -lXext -lGL -lGLU -lglut -lpthread -pthread
 #use this one instead for Mac OSX
 #LIBS		= -lm -framework GLUT --lobjc -framework OpenGL
 LIBDIRS 	= -L. -L/usr/X11R6/lib -L/usr/lib

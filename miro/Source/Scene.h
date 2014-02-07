@@ -21,6 +21,8 @@ public:
     void preCalc();
     void openGL(Camera *cam);
 	Vector3 getHDRColorFromVector( const Vector3 &direction) const;
+    void multithread( Ray ray, Camera* cam, Image* img, int i, int j);
+
 
     void raytraceImage(Camera *cam, Image *img);
     bool trace(HitInfo& minHit, const Ray& ray,
