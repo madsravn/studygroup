@@ -12,8 +12,7 @@
 #include "Triangle.h"
 #include "Lambert.h"
 #include "ReflectionMaterial.h"
-#include "RefractionMaterial.h"
-
+#include "RefractionMaterial.h" 
 
 // local helper function declarations
 namespace
@@ -111,10 +110,12 @@ void makeCornellBox() {
 	// create the ceiling triangles
 
     // c1, c2, c4 => c4, c3, c1
-    makeSquare(Vector3(1,2,1), Vector3(-1,2,-1), Vector3(1,2,1), Vector3(1,2,-1), Vector3(0,-1,0), new Lambert(Vector3(0.5f,0.0f,0.5f)), g_scene);
+    makeSquare(Vector3(-1,2,1), Vector3(-1,2,-1), Vector3(1,2,1), Vector3(1,2,-1), Vector3(0,-1,0), new Lambert(Vector3(0.5f,0.0f,0.5f)), g_scene);
+
 
 	// create the backwall triangles
-    makeSquare(Vector3(-1,0,-1), Vector3(1,0,-1), Vector3(-1,0,-1), Vector3(1,2,-1), Vector3(0,0,1), new Lambert(Vector3(0.5f,0.5f,0.0f)), g_scene);
+    makeSquare(Vector3(-1,0,-1), Vector3(1,0,-1), Vector3(-1,2,-1), Vector3(1,2,-1), Vector3(0,0,1), new Lambert(Vector3(0.5f,0.5f,0.0f)), g_scene);
+
 
 	// create the frontwall triangles
     //makeSquare(Vector3(-1,0,1), Vector3(1,0,1), Vector3(-1,2,1), Vector3(1,2,1), Vector3(0,0,-1), new Lambert(Vector3(0.0f,0.0f,0.0f)), g_scene);

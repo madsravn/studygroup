@@ -14,7 +14,7 @@
 Scene * g_scene = 0;
 const int recDepth = 5;
 const int pathBounces = 5;
-const int pathSamples = 16;
+const int pathSamples = 128;
 
 Vector3 Scene::getHDRColorFromVector(const Vector3 &direction) const {
 
