@@ -50,14 +50,23 @@ unsigned char Map(float r)
     return c;
 }
 
+Vector3 toneMapping(Vector3 V_in) {
+	return (V_in / (V_in + 1));
+}
+
+float toneMapping(float V_in) {
+	return (V_in / (V_in + 1));
+}
+
 void Image::setPixel(int x, int y, const Vector3& p)
 {
+	Vector3 p_t  = toneMapping(p);
     // do some tone mapping
     if (x >= 0 && x < m_width && y < m_height && y >= 0)
     {
-        m_pixels[y*m_width+x].r = Map(p.x);
-        m_pixels[y*m_width+x].g = Map(p.y);
-        m_pixels[y*m_width+x].b = Map(p.z);
+        m_pixels[y*m_width+x].r = Map(p_t.x);
+        m_pixels[y*m_width+x].g = Map(p_t.y);
+        m_pixels[y*m_width+x].b = Map(p_t.z);
     }
 }
 
