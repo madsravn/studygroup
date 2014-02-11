@@ -137,6 +137,7 @@ MiroWindow::mouse(int button, int state, int x, int y)
         m_mouseX = x;
         m_mouseY = y;
 		std::cout << x << ", " << y << std::endl;
+        //TODO: Tegn path her
         m_activeButton |= b;       /* set the proper bit   */
     }
     else
