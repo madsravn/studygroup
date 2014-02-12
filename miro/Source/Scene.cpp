@@ -10,7 +10,7 @@
 #include "PointLight.h"
 #include <future>
 #include <exception>
-#include "MLT.h"
+//#include "MLT.h"
 
 Scene * g_scene = 0;
 const int recDepth = 5;
@@ -150,7 +150,7 @@ void
     
 	// loop over all pixels in the image
 
-	MLT mlt = MLT(*this);
+	//MLT mlt = MLT(*this);
 	for (int j = 0; j < img->height(); ++j)
 	{
 		for (int i = 0; i < img->width(); ++i)
@@ -158,15 +158,15 @@ void
 			
 			ray = cam->eyeRay(i, j, img->width(), img->height());	
 			
-			Path path = mlt.generateEyePath(ray);
+			/*Path path = mlt.generateEyePath(ray);
 
 			if (path.size > 1) {
 				std::cout << path << std::endl;
-			}
+			}*/
 			//shadeResult = basicShading(ray);
 			//shadeResult = pathTraceShading(ray);
 			//shadeResult = biPathTraceShading(ray);
-			shadeResult = pathTraceFromPath(path);
+			//shadeResult = pathTraceFromPath(path);
 			img->setPixel(i, j, shadeResult);
 		}
 		img->drawScanline(j);
@@ -181,14 +181,13 @@ void
 	debug("done Raytracing!\n");
 }
 
-Vector3 Scene::pathTraceFromPath(Path path) {
-	Vector3 shadeResult = Vector3(0.0f);
-
-	for (int i = 1; i < path.size; i++) { // 0 = eye point	
-		HitInfo hit = path.hits[i];
-	}
-
-}
+//Vector3 Scene::pathTraceFromPath(Path path) {
+//	Vector3 shadeResult = Vector3(0.0f);
+//
+//	for (int i = 1; i < path.size; i++) { // 0 = eye point	
+//		HitInfo hit = path.hits[i];
+//	}
+//}
 
 Vector3 Scene::tracePath(const Ray &ray, int recDepth, bool log) {
 

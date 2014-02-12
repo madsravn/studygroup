@@ -55,7 +55,6 @@
     <ClCompile Include="..\Source\ReflectionMaterial.cpp" />
     <ClCompile Include="..\Source\RefractionMaterial.cpp" />
     <ClCompile Include="..\Source\Scene.cpp" />
-    <ClCompile Include="..\Source\smallpsmlt.cpp" />
     <ClCompile Include="..\Source\Sphere.cpp" />
     <ClCompile Include="..\Source\Triangle.cpp" />
     <ClCompile Include="..\Source\TriangleMesh.cpp" />

@@ -85,9 +85,6 @@
     <ClCompile Include="..\Source\MLT.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\Source\smallpsmlt.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Source\assignment1.h">
@@ -162,16 +159,16 @@
     <ClInclude Include="..\Source\Vector4.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\Source\ReflectionMaterial.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Source\RefractionMaterial.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\Source\Utils.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\Source\MLT.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\ReflectionMaterial.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\RefractionMaterial.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

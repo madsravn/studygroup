@@ -9,12 +9,12 @@ struct Path {
 	int size; 					// Length of path
 	Path(){
 		size=0;
-	}
+	};
 
 	void add(HitInfo hit) {
 		hits[size] = hit;
 		size++;
-	}	
+	};
 };
 
 inline std::ostream & operator<<(std::ostream& out, const Path& p) {
