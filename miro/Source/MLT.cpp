@@ -1,6 +1,6 @@
 #include "MLT.h"
 
-const int maxRecDepth = 10; // TODO: Flyt denne konstant, evt. til en klasse med konstanter
+const int maxRecDepth  = 10; // TODO: Flyt denne konstant, evt. til en klasse med konstanter
 const int maxEyeEvents = 10;
 
 // Recursive path tracing
@@ -16,7 +16,9 @@ void MLT::tracePath(Path& path, const Ray &ray, int recDepth, bool log) {
 	if (!scene.trace(hit, ray, 0.0001f)) return;	// Trace misses scene		
 	
 	path.hits[path.size] = HitInfo(hit);
-	Ray randomRay = Ray(hit.P, generateRandomRayDirection(hit.N));	
+	path.size++;
+
+	Ray randomRay = Ray(hit.P, generateRandomRayDirection(hit.N));		// TODO: Reflection and Refraction
 	tracePath(path, randomRay, recDepth + 1, log);
 }
 
@@ -24,9 +26,9 @@ void MLT::tracePath(Path& path, const Ray &ray, int recDepth, bool log) {
 Path MLT::generateEyePath(Ray& eyeRay) {
 	Path result;
 	result.size = 0;
-	
-	Ray ray;					// TODO: This should be something
-	tracePath(result, ray, 1, maxEyeEvents);
+	result.add(HitInfo(0.0f, eyeRay.o));
+
+	tracePath(result, eyeRay, 1, maxEyeEvents);
 	return result;
 }
 
@@ -45,16 +47,29 @@ float MLT::mutate(float value) {
 	}
 	return value;
 }
+
+// Builds an initial path
+Path initialPath() {
+	return Path();
+}
+
+float acceptProb(float x, float y) {
+	// T(y > x) / T(x > y)
+	return 0;
+}
 /*
-void MLT() {
-	x <- initialPath()
-	image <- { array of zeros }
-	for i <- 1 to N
-		y <- mutate(x)
-		a <- acceptProb(x -> y)
-		if random() < a
-			then x <- y
-		recordSample(image, x)
-	return image
+Image* MLT() {
+	Path x = initialPath();
+	Image * img = 0;
+	for (int i = 1; i < 10000; i++) {
+		Path y = mutate(x);
+		float lum_x = x.getLuminance();
+		float lum_y = y.getLuminance();
+		float acceptance = acceptProb(lum_x, lum_y);			// T(y < x) / T(x < y)
+		if (rnd() < acceptance)
+			x = y;
+		recordSample(img, x);
+	}
+	return img;
 }
 */

@@ -21,4 +21,11 @@ Vector3 ReflectionMaterial::shade(const Ray& ray, const HitInfo& hit, const Scen
 		//Image based
 		return scene.getHDRColorFromVector(rayReflect.d);
 	}
-}
+};
+
+Vector3 ReflectionMaterial::shade(const Path path, const int pathPosition, const Scene& scene, bool log = false) const {
+	if(pathPosition + 1 > path.size) { // Not last element
+		return path.hits[pathPosition + 1].material->shade(path, pathPosition + 1, scene, log);	
+	}
+	return Vector3(0,0,0);
+};

@@ -7,8 +7,10 @@ class Lambert : public Material
 {
 public:
     Lambert(const Vector3 & kd = Vector3(1),
-            const Vector3 & ka = Vector3(0));
+		const Vector3 & ka = Vector3(0)) ;
     virtual ~Lambert();
+
+	//const type = LAMBERT;
 
     const Vector3 & kd() const {return m_kd;}
     const Vector3 & ka() const {return m_ka;}
@@ -20,6 +22,10 @@ public:
     
     virtual Vector3 shade(const Ray& ray, const HitInfo& hit,
                           const Scene& scene, const int recDepth, bool log = false) const;
+	virtual Vector3 shade(const Path path, const int pathPosition, 
+                          const Scene& scene, bool log = false) const;
+	virtual Ray bounceRay(const Ray& ray, const HitInfo& hit) const;
+
 	Vector3 getHDRColorFromVector(const Vector3 &direction) const;
 	float glossiness;
 

@@ -76,12 +76,9 @@ Vector3	Lambert::shade(const Ray& ray, const HitInfo& hit, const Scene& scene, c
 
 	Vector3 fakeLightPos = pLight->randomPointonLight(p);
 
-    //TODO: Kan vi ramme nogle fejl med 0.0001f?
-	//scene.trace(lightHit, Ray(p, lv), 0.001f);	
-	scene.trace(lightHit, Ray(p, Vector3(fakeLightPos - p).normalized()), 0.001f);	
+	scene.trace(lightHit, Ray(p, lv), 0.001f);		
 
-	//bool isLightHit = Vector3(pLight->position() - p).length() <= lightHit.t;
-	bool isLightHit = Vector3(fakeLightPos - p).length() <= lightHit.t;
+	bool isLightHit = Vector3(pLight->position() - p).length() <= lightHit.t;
 	if (isLightHit)
 		illumination_direct = (pLight->wattage() * color_light * std::max(dot(lv, n), 0.0f)) 
 								/ pow((pLight->position() - p).length(), 2);
@@ -97,4 +94,65 @@ Vector3	Lambert::shade(const Ray& ray, const HitInfo& hit, const Scene& scene, c
 	}
 
 	return m_kd*(illumination_direct + illumination_indirect);
+}
+
+Vector3 Lambert::shade(const Path path, const int pathPosition, const Scene& scene, bool log = false) const {
+	
+	if (path.size >= pathPosition) {
+		return Vector3(0.0f);
+	}
+
+	HitInfo hit = path.hits[pathPosition];
+	
+	float rr_weight = 1.0f;
+
+	Vector3 objectColor = m_kd;
+
+	const Lights *lightlist = scene.lights();
+
+	// Current point light selected at random
+	PointLight* pLight = lightlist->at(rand() % lightlist->size());
+	
+    // Hit point
+	Vector3 p = hit.P;
+	
+    // Light color
+	Vector3 color_light = pLight->color();
+	
+    // Hit point normal
+	Vector3 n = hit.N;
+	
+    // Light vector
+	Vector3 lv = (pLight->position() - p).normalized();
+	
+	Vector3 illumination_direct = Vector3(0.0f);
+	Vector3 illumination_indirect = Vector3(0.0f);
+
+	// Shadow ray test
+	HitInfo lightHit;
+	scene.trace(lightHit, Ray(p, lv), 0.001f);		
+	bool isLightHit = Vector3(pLight->position() - p).length() <= lightHit.t;
+	if (isLightHit)
+		illumination_direct = (pLight->wattage() * color_light * std::max(dot(lv, n), 0.0f)) 
+								/ pow((pLight->position() - p).length(), 2);
+	
+	// Next ray bounce
+	Vector3 nextRayDirection = (path.hits[pathPosition + 1].P - hit.P).normalized();
+	if(pathPosition + 1 > path.size) { // Not last element
+		Vector3 rayColor = path.hits[pathPosition + 1].material->shade(path, pathPosition + 1, scene, log);	
+		float nDotD = dot(n, nextRayDirection);
+		illumination_indirect = rayColor * nDotD * M_1_PI;
+	}
+	
+	return m_kd*(illumination_direct + illumination_indirect);
+};
+
+Ray Lambert::bounceRay(const Ray& ray, const HitInfo& hit) const {
+	// Hit point
+	Vector3 p = hit.P;	
+	
+    // Hit point normal
+	Vector3 n = hit.N;
+
+	Ray randomRay = Ray(p, generateRandomRayDirection(n));
 }
