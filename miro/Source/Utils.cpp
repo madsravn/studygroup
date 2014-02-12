@@ -44,3 +44,22 @@ double maxVectorValue(Vector3 &vector) {
 double luminance(Vector3 color) {
 	return color.x * 0.2126f + color.y * 0.7152f + color.z * 0.0722f;
 }
+
+
+Vector3 clamp(Vector3 vector, float lowerBound, float upperBound) {
+	if (vector.x > upperBound)
+		vector.x = upperBound;
+	else if (vector.x < lowerBound)
+		vector.x = lowerBound;
+	if (vector.y > upperBound)
+		vector.y = upperBound;
+	else if (vector.y < lowerBound)
+		vector.y = lowerBound;
+	if (vector.z > upperBound)
+		vector.z = upperBound;
+	else if (vector.z < lowerBound)
+		vector.z = lowerBound;
+	return vector;
+}
+
+

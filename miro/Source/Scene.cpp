@@ -46,26 +46,6 @@ Vector3 Scene::getHDRColorFromVector(const Vector3 &direction) const {
     return Vector3(0,0,0);
 }
 
-Vector3 clamp(Vector3 vector, float lowerBound, float upperBound) {
-	if (vector.x > upperBound)
-		vector.x = upperBound;
-	else if (vector.x < lowerBound)
-		vector.x = lowerBound;
-	if (vector.y > upperBound)
-		vector.y = upperBound;
-	else if (vector.y < lowerBound)
-		vector.y = lowerBound;
-	if (vector.z > upperBound)
-		vector.z = upperBound;
-	else if (vector.z < lowerBound)
-		vector.z = lowerBound;
-	return vector;
-}
-
-Vector3 exp(const Vector3 *x) {
-	return Vector3(exp(x->x), exp(x->y), exp(x->z));
-}
-
 // Can't remember where I found this algorithm, I took it from a project I made two years ago
 bool isPointInPolygon(const Vector3 &point, const int polygonSides) {
 	Vector3* points = new Vector3[polygonSides];
