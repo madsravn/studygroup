@@ -74,9 +74,15 @@ Vector3	Lambert::shade(const Ray& ray, const HitInfo& hit, const Scene& scene, c
 	// Shadow ray test
 	HitInfo lightHit;
 
+	Vector3 fakeLightPos = pLight->randomPointonLight(p);
+
     //TODO: Kan vi ramme nogle fejl med 0.0001f?
-	scene.trace(lightHit, Ray(hit.P, lv), 0.001f);	
-	if (Vector3(pLight->position() - p).length() <= lightHit.t)
+	//scene.trace(lightHit, Ray(p, lv), 0.001f);	
+	scene.trace(lightHit, Ray(p, Vector3(fakeLightPos - p).normalized()), 0.001f);	
+
+	//bool isLightHit = Vector3(pLight->position() - p).length() <= lightHit.t;
+	bool isLightHit = Vector3(fakeLightPos - p).length() <= lightHit.t;
+	if (isLightHit)
 		illumination_direct = (pLight->wattage() * color_light * std::max(dot(lv, n), 0.0f)) 
 								/ pow((pLight->position() - p).length(), 2);
 	
