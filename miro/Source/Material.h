@@ -3,12 +3,12 @@
 
 #include "Miro.h"
 #include "Vector3.h"
-//#include "MLT.h"
+#include "MLT.h"
 
 class Material
 {
 public:
-	enum materialType {LAMBERT, REFLECT, REFRACT};
+	//enum materialType {LAMBERT, REFLECT, REFRACT};
 
 	//const materialType type;
 
