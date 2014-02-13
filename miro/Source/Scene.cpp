@@ -16,6 +16,19 @@ const int recDepth = 5;
 const int pathBounces = 5;
 const int pathSamples = 64;
 
+
+/*
+TODO:	pathTraceFromRay producerer ikke HELT korrekt resultater. Der kommer et 
+		par hvide pixels rundt omkring(Tjek loggen på docs). Det kommer nok fra, 
+		hvordan fladerne bliver shadet, så der må være et sted hvor der ikke 
+		sker det samme.
+
+		1. pathTraceFromRay skal fixes så den producerer et perfekt resultat.
+		2. Den skal udvides/modificere med MLT, så den kan perturbere paths. 
+		3. Vi skal have tilføjet muligheden for at MLT kan opdatere billedet 
+		   direkte, selvom jeg ikke er meget for den øgede coupling :p		
+*/
+
 Vector3 Scene::getHDRColorFromVector(const Vector3 &direction) const {
 
 	Vector3 ret;
@@ -156,15 +169,15 @@ void
 		{
 			ray = cam->eyeRay(i, j, img->width(), img->height());				
 			
-			std::vector<HitInfo> path = mlt.generateEyePath(ray);
+			//std::vector<HitInfo> path = mlt.generateEyePath(ray);
 			
 			/*if (path.size() <= 1) {
 				std::cout << path << std::endl;
 			}*/
 			//shadeResult = basicShading(ray);
-			//shadeResult = pathTraceShading(ray);
+			shadeResult = pathTraceShading(ray);
 			//shadeResult = biPathTraceShading(ray);
-			shadeResult = pathTraceFromPath(path);
+			//shadeResult = pathTraceFromPath(path);
 			/*if (shadeResult == Vector3(0.0f)) {
 				std::cout << i << ", " << j << std::endl;
 			}*/
