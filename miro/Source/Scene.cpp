@@ -10,12 +10,11 @@
 #include "PointLight.h"
 #include <future>
 #include <exception>
-//#include "MLT.h"
 
 Scene * g_scene = 0;
 const int recDepth = 5;
 const int pathBounces = 5;
-const int pathSamples = 32;
+const int pathSamples = 4;
 
 Vector3 Scene::getHDRColorFromVector(const Vector3 &direction) const {
 
@@ -164,7 +163,7 @@ void
 				std::cout << path << std::endl;
 			}*/
 			//shadeResult = basicShading(ray);
-			//shadeResult = pathTraceShading(ray);
+			shadeResult = pathTraceShading(ray);
 			//shadeResult = biPathTraceShading(ray);
 			//shadeResult = pathTraceFromPath(path);
 			img->setPixel(i, j, shadeResult);

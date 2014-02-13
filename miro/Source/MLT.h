@@ -10,8 +10,8 @@ public:
 	MLT(Scene& scene) : scene(scene) {};
 	~MLT(void) {};
 	float mutate(float value);											
-	/*void tracePath(std::vector<HitInfo>& path, const Ray &ray, int recDepth, bool log);
-	std::vector<HitInfo> generateEyePath(Ray& eyeRay);*/
+	void tracePath(std::vector<HitInfo>& path, const Ray &ray, int recDepth, bool log);
+	std::vector<HitInfo> generateEyePath(Ray& eyeRay);
 private:
 	Scene& scene;
 };
