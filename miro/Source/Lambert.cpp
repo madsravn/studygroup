@@ -98,7 +98,7 @@ Vector3	Lambert::shade(const Ray& ray, const HitInfo& hit, const Scene& scene, c
 
 Vector3 Lambert::shade(const std::vector<HitInfo>& path, const int pathPosition, const Scene& scene, bool log) const {
 	
-	if (path.size() >= pathPosition) {
+	if (path.size() < pathPosition) {
 		return Vector3(0.0f);
 	}
 
@@ -137,11 +137,13 @@ Vector3 Lambert::shade(const std::vector<HitInfo>& path, const int pathPosition,
 								/ pow((pLight->position() - p).length(), 2);
 	
 	// Next ray bounce
-	Vector3 nextRayDirection = (path.at(pathPosition + 1).P - hit.P).normalized();
-	if(pathPosition + 1 > path.size()) { // Not last element
-		Vector3 rayColor = path.at(pathPosition + 1).material->shade(path, pathPosition + 1, scene, log);	
-		float nDotD = dot(n, nextRayDirection);
-		illumination_indirect = rayColor * nDotD * M_1_PI;
+	if (path.size() > pathPosition + 1) {
+		Vector3 nextRayDirection = (path.at(pathPosition + 1).P - hit.P).normalized();
+		if(pathPosition + 1 > path.size()) { // Not last element
+			Vector3 rayColor = path.at(pathPosition + 1).material->shade(path, pathPosition + 1, scene, log);	
+			float nDotD = dot(n, nextRayDirection);
+			illumination_indirect = rayColor * nDotD * M_1_PI;
+		}
 	}
 	
 	return m_kd*(illumination_direct + illumination_indirect);
