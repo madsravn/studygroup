@@ -96,7 +96,7 @@ Vector3	Lambert::shade(const Ray& ray, const HitInfo& hit, const Scene& scene, c
 	return m_kd*(illumination_direct + illumination_indirect);
 }
 
-Vector3 Lambert::shade(const std::vector<HitInfo> path, const int pathPosition, const Scene& scene, bool log) const {
+Vector3 Lambert::shade(const std::vector<HitInfo>& path, const int pathPosition, const Scene& scene, bool log) const {
 	
 	if (path.size() >= pathPosition) {
 		return Vector3(0.0f);
