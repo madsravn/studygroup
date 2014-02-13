@@ -3,6 +3,7 @@
 
 #include "Vector3.h"
 #include "Material.h"
+#include <vector>
 
 ;class Ray
 {
@@ -52,5 +53,16 @@ public:
         // empty
     }
 };
+
+inline std::ostream &
+operator<<(std::ostream& out, const std::vector<HitInfo>& hits)
+{
+    for(int i = 0; i < hits.size(); ++i) {
+        out << hits.at(i).P << " <===> " << hits.at(i).N << std::endl;
+    }
+    return out;
+}
+
+
 
 #endif // CSE168_RAY_H_INCLUDED
