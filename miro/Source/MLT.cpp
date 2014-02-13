@@ -16,8 +16,8 @@ void MLT::tracePath(std::vector<HitInfo>& path, const Ray &ray, int recDepth, bo
 	if (!scene.trace(hit, ray, 0.0001f)) return;	// Trace misses scene		
 	
 	path.push_back(HitInfo(hit));	
-
-	Ray randomRay = Ray(hit.P, generateRandomRayDirection(hit.N));		// TODO: Reflection and Refraction
+	
+	Ray randomRay = hit.material->bounceRay(ray, hit);		// TODO: Reflection and Refraction
 	tracePath(path, randomRay, recDepth + 1, log);
 }
 
@@ -26,7 +26,7 @@ std::vector<HitInfo> MLT::generateEyePath(Ray& eyeRay) {
 	std::vector<HitInfo> result;	
 	result.push_back(HitInfo(0.0f, eyeRay.o));
 
-	tracePath(result, eyeRay, 1, maxEyeEvents);
+	tracePath(result, eyeRay, 1);
 	return result;
 }
 

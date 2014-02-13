@@ -14,7 +14,7 @@
 Scene * g_scene = 0;
 const int recDepth = 5;
 const int pathBounces = 5;
-const int pathSamples = 4;
+const int pathSamples = 8;
 
 Vector3 Scene::getHDRColorFromVector(const Vector3 &direction) const {
 
@@ -153,19 +153,18 @@ void
 	for (int j = 0; j < img->height(); ++j)
 	{
 		for (int i = 0; i < img->width(); ++i)
-		{
-			
+		{		
 			ray = cam->eyeRay(i, j, img->width(), img->height());	
 			
 			std::vector<HitInfo> path = mlt.generateEyePath(ray);
-/*
+			/*
 			if (path.size() > 1) {
 				std::cout << path << std::endl;
 			}*/
 			//shadeResult = basicShading(ray);
-			shadeResult = pathTraceShading(ray);
+			//shadeResult = pathTraceShading(ray);
 			//shadeResult = biPathTraceShading(ray);
-			//shadeResult = pathTraceFromPath(path);
+			shadeResult = pathTraceFromPath(path);
 			img->setPixel(i, j, shadeResult);
 		}
 		img->drawScanline(j);
@@ -181,13 +180,8 @@ void
 }
 
 Vector3 Scene::pathTraceFromPath(std::vector<HitInfo> path) {
-	Vector3 shadeResult = Vector3(0.0f);
-
-	for (int i = 1; i < path.size(); i++) { // 0 = eye point	
-		HitInfo hit = path.at(i);
-	}
-
-	return shadeResult;
+	// Recursive shading
+	return path.at(1).material->shade(path, 1, *this);
 }
 
 Vector3 Scene::tracePath(const Ray &ray, int recDepth, bool log) {
@@ -197,12 +191,11 @@ Vector3 Scene::tracePath(const Ray &ray, int recDepth, bool log) {
 
     if(log) std::cout << "Ray is " << ray << std::endl;
 	if (trace(hitInfo, ray, 0.0001f)) {
-		shadeResult += (hitInfo.material->shade(ray, hitInfo, *this, recDepth));		
-	} 
+		shadeResult += hitInfo.material->shade(ray, hitInfo, *this, recDepth);		
+	}
 
 	return shadeResult;
 }
-
 
 Vector3 Scene::pathTraceShading(const Ray &ray, bool log) {
 	HitInfo hitInfo;
@@ -284,7 +277,6 @@ Vector3 Scene::biPathTraceShading(const Ray &ray) {
 	}
 	return shadeResult;
 }
-
 
 bool
 Scene::trace(HitInfo& minHit, const Ray& ray, float tMin, float tMax) const
