@@ -17,7 +17,7 @@ public:
 	virtual Vector3 shade(const Ray& ray, const HitInfo& hit,
 		const Scene& scene, const int recDepth, bool log = false) const;
 
-	virtual Vector3 shade(const Path path, const int pathPosition, const Scene& scene, bool log = false) const;
+	virtual Vector3 shade(const std::vector<HitInfo> path, const int pathPosition, const Scene& scene, bool log = false) const;
 
 	virtual Ray bounceRay(const Ray& ray, const HitInfo& hit) const;
 	void setIoR(float i) {

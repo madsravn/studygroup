@@ -47,7 +47,7 @@ Vector3 RefractionMaterial::shade(const Ray& ray, const HitInfo& hit, const Scen
 	return refractionColor;
 }
 //
-Vector3 RefractionMaterial::shade(const Path path, const int pathPosition, const Scene& scene, bool log = false) const {
+Vector3 RefractionMaterial::shade(const std::vector<HitInfo> path, const int pathPosition, const Scene& scene, bool log = false) const {
 
 	if(pathPosition + 1 > path.size) { // Not last element
 		return path.hits[pathPosition + 1].material->shade(path, pathPosition + 1, scene, log);	
