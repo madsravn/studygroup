@@ -23,7 +23,7 @@ Vector3 ReflectionMaterial::shade(const Ray& ray, const HitInfo& hit, const Scen
 	}
 };
 
-Vector3 ReflectionMaterial::shade(const std::vector<HitInfo> path, const int pathPosition, const Scene& scene, bool log) const {
+Vector3 ReflectionMaterial::shade(const std::vector<HitInfo>& path, const int pathPosition, const Scene& scene, bool log) const {
 	if(pathPosition + 1 > path.size()) { // Not last element
 		return path.at(pathPosition + 1).material->shade(path, pathPosition + 1, scene, log);	
 	}
