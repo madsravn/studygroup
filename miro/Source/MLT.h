@@ -1,40 +1,19 @@
+#ifndef CSE168_MLT_H_INCLUDED
+#define CSE168_MLT_H_INCLUDED
+
 #include "Utils.h"
-//#include "Scene.h"
-//#include "Ray.h"
-
-const int MaxEvents = 100;
-
-struct Path {
-	//HitInfo hits[MaxEvents];	// Points in path
-	int size; 					// Length of path
-  Path(){
-		size=0;
-	};
-
-//	void add(HitInfo hit) {
-//		hits[size] = hit;
-//		size++;
-//	};
-};
-
-//inline std::ostream & operator<<(std::ostream& out, const Path& p) {
-//	out << "Path:" << std::endl;
-//	for (int i = 0; i < p.size; i++) {
-//		out << "[" << i << "] = " << p.hits[i].P << ", " << p.hits[i].N << std::endl;
-//	}
-//	return out;
-//}
+#include "Scene.h"
 
 class MLT
 {
 public:	
-	MLT(void) {};
-	/*MLT(Scene& scene) : scene(scene) {};*/
+	MLT(Scene& scene) : scene(scene) {};
 	~MLT(void) {};
-	/*float mutate(float value);											
-	void tracePath(Path& path, const Ray &ray, int recDepth, bool log);
-	Path generateEyePath(Ray& eyeRay);*/
+	float mutate(float value);											
+	/*void tracePath(std::vector<HitInfo>& path, const Ray &ray, int recDepth, bool log);
+	std::vector<HitInfo> generateEyePath(Ray& eyeRay);*/
 private:
-	//Scene& scene;
+	Scene& scene;
 };
 
+#endif // CSE168_MLT_H_INCLUDED

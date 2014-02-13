@@ -10,5 +10,7 @@ class HDRMaterial : public Material {
     
     virtual Vector3 shade(const Ray& ray, const HitInfo& hit,
                           const Scene& scene, const int recDepth) const;
+
+	virtual Ray bounceRay(const Ray& ray, const HitInfo& hit) const;
 };
 

@@ -5,6 +5,7 @@
 #include "Miro.h"
 #include "Material.h"
 
+
 class Object
 {
 public:

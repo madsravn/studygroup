@@ -23,12 +23,12 @@ Vector3 ReflectionMaterial::shade(const Ray& ray, const HitInfo& hit, const Scen
 	}
 };
 
-//Vector3 ReflectionMaterial::shade(const Path path, const int pathPosition, const Scene& scene, bool log = false) const {
-//	if(pathPosition + 1 > path.size) { // Not last element
-//		return path.hits[pathPosition + 1].material->shade(path, pathPosition + 1, scene, log);	
-//	}
-//	return Vector3(0,0,0);
-//};
+Vector3 ReflectionMaterial::shade(const Path path, const int pathPosition, const Scene& scene, bool log = false) const {
+	if(pathPosition + 1 > path.size) { // Not last element
+		return path.hits[pathPosition + 1].material->shade(path, pathPosition + 1, scene, log);	
+	}
+	return Vector3(0,0,0);
+};
 
 Ray ReflectionMaterial::bounceRay(const Ray& ray, const HitInfo& hit) const {
 	Vector3 vReflect = ray.d - 2.0f * dot(ray.d, hit.N) * hit.N;
