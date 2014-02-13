@@ -115,7 +115,7 @@ void
 
 	int pfmWidth = 1500, pfmHeight = 1500;
 	pfmImage = readPFMImage("hdr/stpeters_probe.pfm", &pfmWidth, &pfmWidth);
-
+/*
 #if !defined (_WIN32)
     std::cout << "Multithreaded" << std::endl;
     std::vector<std::future<void>> futures;
@@ -144,7 +144,7 @@ void
     glFinish();
 
 #else
-
+*/
     //OLD STUFF
     
 	// loop over all pixels in the image
@@ -172,7 +172,7 @@ void
 		printf("Rendering Progress: %.3f%%\r", j/float(img->height())*100.0f);
 		fflush(stdout);
 	}
-#endif
+//#endif
 
 	printf("Rendering Progress: 100.000%\n");
 
