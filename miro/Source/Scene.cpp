@@ -149,7 +149,7 @@ void
     
 	// loop over all pixels in the image
 
-	//MLT mlt = MLT(*this);
+	MLT mlt = MLT(*this);
 	for (int j = 0; j < img->height(); ++j)
 	{
 		for (int i = 0; i < img->width(); ++i)
@@ -157,9 +157,9 @@ void
 			
 			ray = cam->eyeRay(i, j, img->width(), img->height());	
 			
-			/*Path path = mlt.generateEyePath(ray);
-
-			if (path.size > 1) {
+			std::vector<HitInfo> path = mlt.generateEyePath(ray);
+/*
+			if (path.size() > 1) {
 				std::cout << path << std::endl;
 			}*/
 			//shadeResult = basicShading(ray);
@@ -180,13 +180,15 @@ void
 	debug("done Raytracing!\n");
 }
 
-//Vector3 Scene::pathTraceFromPath(Path path) {
-//	Vector3 shadeResult = Vector3(0.0f);
-//
-//	for (int i = 1; i < path.size; i++) { // 0 = eye point	
-//		HitInfo hit = path.hits[i];
-//	}
-//}
+Vector3 Scene::pathTraceFromPath(std::vector<HitInfo> path) {
+	Vector3 shadeResult = Vector3(0.0f);
+
+	for (int i = 1; i < path.size(); i++) { // 0 = eye point	
+		HitInfo hit = path.at(i);
+	}
+
+	return shadeResult;
+}
 
 Vector3 Scene::tracePath(const Ray &ray, int recDepth, bool log) {
 
@@ -197,6 +199,37 @@ Vector3 Scene::tracePath(const Ray &ray, int recDepth, bool log) {
 	if (trace(hitInfo, ray, 0.0001f)) {
 		shadeResult += (hitInfo.material->shade(ray, hitInfo, *this, recDepth));		
 	} 
+
+	return shadeResult;
+}
+
+
+Vector3 Scene::pathTraceShading(const Ray &ray, bool log) {
+	HitInfo hitInfo;
+	Vector3 shadeResult = 0;
+
+    if(log) std::cout << "Ray is " << ray << std::endl;		
+
+	float inversePathSamples = 1.0f / (float)(pathSamples);
+	for (int i = 0; i < pathSamples; ++i) {	
+		// Trace new ray
+		if (trace(hitInfo, ray, 0.0001f)) {
+			shadeResult += hitInfo.material->shade(ray, hitInfo, *this, 0) * inversePathSamples;		
+		} 
+	}		
+
+	return shadeResult;
+}
+
+Vector3 Scene::basicShading(const Ray &ray) {
+	
+	HitInfo hitInfo;
+	Vector3 shadeResult = 0;
+	
+	if (trace(hitInfo, ray, 0.0001f))
+	{
+		shadeResult += (hitInfo.material->shade(ray, hitInfo, *this, recDepth));
+	}	
 
 	return shadeResult;
 }
@@ -252,35 +285,6 @@ Vector3 Scene::biPathTraceShading(const Ray &ray) {
 	return shadeResult;
 }
 
-Vector3 Scene::pathTraceShading(const Ray &ray, bool log) {
-	HitInfo hitInfo;
-	Vector3 shadeResult = 0;
-
-    if(log) std::cout << "Ray is " << ray << std::endl;		
-
-	float inversePathSamples = 1.0f / (float)(pathSamples);
-	for (int i = 0; i < pathSamples; ++i) {	
-		// Trace new ray
-		if (trace(hitInfo, ray, 0.0001f)) {
-			shadeResult += hitInfo.material->shade(ray, hitInfo, *this, 0) * inversePathSamples;		
-		} 
-	}		
-
-	return shadeResult;
-}
-
-Vector3 Scene::basicShading(const Ray &ray) {
-	
-	HitInfo hitInfo;
-	Vector3 shadeResult = 0;
-	
-	if (trace(hitInfo, ray, 0.0001f))
-	{
-		shadeResult += (hitInfo.material->shade(ray, hitInfo, *this, recDepth));
-	}	
-
-	return shadeResult;
-}
 
 bool
 Scene::trace(HitInfo& minHit, const Ray& ray, float tMin, float tMax) const

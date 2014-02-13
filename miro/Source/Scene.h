@@ -5,6 +5,7 @@
 #include "Object.h"
 #include "PointLight.h"
 #include "BVH.h"
+#include "MLT.h"
 
 class Camera;
 class Image;
@@ -31,7 +32,7 @@ public:
 	Vector3 pathTraceShading(const Ray &ray, bool log = false);
 	Vector3 tracePath(const Ray &ray, int recDepth, bool log = false);
 	Vector3 biPathTraceShading(const Ray &ray);	
-	//Vector3 pathTraceFromPath(Path path);
+	Vector3 pathTraceFromPath(std::vector<HitInfo> path);
 protected:
 
     Objects m_objects;
