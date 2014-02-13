@@ -360,17 +360,19 @@ void makeCornellBox2() {
     t->setMaterial(material); 
     g_scene->addObject(t);
 	
-	
-    // teapot
+
+	/* Meshes*/
 	TriangleMesh * mesh;
-    xform.setIdentity();
+
+    // teapot	
+    /*xform.setIdentity();
 	xform *= scale(.2, .2, .2);
 	xform *= rotate(30, 0, 1, 0);
     xform *= translate(-1, 0, 3);
     mesh = new TriangleMesh;
     mesh->load("mesh/teapot.obj", xform);
 	material = new Lambert(Vector3(0, 0, 0.5f));
-    addMeshTrianglesToScene(mesh, material);
+    addMeshTrianglesToScene(mesh, material);*/
 	
 
     // Sphere

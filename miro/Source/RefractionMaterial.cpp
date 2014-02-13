@@ -48,10 +48,11 @@ Vector3 RefractionMaterial::shade(const Ray& ray, const HitInfo& hit, const Scen
 }
 //
 Vector3 RefractionMaterial::shade(const std::vector<HitInfo>& path, const int pathPosition, const Scene& scene, bool log) const {
-	if(pathPosition + 1 > path.size()) { // Not last element
-		return path.at(pathPosition + 1).material->shade(path, pathPosition + 1, scene, log);	
+	Vector3 shadeResult = Vector3(0.0f);
+	if(pathPosition + 1 < path.size()) { // Not last element
+		shadeResult = path.at(pathPosition + 1).material->shade(path, pathPosition + 1, scene, log);	
 	}
-	return Vector3(0,0,0);
+	return shadeResult;
 }
 
 Ray RefractionMaterial::bounceRay(const Ray& ray, const HitInfo& hit) const {
@@ -79,4 +80,6 @@ Ray RefractionMaterial::bounceRay(const Ray& ray, const HitInfo& hit) const {
 	vRefract.normalize();
 
 	Ray rayRefract = Ray(Vector3(hit.P), vRefract);
+
+	return rayRefract;
 }

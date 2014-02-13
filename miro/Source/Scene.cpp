@@ -14,7 +14,7 @@
 Scene * g_scene = 0;
 const int recDepth = 5;
 const int pathBounces = 5;
-const int pathSamples = 8;
+const int pathSamples = 1;
 
 Vector3 Scene::getHDRColorFromVector(const Vector3 &direction) const {
 
@@ -153,18 +153,21 @@ void
 	for (int j = 0; j < img->height(); ++j)
 	{
 		for (int i = 0; i < img->width(); ++i)
-		{		
+		{
 			ray = cam->eyeRay(i, j, img->width(), img->height());	
 			
 			std::vector<HitInfo> path = mlt.generateEyePath(ray);
-			/*
-			if (path.size() > 1) {
+			
+			if (path.size() <= 1) {
 				std::cout << path << std::endl;
-			}*/
+			}
 			//shadeResult = basicShading(ray);
 			//shadeResult = pathTraceShading(ray);
 			//shadeResult = biPathTraceShading(ray);
 			shadeResult = pathTraceFromPath(path);
+			if (shadeResult == Vector3(0.0f)) {
+				std::cout << i << ", " << j << std::endl;
+			}
 			img->setPixel(i, j, shadeResult);
 		}
 		img->drawScanline(j);
@@ -181,7 +184,15 @@ void
 
 Vector3 Scene::pathTraceFromPath(std::vector<HitInfo> path) {
 	// Recursive shading
-	return path.at(1).material->shade(path, 1, *this);
+	Vector3 shadeResult = Vector3(1.0f);
+	if (path.size() < 2) {
+		return shadeResult;
+	}
+	float inversePathSamples = 1.0f / (float)(pathSamples);
+	for (int i = 0; i < pathSamples; ++i) {	
+		shadeResult += path.at(1).material->shade(path, 1, *this) * inversePathSamples;
+	}
+	return shadeResult;
 }
 
 Vector3 Scene::tracePath(const Ray &ray, int recDepth, bool log) {
@@ -190,6 +201,7 @@ Vector3 Scene::tracePath(const Ray &ray, int recDepth, bool log) {
 	Vector3 shadeResult = 0;
 
     if(log) std::cout << "Ray is " << ray << std::endl;
+
 	if (trace(hitInfo, ray, 0.0001f)) {
 		shadeResult += hitInfo.material->shade(ray, hitInfo, *this, recDepth);		
 	}
@@ -203,13 +215,17 @@ Vector3 Scene::pathTraceShading(const Ray &ray, bool log) {
 
     if(log) std::cout << "Ray is " << ray << std::endl;		
 
-	float inversePathSamples = 1.0f / (float)(pathSamples);
-	for (int i = 0; i < pathSamples; ++i) {	
-		// Trace new ray
-		if (trace(hitInfo, ray, 0.0001f)) {
-			shadeResult += hitInfo.material->shade(ray, hitInfo, *this, 0) * inversePathSamples;		
-		} 
-	}		
+	if (trace(hitInfo, ray, 0.0001f)) {
+		shadeResult += hitInfo.material->shade(ray, hitInfo, *this, 0);		
+	} 
+
+	//float inversePathSamples = 1.0f / (float)(pathSamples);
+	//for (int i = 0; i < pathSamples; ++i) {	
+	//	// Trace new ray
+	//	if (trace(hitInfo, ray, 0.0001f)) {
+	//		shadeResult += hitInfo.material->shade(ray, hitInfo, *this, 0) * inversePathSamples;		
+	//	} 
+	//}		
 
 	return shadeResult;
 }
