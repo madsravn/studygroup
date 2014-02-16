@@ -51,6 +51,44 @@ std::vector<HitInfo> initialPath() {
 	return std::vector<HitInfo>();
 }
 
+void MLT::run() {
+    
+    for (int j = 0; j < img->height(); ++j)
+	{
+		for (int i = 0; i < img->width(); ++i)
+		{
+			Ray ray = cam->eyeRay(i, j, img->width(), img->height());				
+			
+			std::vector<HitInfo> path = generateEyePath(ray);
+			
+			Vector3 shadeResult = pathTraceFromPath(path);
+			img->setPixel(i, j, shadeResult);
+		}
+		img->drawScanline(j);
+		glFinish();
+		printf("Rendering Progress: %.3f%%\r", j/float(img->height())*100.0f);
+		fflush(stdout);
+	}
+
+}
+
+Vector3 MLT::pathTraceFromPath(std::vector<HitInfo> path) {
+	// Recursive shading
+	Vector3 shadeResult = Vector3(0.0f);
+	if (path.size() < 2) {
+		return shadeResult;
+	}
+    const int pathSamples = 64;
+
+	float inversePathSamples = 1.0f / (float)(pathSamples);
+	for(int i = 0; i < pathSamples; i++) {
+		shadeResult += path.at(1).material->shade(path, 1, scene) * inversePathSamples;
+	}
+	
+	return shadeResult;
+}
+
+
 float acceptProb(float x, float y) {
 	// T(y > x) / T(x > y)
 	return 0;

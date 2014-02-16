@@ -25,6 +25,7 @@ TODO:	pathTraceFromRay producerer ikke HELT korrekt resultater. Der kommer et
 
 		1. pathTraceFromRay skal fixes så den producerer et perfekt resultat.
 		2. Den skal udvides/modificere med MLT, så den kan perturbere paths. 
+        pertube - der skal vi ændre pixel-positionen en smule eller ændre path en bitte smule - hvilken?
 		3. Vi skal have tilføjet muligheden for at MLT kan opdatere billedet 
 		   direkte, selvom jeg ikke er meget for den øgede coupling :p		
 */
@@ -162,33 +163,29 @@ void
     
 	// loop over all pixels in the image
 
-	MLT mlt = MLT(*this);
-	for (int j = 0; j < img->height(); ++j)
+	MLT mlt = MLT(*this, img, cam);
+	/*for (int j = 0; j < img->height(); ++j)
 	{
 		for (int i = 0; i < img->width(); ++i)
 		{
 			ray = cam->eyeRay(i, j, img->width(), img->height());				
 			
-			//std::vector<HitInfo> path = mlt.generateEyePath(ray);
+			std::vector<HitInfo> path = mlt.generateEyePath(ray);
 			
-			/*if (path.size() <= 1) {
-				std::cout << path << std::endl;
-			}*/
 			//shadeResult = basicShading(ray);
-			shadeResult = pathTraceShading(ray);
+			//shadeResult = pathTraceShading(ray);
 			//shadeResult = biPathTraceShading(ray);
-			//shadeResult = pathTraceFromPath(path);
-			/*if (shadeResult == Vector3(0.0f)) {
-				std::cout << i << ", " << j << std::endl;
-			}*/
+			shadeResult = pathTraceFromPath(path);
 			img->setPixel(i, j, shadeResult);
 		}
 		img->drawScanline(j);
 		glFinish();
 		printf("Rendering Progress: %.3f%%\r", j/float(img->height())*100.0f);
 		fflush(stdout);
-	}
+	}*/
 //#endif
+
+    mlt.run();
 
 	printf("Rendering Progress: 100.000%\n");
 
