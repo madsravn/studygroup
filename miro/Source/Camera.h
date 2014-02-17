@@ -51,6 +51,8 @@ public:
     inline const Vector3 & bgColor() const  {return m_bgColor;}
 
     Ray eyeRay(int x, int y, int imageWidth, int imageHeight);
+
+    void rayToPixels(const Ray& ray, int& x, int& y, int imageWidth, int imageHeight);
     
     void drawGL();
 

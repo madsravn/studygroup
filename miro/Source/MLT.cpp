@@ -53,11 +53,13 @@ std::vector<HitInfo> initialPath() {
 
 void MLT::run() {
     
+    int a,b;
     for (int j = 0; j < img->height(); ++j)
 	{
 		for (int i = 0; i < img->width(); ++i)
 		{
 			Ray ray = cam->eyeRay(i, j, img->width(), img->height());				
+            cam->rayToPixels(ray, a, b, img->width(), img->height());
 			
 			std::vector<HitInfo> path = generateEyePath(ray);
 			

@@ -96,6 +96,11 @@ Camera::drawGL()
               up().x, up().y, up().z);
 }
 
+// Project v onto u
+Vector3 proj(Vector3 u, Vector3 v) {
+    return (dot(v,u)/dot(u,u))*u;
+}
+
 
 Ray
 Camera::eyeRay(int x, int y, int imageWidth, int imageHeight)
@@ -104,13 +109,44 @@ Camera::eyeRay(int x, int y, int imageWidth, int imageHeight)
 	const Vector3 wDir = Vector3(-m_viewDir).normalize(); 
 	const Vector3 uDir = cross(m_up, wDir).normalize(); 
 	const Vector3 vDir = cross(wDir, uDir);    
+    //std::cout << wDir << uDir << vDir << std::endl;
 
 	// compute the pixel location in the world coordinate system
 	const float aspectRatio = (float)imageWidth / (float)imageHeight; 
 	const float imPlaneUPos = -((x + 0.5f) / (float)imageWidth - 0.5f); 
 	const float imPlaneVPos = -((y + 0.5f) / (float)imageHeight - 0.5f); 
+    //std::cout << "imPlaneUPos = " << imPlaneUPos << " and imPlaneVPos = " << imPlaneVPos << std::endl;
 	const Vector3 pixelPos = m_eye + (aspectRatio * FILM_SIZE * imPlaneUPos) * uDir + (FILM_SIZE * imPlaneVPos) * vDir + m_distance * wDir;
 
 			// set the eye ray
 	return Ray(m_eye, (m_eye - pixelPos).normalize());
 }
+
+void
+Camera::rayToPixels(const Ray& ray, int& x, int& y, int imageWidth, int imageHeight) {
+    // compute the camera coordinate system 
+	const Vector3 wDir = Vector3(-m_viewDir).normalize(); 
+	const Vector3 uDir = cross(m_up, wDir).normalize(); 
+	const Vector3 vDir = cross(wDir, uDir);    
+
+    // compute the pixel location in the world coordinate system
+    const float aspectRatio = (float)imageWidth / (float)imageHeight; 
+    Vector3 uDirProjection = proj(uDir, ray.d);
+    Vector3 vDirProjection = proj(vDir, ray.d);
+    Vector3 wDirProjection = proj(wDir, ray.d);
+    // pixelPos's wDir består bare af wDir*m_distance. Så hvis vi finder length(wDir*m_distance) og sammenligner den med wDirProjection
+    std::cout << "wDir*m_distance = " << wDir*m_distance << std::endl;
+    std::cout << "wDirProjection = " << wDirProjection << std::endl;
+
+    int sameDirection = 1;
+    if(dot(wDir*m_distance,wDirProjection) < 0) {
+        sameDirection = -1;
+    }
+    float scalar = sameDirection*(wDir*m_distance).length()/wDirProjection.length();
+    std::cout << "scalar = " << scalar << std::endl;
+
+    
+}
+
+
+//TODO: Produce a random ray within the image-space
