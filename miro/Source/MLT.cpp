@@ -60,7 +60,8 @@ void MLT::run() {
 		{
 			Ray ray = cam->eyeRay(i, j, img->width(), img->height());				
             /*cam->rayToPixels(ray, a, b, img->width(), img->height());
-            if(!(a == i && b == j)) {
+            if(!(a == i && b == j)) {                            
+                TODO: Add some error handling
                 std::cout << "ERROR with i = " << i << ", j = " << j << ", a = " << a << " and b = " << b << std::endl;
             }*/
 			

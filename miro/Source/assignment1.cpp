@@ -5,6 +5,7 @@
 #include "Camera.h"
 #include "Image.h"
 #include "Sphere.h"
+#include <string>
 
 #include "HDRMaterial.h"
 #include "PointLight.h"

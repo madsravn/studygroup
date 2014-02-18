@@ -35,6 +35,8 @@ public:
     inline void setBGColor(float x, float y, float z);
     inline void setBGColor(const Vector3& color);
 
+    Ray randomRay(int imageWidth, int imageHeight);
+
     inline void setFOV(float fov) { // FOV is in degree not radian
 		m_fov = fov;
 		m_distance = FILM_SIZE / (2.0f * tan(fov * DegToRad / 2.0f));

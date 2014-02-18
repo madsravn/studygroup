@@ -157,7 +157,7 @@ MiroWindow::keyboard(unsigned char key, int x, int y)
         case 'I':
         {
             char str[1024];
-            sprintf(str, "miro_%d.ppm", time(0));
+            sprintf(str, "miro_%d.ppm", (int)time(0));
             if (g_camera->isOpenGL())
             {
                 unsigned char* buf = new unsigned char[g_image->width()*g_image->height()*3];
