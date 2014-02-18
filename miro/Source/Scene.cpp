@@ -190,7 +190,7 @@ void
 
     mlt.run();
 
-	printf("Rendering Progress: 100.000%\n");
+	printf("Rendering Progress: 100.000%%\n");
 
 	debug("done Raytracing!\n");
 }
@@ -210,7 +210,7 @@ Vector3 Scene::pathTraceFromPath(std::vector<HitInfo> path) {
 	return shadeResult;
 }
 
-Vector3 Scene::pathTraceFromMLT(const Ray &ray, MLT &mlt) {	
+/*Vector3 Scene::pathTraceFromMLT(const Ray &ray, MLT &mlt) {	
 	Vector3 shadeResult = Vector3(0.0f);
 	
 
@@ -223,7 +223,7 @@ Vector3 Scene::pathTraceFromMLT(const Ray &ray, MLT &mlt) {
 	}
 
 	return shadeResult;
-}
+}*/
 
 Vector3 Scene::tracePath(const Ray &ray, int recDepth, bool log) {
 
