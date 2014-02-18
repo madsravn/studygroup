@@ -36,7 +36,8 @@ Lambert::~Lambert()
 }
 
 Vector3	Lambert::shade(const Ray& ray, const HitInfo& hit, const Scene& scene, const int recDepth, bool log) const {	
-	float m = maxVectorValue(Vector3(m_kd));
+    Vector3 vm_kd(m_kd);
+	float m = maxVectorValue((vm_kd));
 	if (recDepth > 7){ 		// Efter 7 bounces
 		if (rnd() >= m) { 
 			return Vector3(0.0f); 						// Hvorfor gør den dette? Skalerer farven til p = 1
@@ -51,7 +52,8 @@ Vector3	Lambert::shade(const Ray& ray, const HitInfo& hit, const Scene& scene, c
 	// Current point light selected at random
 	PointLight* pLight = lightlist->at(rand() % lightlist->size());
 	
-	illumination_direct = calcDirectIllum(HitInfo(hit), pLight, scene, illumination_direct);
+    HitInfo t_hit(hit);
+	illumination_direct = calcDirectIllum(t_hit, pLight, scene, illumination_direct);
 	
 	Ray randomRay = Ray(hit.P, generateRandomRayDirection(hit.N));
 	HitInfo randomRayHit;
@@ -71,7 +73,8 @@ Vector3 Lambert::shade(const std::vector<HitInfo>& path, const int pathPosition,
 		return Vector3(0.0f);
 	}
 
-	float m = maxVectorValue(Vector3(m_kd));
+    Vector3 vm_kd(m_kd);
+	float m = maxVectorValue(vm_kd);
 	if (pathPosition > 7 + 1){ 		// Efter 7 bounces
 		if (rnd() >= m) { 
 			return Vector3(0.0f); 						// Hvorfor gør den dette? Skalerer farven til p = 1
