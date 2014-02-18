@@ -60,6 +60,9 @@ void MLT::run() {
 		{
 			Ray ray = cam->eyeRay(i, j, img->width(), img->height());				
             cam->rayToPixels(ray, a, b, img->width(), img->height());
+            if(!(a == i && b == j)) {
+                std::cout << "ERROR with i = " << i << ", j = " << j << ", a = " << a << " and b = " << b << std::endl;
+            }
 			
 			std::vector<HitInfo> path = generateEyePath(ray);
 			
