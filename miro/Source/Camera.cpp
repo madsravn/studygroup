@@ -8,6 +8,7 @@
 #include "Console.h" 
 #include "OpenGL.h"
 #include <cmath>
+#include "Utils.h"
 
 Camera * g_camera = 0;
 
@@ -125,6 +126,14 @@ Camera::eyeRay(int x, int y, int imageWidth, int imageHeight)
 	return Ray(m_eye, (m_eye - pixelPos).normalize());
 }
 
+Ray
+Camera::randomRay(int imageWidth, int imageHeight) {
+    int x = rnd()*imageWidth;
+    int y = rnd()*imageHeight;
+    return eyeRay(x,y,imageWidth, imageHeight);
+}
+
+
 float divideBy(Vector3 a, Vector3 b) {
     const float totient = 0.0000001f;
     for(int i = 0; i < 3; ++i) {
@@ -170,11 +179,8 @@ Camera::rayToPixels(const Ray& ray, int& x, int& y, int imageWidth, int imageHei
     //std::cout << "x = " << x << " og y = " << y << std::endl;
     //const float imPlaneUPos = -((x + 0.5f) / (float)imageWidth - 0.5f); 
 	//const float imPlaneVPos = -((y + 0.5f) / (float)imageHeight - 0.5f); 
-
-
-
-    
 }
+
 
 
 //TODO: Produce a random ray within the image-space
