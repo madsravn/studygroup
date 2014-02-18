@@ -14,8 +14,7 @@
 Scene * g_scene = 0;
 const int recDepth = 5;
 const int pathBounces = 5;
-const int pathSamples = 64;
-
+const int pathSamples = 1;
 
 /*
 TODO:	pathTraceFromRay producerer ikke HELT korrekt resultater. Der kommer et 
@@ -164,7 +163,7 @@ void
 	// loop over all pixels in the image
 
 	MLT mlt = MLT(*this, img, cam);
-	/*for (int j = 0; j < img->height(); ++j)
+	for (int j = 0; j < img->height(); ++j)
 	{
 		for (int i = 0; i < img->width(); ++i)
 		{
@@ -172,17 +171,21 @@ void
 			
 			std::vector<HitInfo> path = mlt.generateEyePath(ray);
 			
-			//shadeResult = basicShading(ray);
-			//shadeResult = pathTraceShading(ray);
-			//shadeResult = biPathTraceShading(ray);
+			shadeResult = basicShading(ray);
+			shadeResult = pathTraceShading(ray);
+			shadeResult = biPathTraceShading(ray);
 			shadeResult = pathTraceFromPath(path);
+			shadeResult = pathTraceFromPath(path);
+
+			if(shadeResult.x > 1 && shadeResult.y > 1 && shadeResult.z > 1)
+				std::cout << i << ", " << j << ":\t" << shadeResult << std::endl;			
 			img->setPixel(i, j, shadeResult);
 		}
 		img->drawScanline(j);
 		glFinish();
 		printf("Rendering Progress: %.3f%%\r", j/float(img->height())*100.0f);
 		fflush(stdout);
-	}*/
+	}
 //#endif
 
     mlt.run();
@@ -204,6 +207,21 @@ Vector3 Scene::pathTraceFromPath(std::vector<HitInfo> path) {
 		shadeResult += path.at(1).material->shade(path, 1, *this) * inversePathSamples;
 	}
 	
+	return shadeResult;
+}
+
+Vector3 Scene::pathTraceFromMLT(const Ray &ray, MLT &mlt) {	
+	Vector3 shadeResult = Vector3(0.0f);
+	
+
+	float inversePathSamples = 1.0f / (float)(pathSamples);
+	for(int i = 0; i < pathSamples; i++) {
+		std::vector<HitInfo> path = mlt.generateEyePath(ray);
+		if (path.size() > 1) {
+			shadeResult += path.at(1).material->shade(path, 1, *this) * inversePathSamples;
+		}
+	}
+
 	return shadeResult;
 }
 

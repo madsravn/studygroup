@@ -33,6 +33,7 @@ public:
 	Vector3 tracePath(const Ray &ray, int recDepth, bool log = false);
 	Vector3 biPathTraceShading(const Ray &ray);	
 	Vector3 pathTraceFromPath(std::vector<HitInfo> path);
+	Vector3 pathTraceFromMLT(const Ray &ray, MLT &mlt);
 protected:
 
     Objects m_objects;

@@ -4,7 +4,7 @@ const int maxRecDepth  = 10; // TODO: Flyt denne konstant, evt. til en klasse me
 const int maxEyeEvents = 10;
 
  //Recursive path tracing
-void MLT::tracePath(std::vector<HitInfo>& path, const Ray &ray, int recDepth, bool log) {
+void MLT::tracePath(std::vector<HitInfo>& path, const Ray &ray, int recDepth, bool log) const {
 	
 	if(recDepth >= maxRecDepth)	return;
 	
@@ -22,7 +22,7 @@ void MLT::tracePath(std::vector<HitInfo>& path, const Ray &ray, int recDepth, bo
 }
 
 // Trace path from eye
-std::vector<HitInfo> MLT::generateEyePath(Ray& eyeRay) {
+std::vector<HitInfo> MLT::generateEyePath(const Ray& eyeRay) const {
 	std::vector<HitInfo> result;	
 	result.push_back(HitInfo(0.0f, eyeRay.o));
 

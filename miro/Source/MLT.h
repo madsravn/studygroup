@@ -13,11 +13,11 @@ class MLT
 public:	
 	MLT(Scene& scene, Image* image, Camera* camera) : scene(scene), img(image), cam(camera) {};
 	~MLT(void) {};
-	float mutate(float value);											
-	void tracePath(std::vector<HitInfo>& path, const Ray &ray, int recDepth, bool log = false);
-	std::vector<HitInfo> generateEyePath(Ray& eyeRay);
+	float mutate(float value);
     void run();
     Vector3 pathTraceFromPath(std::vector<HitInfo> path);
+	void tracePath(std::vector<HitInfo>& path, const Ray &ray, int recDepth, bool log = false) const;
+	std::vector<HitInfo> generateEyePath(const Ray& eyeRay) const;
 private:
 	Scene& scene;
     Image* img;
