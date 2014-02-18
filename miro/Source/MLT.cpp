@@ -3,6 +3,7 @@
 const int maxRecDepth  = 10; // TODO: Flyt denne konstant, evt. til en klasse med konstanter
 const int maxEyeEvents = 10;
 
+
  //Recursive path tracing
 void MLT::tracePath(std::vector<HitInfo>& path, const Ray &ray, int recDepth, bool log) const {
 	
@@ -51,22 +52,21 @@ std::vector<HitInfo> initialPath() {
 	return std::vector<HitInfo>();
 }
 
-void MLT::run() {
-    
+void MLT::run() {    
     int a,b;
     for (int j = 0; j < img->height(); ++j)
 	{
 		for (int i = 0; i < img->width(); ++i)
 		{
 			Ray ray = cam->eyeRay(i, j, img->width(), img->height());				
-            cam->rayToPixels(ray, a, b, img->width(), img->height());
+            /*cam->rayToPixels(ray, a, b, img->width(), img->height());
             if(!(a == i && b == j)) {
                 std::cout << "ERROR with i = " << i << ", j = " << j << ", a = " << a << " and b = " << b << std::endl;
-            }
+            }*/
 			
-			std::vector<HitInfo> path = generateEyePath(ray);
+			std::vector<HitInfo> path;
 			
-			Vector3 shadeResult = pathTraceFromPath(path);
+			Vector3 shadeResult = pathTraceFromPath(path, ray);
 			img->setPixel(i, j, shadeResult);
 		}
 		img->drawScanline(j);
@@ -74,22 +74,20 @@ void MLT::run() {
 		printf("Rendering Progress: %.3f%%\r", j/float(img->height())*100.0f);
 		fflush(stdout);
 	}
-
 }
 
-Vector3 MLT::pathTraceFromPath(std::vector<HitInfo> path) {
+Vector3 MLT::pathTraceFromPath(std::vector<HitInfo> path, Ray &ray) const{
 	// Recursive shading
 	Vector3 shadeResult = Vector3(0.0f);
-	if (path.size() < 2) {
-		return shadeResult;
-	}
-    const int pathSamples = 64;
 
-	float inversePathSamples = 1.0f / (float)(pathSamples);
-	for(int i = 0; i < pathSamples; i++) {
-		shadeResult += path.at(1).material->shade(path, 1, scene) * inversePathSamples;
-	}
-	
+	float inverseSamples = 1.0f / (float)(samples);
+	for(int i = 0; i < samples; i++) {
+		path = generateEyePath(ray);
+		if (path.size() >= 2) {
+			shadeResult += path.at(1).material->shade(path, 1, scene) * inverseSamples;
+			
+		}
+	}	
 	return shadeResult;
 }
 
@@ -98,18 +96,3 @@ float acceptProb(float x, float y) {
 	// T(y > x) / T(x > y)
 	return 0;
 }
-
-//Image* MLT() {
-//	std::vector<HitInfo> x = initialPath();
-//	Image * img = 0;
-//	for (int i = 1; i < 10000; i++) {
-//		std::vector<HitInfo> y = mutate(x);
-//		float lum_x = x.getLuminance();
-//		float lum_y = y.getLuminance();
-//		float acceptance = acceptProb(lum_x, lum_y);			// T(y < x) / T(x < y)
-//		if (rnd() < acceptance)
-//			x = y;
-//		recordSample(img, x);
-//	}
-//	return img;
-//}
