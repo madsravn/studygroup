@@ -2,6 +2,7 @@
 #define CSE168_LAMBERT_H_INCLUDED
 
 #include "Material.h"
+#include "Scene.h"
 
 class Lambert : public Material
 {

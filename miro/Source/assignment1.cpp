@@ -90,8 +90,8 @@ void makeCornellBox() {
     PointLight * light = new PointLight;
     light->setPosition(Vector3(0, 1.8, -.5));    
 	light->setColor(Vector3(1.0f));
-    light->setWattage(20);
-    light->setRadius(0.1f);
+    light->setWattage(10);
+    light->setRadius(0.5f);
     g_scene->addLight(light);
 
 	// create and place a point light source
@@ -99,8 +99,8 @@ void makeCornellBox() {
     light->setPosition(Vector3(.5, .5, 1));
     light->setColor(Vector3(.73, 0.596, 0.357));
 	//light->setColor(Vector3(1.0f));
-    light->setWattage(5);
-    light->setRadius(0.02f);
+    light->setWattage(4);
+    light->setRadius(0.2f);
     g_scene->addLight(light);
 
 	light = new PointLight;

@@ -14,7 +14,7 @@
 Scene * g_scene = 0;
 const int recDepth = 5;
 const int pathBounces = 5;
-const int pathSamples = 64;
+const int pathSamples = 128;
 
 /*
 TODO:	pathTraceFromRay producerer ikke HELT korrekt resultater. Der kommer et 
@@ -26,7 +26,7 @@ TODO:	pathTraceFromRay producerer ikke HELT korrekt resultater. Der kommer et
 		2. Den skal udvides/modificere med MLT, så den kan perturbere paths. 
         pertube - der skal vi ændre pixel-positionen en smule eller ændre path en bitte smule - hvilken?
 		3. Vi skal have tilføjet muligheden for at MLT kan opdatere billedet 
-		   direkte, selvom jeg ikke er meget for den øgede coupling :p		
+		   direkte, selvom jeg ikke er meget for den øgede coupling :p	
 */
 
 Vector3 Scene::getHDRColorFromVector(const Vector3 &direction) const {

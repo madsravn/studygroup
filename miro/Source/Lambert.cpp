@@ -1,6 +1,5 @@
 #include "Lambert.h"
 #include "Ray.h"
-#include "Scene.h"
 #include "PFMLoader.h"
 #include "Utils.h"
 
