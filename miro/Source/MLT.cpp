@@ -20,6 +20,8 @@ void MLT::tracePath(std::vector<HitInfo>& path, const Ray &ray, int recDepth, bo
 	path.push_back(HitInfo(hit));	
 	
 	Ray randomRay = hit.material->bounceRay(ray, hit);		// TODO: Reflection and Refraction
+	if (randomRay.d == Vector3(0.0f)) return;
+
 	tracePath(path, randomRay, recDepth + 1, log);
 }
 
@@ -59,8 +61,8 @@ void MLT::run() {
 	{
 		for (int i = 0; i < img->width(); ++i)
 		{
-			//Ray ray = cam->eyeRay(i, j, img->width(), img->height());				
-            Ray ray = cam->randomRay(img->width(), img->height());
+			Ray ray = cam->eyeRay(i, j, img->width(), img->height());				
+            //Ray ray = cam->randomRay(img->width(), img->height());
 
             cam->rayToPixels(ray, a, b, img->width(), img->height());
 
@@ -68,19 +70,19 @@ void MLT::run() {
 			std::vector<HitInfo> path;
 			
 			Vector3 shadeResult = pathTraceFromPath(path, ray);
-			//img->setPixel(i, j, shadeResult);
-            img->setPixel(a, b, shadeResult);
+			img->setPixel(i, j, shadeResult);
+            //img->setPixel(a, b, shadeResult);
 
 		}
-		//img->drawScanline(j);
-		//glFinish();
+		img->drawScanline(j);
+		glFinish();
 		printf("Rendering Progress: %.3f%%\r", j/float(img->height())*100.0f);
 		fflush(stdout);
-	}
+	}/*
     for(int j = 0; j < img->height(); ++j) {
         img->drawScanline(j);
         glFinish();
-    }
+    }*/
 }
 
 Vector3 MLT::pathTraceFromPath(std::vector<HitInfo> path, Ray &ray) const{

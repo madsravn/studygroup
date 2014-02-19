@@ -10,6 +10,8 @@ double M_PI = 3.14159265358979;
 double M_1_PI = 1.0/M_PI;
 #endif
 
+bool softShadows = true;
+
 Lambert::Lambert(const Vector3 & kd, const Vector3 & ka) :
 	m_kd(kd), m_ka(ka)
 {
@@ -47,13 +49,10 @@ Vector3	Lambert::shade(const Ray& ray, const HitInfo& hit, const Scene& scene, c
 	Vector3 illumination_direct = Vector3(0.0f);
 	Vector3 illumination_indirect = Vector3(0.0f);
 
+	HitInfo t_hit(hit);
 	const Lights *lightlist = scene.lights();
 
-	// Current point light selected at random
-	PointLight* pLight = lightlist->at(rand() % lightlist->size());
-	
-    HitInfo t_hit(hit);
-	illumination_direct = calcDirectIllum(t_hit, pLight, scene, illumination_direct);
+	illumination_direct = calcDirectIllum(t_hit, lightlist, scene, illumination_direct);
 	
 	Ray randomRay = Ray(hit.P, generateRandomRayDirection(hit.N));
 	HitInfo randomRayHit;
@@ -87,11 +86,8 @@ Vector3 Lambert::shade(const std::vector<HitInfo>& path, const int pathPosition,
 	HitInfo hit = path.at(pathPosition);
 
 	const Lights *lightlist = scene.lights();
-
-	// Current point light selected at random
-	PointLight* pLight = lightlist->at(rand() % lightlist->size());
 	
-	illumination_direct = calcDirectIllum(hit, pLight, scene, illumination_direct);
+	illumination_direct = calcDirectIllum(hit, lightlist, scene, illumination_direct);
 
 	// Next ray bounce
 	if (path.size() > pathPosition + 1) {
@@ -105,9 +101,18 @@ Vector3 Lambert::shade(const std::vector<HitInfo>& path, const int pathPosition,
 	return m_kd*(illumination_direct + illumination_indirect);
 };
 
-Vector3 Lambert::calcDirectIllum(HitInfo &hit, PointLight* pLight, const Scene &scene, Vector3 illumination_direct) const {
+Vector3 Lambert::calcDirectIllum(const HitInfo &hit, const Lights *lightlist, const Scene &scene, Vector3 illumination_direct) const {
+	
+	// Current point light selected at random
+	PointLight* pLight = lightlist->at(rand() % lightlist->size());
+	
 	// Light vector
-	Vector3 lv = (pLight->position() - hit.P).normalized();
+	Vector3 lv;
+	if (softShadows){
+		lv = (pLight->randomPointonLight(hit.P) - hit.P).normalized();
+	} else {
+		lv = (pLight->position() - hit.P).normalized();
+	}
 
 	// Shadow ray test
 	HitInfo lightHit;

@@ -25,7 +25,7 @@ public:
 	virtual Vector3 shade(const std::vector<HitInfo>& path, const int pathPosition, 
                           const Scene& scene, bool log = false) const;
 
-	Vector3 calcDirectIllum(HitInfo &hit, PointLight* pLight, const Scene &scene, Vector3 illumination_direct) const;
+	Vector3 calcDirectIllum(const HitInfo &hit, const Lights *lightlist, const Scene &scene, Vector3 illumination_direct) const;
 
 	virtual Ray bounceRay(const Ray& ray, const HitInfo& hit) const;
 

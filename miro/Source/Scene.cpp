@@ -184,14 +184,11 @@ void
 	//	printf("Rendering Progress: %.3f%%\r", j/float(img->height())*100.0f);
 	//	fflush(stdout);
 	//}
-//#endif
+	//#endif
 
 	printf("Rendering Progress: 100.000%%\n");
-
 	debug("done Raytracing!\n");
 }
-
-
 
 /*Vector3 Scene::pathTraceFromMLT(const Ray &ray, MLT &mlt) {	
 	Vector3 shadeResult = Vector3(0.0f);	
