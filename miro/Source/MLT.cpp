@@ -1,12 +1,17 @@
 #include "MLT.h"
-#include "MarkovChain.h"
 
 const int maxRecDepth  = 10; // TODO: Flyt denne konstant, evt. til en klasse med konstanter
 const int maxEyeEvents = 10;
 
 
+MLT::MLT(Scene& scene, Image* image, Camera* camera, int pathSamples) : scene(scene), img(image), cam(camera), samples(pathSamples) {
+    MC.imageWidth = image->width();
+    MC.imageHeight = image->height();
+}
+
+
  //Recursive path tracing
-void MLT::tracePath(std::vector<HitInfo>& path, const Ray &ray, int recDepth, bool log) const {
+void MLT::tracePath(std::vector<HitInfo>& path, const Ray &ray, int recDepth, const MarkovChain& MC, bool log) const {
 	
 	if(recDepth >= maxRecDepth)	return;
 	
@@ -19,18 +24,19 @@ void MLT::tracePath(std::vector<HitInfo>& path, const Ray &ray, int recDepth, bo
 	
 	path.push_back(HitInfo(hit));	
 	
-	Ray randomRay = hit.material->bounceRay(ray, hit);		// TODO: Reflection and Refraction
+	Ray randomRay = hit.material->bounceRay(ray, hit, MC);		// TODO: Reflection and Refraction
+    //TODO: FIX!
 	if (randomRay.d == Vector3(0.0f)) return;
 
-	tracePath(path, randomRay, recDepth + 1, log);
+	tracePath(path, randomRay, recDepth + 1, MC, log);
 }
 
 // Trace path from eye
-std::vector<HitInfo> MLT::generateEyePath(const Ray& eyeRay) const {
+std::vector<HitInfo> MLT::generateEyePath(const Ray& eyeRay, const MarkovChain& MC) const {
 	std::vector<HitInfo> result;	
 	result.push_back(HitInfo(0.0f, eyeRay.o));
 
-	tracePath(result, eyeRay, 1);
+	tracePath(result, eyeRay, 1, MC);
 	return result;
 }
 
@@ -91,7 +97,7 @@ Vector3 MLT::pathTraceFromPath(std::vector<HitInfo> path, Ray &ray) const{
 
 	float inverseSamples = 1.0f / (float)(samples);
 	for(int i = 0; i < samples; i++) {
-		path = generateEyePath(ray);
+		path = generateEyePath(ray, MC);
 		if (path.size() >= 2) {
 			shadeResult += path.at(1).material->shade(path, 1, scene) * inverseSamples;
 			

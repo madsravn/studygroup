@@ -55,7 +55,7 @@ Vector3 RefractionMaterial::shade(const std::vector<HitInfo>& path, const int pa
 	return shadeResult;
 }
 
-Ray RefractionMaterial::bounceRay(const Ray& ray, const HitInfo& hit) const {
+Ray RefractionMaterial::bounceRay(const Ray& ray, const HitInfo& hit, const MarkovChain& MC) const {
 
 	// specular refraction
 	float costheta1 = dot(hit.N, -ray.d);

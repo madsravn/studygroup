@@ -4,8 +4,11 @@
 double rnd(void);  
 // Based on Toshiyas smallpsmlt
 // theory: http://people.cs.kuleuven.be/~philip.dutre/GI/TotalCompendium.pdf  
-Vector3 generateRandomRayDirection(Vector3 normal);
+Vector3 generateRandomRayDirection(Vector3 normal, float rand1, float rand2);
+Vector3 generateRandomRayDirection(float rand1, float rand2);
 Vector3 generateRandomRayDirection();
+Vector3 generateRandomRayDirection(Vector3 normal);
+
 double maxVectorValue(Vector3 &vector);
 double luminance(Vector3 color);
 Vector3 clamp(Vector3 vector, float lowerBound, float upperBound);

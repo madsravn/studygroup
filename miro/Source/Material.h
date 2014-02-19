@@ -4,6 +4,7 @@
 #include "Miro.h"
 #include "Vector3.h"
 #include "Ray.h"
+#include "MarkovChain.h"
 #include <vector>
 
 class Material
@@ -22,7 +23,7 @@ public:
 	
 	virtual Vector3 shade(const std::vector<HitInfo>& path, const int pathPosition, const Scene& scene, bool log = false) const;
 	
-	virtual Ray bounceRay(const Ray& ray, const HitInfo& hit) const;
+	virtual Ray bounceRay(const Ray& ray, const HitInfo& hit,const  MarkovChain& MC) const;
 };
 
 #endif // CSE168_MATERIAL_H_INCLUDED

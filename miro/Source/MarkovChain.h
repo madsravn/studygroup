@@ -10,8 +10,11 @@ class MarkovChain {
         MarkovChain(int width, int height);
         MarkovChain large_step() const;
         MarkovChain mutate(int width, int height) const;
+        void reset();
+        double getNext() const;
         std::vector<double> u;
         int imageWidth, imageHeight;
+        mutable int pos;
 };
 
 class prdns {
