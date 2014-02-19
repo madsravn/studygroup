@@ -181,6 +181,3 @@ Camera::rayToPixels(const Ray& ray, int& x, int& y, int imageWidth, int imageHei
 	//const float imPlaneVPos = -((y + 0.5f) / (float)imageHeight - 0.5f); 
 }
 
-
-
-//TODO: Produce a random ray within the image-space
