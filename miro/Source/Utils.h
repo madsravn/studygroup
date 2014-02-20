@@ -24,7 +24,7 @@ inline double perturb(const double value, const double s1, const double s2) {
 		r = (r - 0.5) * 2.0;
 		Result = value - s2 * exp(-log(s2 / s1) * r); if (Result < 0.0) Result += 1.0;
 	}
-    std::cout << "Result = " << Result << std::endl;
+    //std::cout << "Result = " << Result << std::endl;
 	return Result;
 }
 

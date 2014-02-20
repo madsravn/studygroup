@@ -15,6 +15,7 @@ class MarkovChain {
         std::vector<double> u;
         int imageWidth, imageHeight;
         mutable int pos;
+        mutable int count;
 };
 
 class prdns {

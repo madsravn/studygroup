@@ -4,6 +4,7 @@
 
 MarkovChain::MarkovChain() {
     pos = 0;
+    count = 0;
     u.resize(states);
     for(int i = 0; i < states; ++i) {
         u[i] = rnd();
@@ -12,12 +13,14 @@ MarkovChain::MarkovChain() {
 
 void
 MarkovChain::reset() {
+    count = 0;
     pos = 0;
 }
 
 double
 MarkovChain::getNext() const {
     double ret = u.at(pos);
+    count++;
     pos = ( pos + 1 ) % u.size();
     return ret;
 }
@@ -25,6 +28,7 @@ MarkovChain::getNext() const {
 
 MarkovChain::MarkovChain(int width, int height) {
     pos = 0;
+    count = 0;
     imageWidth = width;
     imageHeight = height;
     u.resize(states);

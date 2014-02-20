@@ -6,6 +6,7 @@
 #include "Vector3.h"
 #include "Miro.h"
 #include "Ray.h"
+#include "MarkovChain.h"
 
 class Camera
 {
@@ -35,7 +36,7 @@ public:
     inline void setBGColor(float x, float y, float z);
     inline void setBGColor(const Vector3& color);
 
-    Ray randomRay(int imageWidth, int imageHeight);
+    Ray randomRay(int imageWidth, int imageHeight, const MarkovChain& MC);
 
     inline void setFOV(float fov) { // FOV is in degree not radian
 		m_fov = fov;

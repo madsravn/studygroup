@@ -62,13 +62,61 @@ std::vector<HitInfo> initialPath() {
 }
 
 void MLT::run() {    
-    int a,b;
-    for (int j = 0; j < img->height(); ++j)
+    int ai, bi;
+
+    double LargeStepProb = 0.3;
+
+    bool running = true;
+    MarkovChain current(img->width(), img->height());
+    MarkovChain proposal(img->width(), img->height());
+    const int count = 512*512;
+    int i = 0;
+    while( i < count) {
+
+        double isLargeStepDone;
+        if(rnd() <= LargeStepProb) {
+            isLargeStepDone = 1.0;
+            proposal = current.large_step();
+        } else {
+            isLargeStepDone = 0.0;
+            proposal = current.mutate(img->width(), img->height()); //TODO: Fix
+        }
+        //InitRandomNumbersByChain(proposal); // Det tror jeg ikke vi behøver - vi sender vores MarkovChain med i stedet.
+
+        //proposal.C = CombinePaths(Gene......); // Det skal vi lige have fikset
+        
+        double a = 0.5;
+
+
+        Ray ray = cam->randomRay(img->width(), img->height(), current);
+
+        cam->rayToPixels(ray, ai, bi, img->width(), img->height());
+
+        std::vector<HitInfo> path;
+
+        Vector3 shadeResult = pathTraceFromPath(path, ray);
+
+        img->setPixel(ai,bi, shadeResult);
+
+        i++;
+
+        if(rnd() <= a) {
+            current = proposal;
+        }
+    }
+
+    for(int j = 0; j < img->height(); ++j) {
+        img->drawScanline(j);
+        glFinish();
+    }
+
+
+    /*for (int j = 0; j < img->height(); ++j)
 	{
 		for (int i = 0; i < img->width(); ++i)
 		{
-			Ray ray = cam->eyeRay(i, j, img->width(), img->height());				
-            //Ray ray = cam->randomRay(img->width(), img->height());
+			//Ray ray = cam->eyeRay(i, j, img->width(), img->height());				
+            Ray ray = cam->randomRay(img->width(), img->height(), MC);
 
             cam->rayToPixels(ray, a, b, img->width(), img->height());
 
@@ -76,15 +124,17 @@ void MLT::run() {
 			std::vector<HitInfo> path;
 			
 			Vector3 shadeResult = pathTraceFromPath(path, ray);
-			img->setPixel(i, j, shadeResult);
-            //img->setPixel(a, b, shadeResult);
+			//img->setPixel(i, j, shadeResult);
+            img->setPixel(a, b, shadeResult);
+            std::cout << "MC.count = " << MC.count << std::endl;
+            MC.reset();
 
 		}
-		img->drawScanline(j);
-		glFinish();
+		//img->drawScanline(j);
+		//glFinish();
 		printf("Rendering Progress: %.3f%%\r", j/float(img->height())*100.0f);
 		fflush(stdout);
-	}/*
+	}
     for(int j = 0; j < img->height(); ++j) {
         img->drawScanline(j);
         glFinish();
