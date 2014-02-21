@@ -1,3 +1,6 @@
+#ifndef CONSTANTS_H_
+#define CONSTANTS_H_
+
 namespace Constants {
     const int MinPathLength = 3;
     const int MaxPathLength = 13;
@@ -8,4 +11,5 @@ namespace Constants {
     const int NumStatesSubpath = (MaxEvents + 2) * NumRNGsPerEvent;
     const int NumStates = NumStatesSubpath * 2;
 }
-    
+   
+#endif

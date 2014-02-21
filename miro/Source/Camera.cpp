@@ -129,8 +129,8 @@ Camera::eyeRay(int x, int y, int imageWidth, int imageHeight)
 Ray
 Camera::randomRay(int imageWidth, int imageHeight, const MarkovChain& MC) {
     // TODO: getNext eller de allerede pertuberede i den størrelse? 
-    int x = MC.getNext()*imageWidth;
-    int y = MC.getNext()*imageHeight;
+    int x = MC.get(0)*imageWidth;
+    int y = MC.get(1)*imageHeight;
     return eyeRay(x,y,imageWidth, imageHeight);
 }
 

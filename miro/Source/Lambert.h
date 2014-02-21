@@ -28,7 +28,7 @@ public:
 
 	Vector3 calcDirectIllum(const HitInfo &hit, const Lights *lightlist, const Scene &scene, Vector3 illumination_direct) const;
 
-	virtual Ray bounceRay(const Ray& ray, const HitInfo& hit, const MarkovChain& MC) const;
+	virtual Ray bounceRay(const Ray& ray, const HitInfo& hit, const int recDepth, const MarkovChain& MC) const;
 
 	Vector3 getHDRColorFromVector(const Vector3 &direction) const;
 	float glossiness;

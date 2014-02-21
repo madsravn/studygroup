@@ -24,7 +24,7 @@ void MLT::tracePath(std::vector<HitInfo>& path, const Ray &ray, int recDepth, co
 	
 	path.push_back(HitInfo(hit));	
 	
-	Ray randomRay = hit.material->bounceRay(ray, hit, MC);		// TODO: Reflection and Refraction
+	Ray randomRay = hit.material->bounceRay(ray, hit, recDepth, MC);		// TODO: Reflection and Refraction
     //TODO: FIX!
 	if (randomRay.d == Vector3(0.0f)) return;
 

@@ -2,6 +2,7 @@
 #include "Ray.h"
 #include "PFMLoader.h"
 #include "Utils.h"
+#include "Constants.h"
 
 #if defined(_WIN32)
 
@@ -125,8 +126,8 @@ Vector3 Lambert::calcDirectIllum(const HitInfo &hit, const Lights *lightlist, co
 	return illumination_direct;
 }
 
-Ray Lambert::bounceRay(const Ray& ray, const HitInfo& hit, const MarkovChain& MC) const {
-    double rand1 = MC.getNext();
-    double rand2 = MC.getNext();
+Ray Lambert::bounceRay(const Ray& ray, const HitInfo& hit, const int recDepth, const MarkovChain& MC) const {
+    double rand1 = MC.get(recDepth*Constants::NumRNGsPerEvent);
+    double rand2 = MC.get(recDepth*Constants::NumRNGsPerEvent + 1);
 	return Ray(hit.P, generateRandomRayDirection(hit.N, rand1, rand2));	
 }

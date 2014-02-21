@@ -1,8 +1,9 @@
 #ifndef MARKOVCHAIN_H_CSE68
 #define MARKOVCHAIN_H_CSE68
 #include <vector>
+#include "Constants.h"
 
-const int states = 128;
+const int states = Constants::NumStates;
 
 class MarkovChain {
     public:
@@ -16,6 +17,7 @@ class MarkovChain {
         int imageWidth, imageHeight;
         mutable int pos;
         mutable int count;
+        double get(int i) const;
 };
 
 class prdns {
