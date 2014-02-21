@@ -1,7 +1,7 @@
 #include "MLT.h"
+#include "Constants.h"
 
-const int maxRecDepth  = 10; // TODO: Flyt denne konstant, evt. til en klasse med konstanter
-const int maxEyeEvents = 10;
+const int maxRecDepth  = Constants::MaxPathLength; // TODO: Flyt denne konstant, evt. til en klasse med konstanter
 
 
 MLT::MLT(Scene& scene, Image* image, Camera* camera, int pathSamples) : scene(scene), img(image), cam(camera), samples(pathSamples) {
