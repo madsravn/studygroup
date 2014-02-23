@@ -6,6 +6,7 @@
 #include "Ray.h"
 #include "MarkovChain.h"
 #include <vector>
+#include <stdexcept>
 
 class Material
 {
