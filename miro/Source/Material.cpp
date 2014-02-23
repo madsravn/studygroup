@@ -22,3 +22,8 @@ Vector3 Material::shade(const std::vector<HitInfo>& path, const int pathPosition
 Ray Material::bounceRay(const Ray& ray, const HitInfo& hit,const MarkovChain& MC) const {
 	return Ray();
 }
+
+double Material::getPDF(Vector3 in, Vector3 out, Vector3 normal) const
+{
+	throw std::logic_error("The method or operation is not implemented.");
+}

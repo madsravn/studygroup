@@ -15,7 +15,6 @@
 #include "ReflectionMaterial.h"
 #include "RefractionMaterial.h"
 
-
 // local helper function declarations
 namespace
 {
@@ -24,7 +23,6 @@ inline Matrix4x4 translate(float x, float y, float z);
 inline Matrix4x4 scale(float x, float y, float z);
 inline Matrix4x4 rotate(float angle, float x, float y, float z);
 } // namespace
-
 
 void makeSquare(Vector3 c1, Vector3 c2, Vector3 c3, Vector3 c4, Vector3 n,
         Material* mat, Scene* g_scene) {
@@ -130,8 +128,7 @@ void makeCornellBox() {
 
 	// create the leftwall triangles
     makeSquare(Vector3(-1,0,1), Vector3(-1,0,-1), Vector3(-1,2,1), Vector3(-1,2,-1), Vector3(1,0,0),	new Lambert(Vector3(1.0f, 0.0f, 0.0f)), g_scene);
-	
-	
+		
 	TriangleMesh * mesh;
     xform.setIdentity();
 	xform *= scale(.2, .2, .2);

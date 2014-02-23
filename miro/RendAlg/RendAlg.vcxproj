@@ -47,6 +47,7 @@
     <ClCompile Include="..\Source\Image.cpp" />
     <ClCompile Include="..\Source\Lambert.cpp" />
     <ClCompile Include="..\Source\main.cpp" />
+    <ClCompile Include="..\Source\MarkovChain.cpp" />
     <ClCompile Include="..\Source\Material.cpp" />
     <ClCompile Include="..\Source\MiroWindow.cpp" />
     <ClCompile Include="..\Source\MLT.cpp" />
@@ -67,9 +68,11 @@
     <ClInclude Include="..\Source\BVH.h" />
     <ClInclude Include="..\Source\Camera.h" />
     <ClInclude Include="..\Source\Console.h" />
+    <ClInclude Include="..\Source\Contribution.h" />
     <ClInclude Include="..\Source\HDRMaterial.h" />
     <ClInclude Include="..\Source\Image.h" />
     <ClInclude Include="..\Source\Lambert.h" />
+    <ClInclude Include="..\Source\MarkovChain.h" />
     <ClInclude Include="..\Source\Material.h" />
     <ClInclude Include="..\Source\Matrix4x4.h" />
     <ClInclude Include="..\Source\Miro.h" />
@@ -78,6 +81,7 @@
     <ClInclude Include="..\Source\Node.h" />
     <ClInclude Include="..\Source\Object.h" />
     <ClInclude Include="..\Source\OpenGL.h" />
+    <ClInclude Include="..\Source\PathContribution.h" />
     <ClInclude Include="..\Source\PFMLoader.h" />
     <ClInclude Include="..\Source\PointLight.h" />
     <ClInclude Include="..\Source\Ray.h" />

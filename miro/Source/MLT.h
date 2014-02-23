@@ -8,6 +8,7 @@
 #include "Material.h"
 #include "Camera.h"
 #include "MarkovChain.h"
+#include "PathContribution.h"
 
 class MLT
 {
@@ -19,6 +20,13 @@ public:
 	void tracePath(std::vector<HitInfo>& path, const Ray &ray, int recDepth, const MarkovChain& MC, bool log = false) const;
 	std::vector<HitInfo> generateEyePath(const Ray& eyeRay, const MarkovChain& MC) const;
 	Vector3 pathTraceFromPath(std::vector<HitInfo> path, Ray &ray) const;
+	void accumulatePathContribution(const std::vector<HitInfo> path, const double scaling) const;
+	PathContribution calcPathContribution(const std::vector<HitInfo> path) const;
+	Vector3 pathTroughput(const std::vector<HitInfo> path) const;	
+	double pathProbabilityDensity(const std::vector<HitInfo> path) const;
+	double pathProbabilityDensity(const std::vector<HitInfo> path, int numEyeVertices) const;
+	double MISWeight(const std::vector<HitInfo> path, const int pathLength) const;
+	double directionToArea(const HitInfo current, const HitInfo next) const;
 private:
 	Scene& scene;
     Image* img;

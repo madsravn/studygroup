@@ -25,7 +25,6 @@ MarkovChain::getNext() const {
     return ret;
 }
 
-
 MarkovChain::MarkovChain(int width, int height) {
     pos = 0;
     count = 0;
@@ -36,7 +35,6 @@ MarkovChain::MarkovChain(int width, int height) {
         u[i] = rnd();
     }
 }
-
 
 MarkovChain
 MarkovChain::large_step() const {
@@ -59,7 +57,6 @@ MarkovChain::mutate(int width, int height) const {
     }
     return Result;
 }
-    
 
 void prdns::InitRandomNumbersByChain(const MarkovChain MC) {
     u.resize(states);
@@ -67,7 +64,6 @@ void prdns::InitRandomNumbersByChain(const MarkovChain MC) {
         u[i] = MC.u[i];
     }
 }
-
 
 void prdns::InitRandomNumbers() {
     u.resize(states);

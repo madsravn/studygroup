@@ -130,3 +130,7 @@ Ray Lambert::bounceRay(const Ray& ray, const HitInfo& hit, const MarkovChain& MC
     double rand2 = MC.getNext();
 	return Ray(hit.P, generateRandomRayDirection(hit.N, rand1, rand2));	
 }
+
+double Lambert::getPDF(Vector3 in, Vector3 out, Vector3 normal) const {
+	abs(dot(out, normal)) / PI;
+}

@@ -59,27 +59,6 @@ Vector3 Scene::getHDRColorFromVector(const Vector3 &direction) const {
     return Vector3(0,0,0);
 }
 
-// Can't remember where I found this algorithm, I took it from a project I made two years ago
-bool isPointInPolygon(const Vector3 &point, const int polygonSides) {
-	Vector3* points = new Vector3[polygonSides];
-	for (int i = 0; i < polygonSides; i++) {
-		points[i] = Vector3(
-			cos(2*(PI/polygonSides) * i),	//Polar to cartesian coordinates
-			sin(2*(PI/polygonSides) * i), 0);
-	}
-
-	int i, j = polygonSides - 1;
-
-	bool c = false;
-	for (i = 0, j = polygonSides-1; i < polygonSides; j = i++) {
-		if (((&points[i])->y > point.y  != (&points[j])->y > point.y ) &&
-			(point.x < ((&points[j])->x - (&points[i])->y) * (point.y -  (&points[i])->y) / ( (&points[j])->y -  (&points[i])->y) +  (&points[i])->x) )
-			c = !c;
-	}
-
-	return c;
-}
-
 void
 	Scene::openGL(Camera *cam)
 {

@@ -1,6 +1,7 @@
 #ifndef UTILS_H_CSE68
 #define UTILS_H_CSE68
 #include "Vector3.h"
+#include <vector>
 double rnd(void);  
 // Based on Toshiyas smallpsmlt
 // theory: http://people.cs.kuleuven.be/~philip.dutre/GI/TotalCompendium.pdf  
@@ -8,6 +9,13 @@ Vector3 generateRandomRayDirection(Vector3 normal, float rand1, float rand2);
 Vector3 generateRandomRayDirection(float rand1, float rand2);
 Vector3 generateRandomRayDirection();
 Vector3 generateRandomRayDirection(Vector3 normal);
+
+template <class T> 
+std::vector<T> subVector(const std::vector<T> vector, int start, int end) {
+	vector<T>::const_iterator first = vector.begin() + start;
+	vector<T>::const_iterator last = vector.begin() + end;
+	return vector<T>(first, last);
+};
 
 double maxVectorValue(Vector3 &vector);
 double luminance(Vector3 color);

@@ -114,35 +114,6 @@ void MLT::run() {
         glFinish();
     }
 
-
-    /*for (int j = 0; j < img->height(); ++j)
-	{
-		for (int i = 0; i < img->width(); ++i)
-		{
-			//Ray ray = cam->eyeRay(i, j, img->width(), img->height());				
-            Ray ray = cam->randomRay(img->width(), img->height(), MC);
-
-            cam->rayToPixels(ray, a, b, img->width(), img->height());
-
-			
-			std::vector<HitInfo> path;
-			
-			Vector3 shadeResult = pathTraceFromPath(path, ray);
-			//img->setPixel(i, j, shadeResult);
-            img->setPixel(a, b, shadeResult);
-            std::cout << "MC.count = " << MC.count << std::endl;
-            MC.reset();
-
-		}
-		//img->drawScanline(j);
-		//glFinish();
-		printf("Rendering Progress: %.3f%%\r", j/float(img->height())*100.0f);
-		fflush(stdout);
-	}
-    for(int j = 0; j < img->height(); ++j) {
-        img->drawScanline(j);
-        glFinish();
-    }*/
 }
 
 Vector3 MLT::pathTraceFromPath(std::vector<HitInfo> path, Ray &ray) const{
@@ -160,8 +131,123 @@ Vector3 MLT::pathTraceFromPath(std::vector<HitInfo> path, Ray &ray) const{
 	return shadeResult;
 }
 
+void MLT::accumulatePathContribution(const std::vector<HitInfo> path, const double scaling) const {
+	
+	for (int i = 0; i < path.size(); i++) {
+		const HitInfo &hit = path.at(i);
+		const int ix = 0, iy = 0;	// skal være pixel position
+		const Vector3 color;		// Skal være fladens farve * scaling
+		if (ix >= 0 && ix < img->width() && iy >= 0 && iy < img->height()) {
+			// pixel(x,y) += color
+		}
+	}
+	
+	/*
+	if (pc.sc == 0) return;
+	for (int i = 0; i < pc.n; i++) {
+		const int ix = int(pc.c[i].x), iy = int(pc.c[i].y); 
+		const Vec c = pc.c[i].c * mScaling;													// Scaled by a scalar
+		if ((ix < 0) || (ix >= PixelWidth) || (iy < 0) || (iy >= PixelHeight)) continue;	// Quits if the pixel exists?
+		img[ix + iy*PixelWidth] = img[ix + iy*PixelWidth] + c;								// Add color to pixel
+	}
+	*/
+}
+
+PathContribution MLT::calcPathContribution(const std::vector<HitInfo> path) const {
+	PathContribution result = PathContribution();
+
+	for (int pathLength = 3; pathLength <= 13; pathLength++) {
+		for (int numEyeVertices = 1; numEyeVertices <= std::min(pathLength + 1, (int)path.size()); numEyeVertices++) {
+
+			if (numEyeVertices > path.size()) continue;
+
+			std::vector<HitInfo> subPath = subVector(path, 0, numEyeVertices);
+			
+			Vector3 direction = (path.at(1).P - path.at(0).P).normalized();
+
+			double px = -1.0f, py = -1.0f;
+			// Set px and py based on the direction
+
+			Vector3 throughput = pathTroughput(subPath);
+			double probabilityDensity = pathProbabilityDensity(subPath, pathLength);	// Denne bliver også kørt inde i MISWeight, overflødigt
+			double weight = MISWeight(subPath, pathLength);
+			if (weight <= 0.0f || probabilityDensity <= 0.0f) continue;
+
+			Vector3 color = throughput * (weight / probabilityDensity);
+			// Assert color is positive
+			if (maxVectorValue(color) <= 0.0f) continue;
+
+			result.colors.push_back(Contribution(px, py, color));
+			result.scalarContribution = std::max(maxVectorValue(color), result.scalarContribution);
+		}
+	}
+	return result;
+}
+
+Vector3 MLT::pathTroughput(const std::vector<HitInfo> path) const {
+
+}
+
+// Probability density for path with a specific number of vertices
+double MLT::pathProbabilityDensity(const std::vector<HitInfo> path, int numEyeVertices) const {
+	double sumPDFs = 0.0f;
+
+	// extended BPT
+	double p = 1.0;
+
+	// sampling from the eye
+	for (int i = 1; i < numEyeVertices; i++) {		
+		if (i == 1) {  // First hit
+			p *= 1.0 / double(img->width() * img->height());						// divided by image size
+			Vector3 direction = (path.at(i + 1).P - path.at(i).P).normalized();		// Direction from first to second hit
+			double cosTheta = dot(direction, cam->viewDir());						// Cosine of angle from camera
+			double distanceToScreen = cam->distance() / cosTheta;					// Distance to screen from canvas/lens/whatever
+			distanceToScreen = distanceToScreen * distanceToScreen;					// Distance to screen squared
+			p /= (cosTheta / distanceToScreen);										// Divided by cosine of angle divided by distance to screen squared				
+
+		} else {																	// Other hits
+			// PDF of sampling ith vertex
+			Vector3 direction0 = (path.at(i - 1).P - path.at(i).P).normalized();
+			Vector3 direction1 = (path.at(i + 1).P - path.at(i).P).normalized();
+
+			p *= path.at(i).material->getPDF(direction0, direction1, path.at(i).N);					
+		}
+		p *= directionToArea(path.at(i), path.at(i + 1));
+	}
+	return p;
+}
+
+// Probability density for path with all numbers of vertices
+double MLT::pathProbabilityDensity(const std::vector<HitInfo> path) const {
+	double p = 0.0f;
+	for (int numEyeVertices = 0; numEyeVertices <= path.size() + 1; numEyeVertices++) {
+		p += pathProbabilityDensity(path, numEyeVertices);
+	}
+	return p;
+}
+
+
+double MLT::MISWeight(const std::vector<HitInfo> path, const int pathLength) const
+{
+	int numEyeVertices = path.size();
+	const double p_i = pathProbabilityDensity(path, numEyeVertices);
+	const double p_all = pathProbabilityDensity(path);
+
+	if(p_i || p_all == 0.0f) {    // Er dette rigtigt? Fancy C shit
+		return 0.0f;
+	} else {
+		return std::max(std::min(p_i / p_all, 1.0), 0.0);
+	}
+}
+
+double MLT::directionToArea(const HitInfo current, const HitInfo next) const {
+	const Vector3 dv = next.P - current.P;					// Distance between vertices
+	const double d2 = dot(dv, dv);							// Distance squared
+	return abs(dot(next.N, dv)) / (d2 * sqrt(d2));			// dot product of next normal and distance divided by d^3
+}
 
 float acceptProb(float x, float y) {
 	// T(y > x) / T(x > y)
 	return 0;
 }
+ 

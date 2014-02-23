@@ -31,6 +31,7 @@ public:
 	virtual Ray bounceRay(const Ray& ray, const HitInfo& hit, const MarkovChain& MC) const;
 
 	Vector3 getHDRColorFromVector(const Vector3 &direction) const;
+	virtual double getPDF(Vector3 in, Vector3 out, Vector3 normal) const;
 	float glossiness;
 
 protected:

@@ -87,3 +87,7 @@ Ray RefractionMaterial::bounceRay(const Ray& ray, const HitInfo& hit, const Mark
 
 	return rayRefract;
 }
+
+double RefractionMaterial::getPDF(Vector3 direction0, Vector3 direction1, Vector3 normal) const {
+	return 0.0f;
+}
