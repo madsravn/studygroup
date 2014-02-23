@@ -12,9 +12,9 @@ Vector3 generateRandomRayDirection(Vector3 normal);
 
 template <class T> 
 std::vector<T> subVector(const std::vector<T> vector, int start, int end) {
-	vector<T>::const_iterator first = vector.begin() + start;
-	vector<T>::const_iterator last = vector.begin() + end;
-	return vector<T>(first, last);
+    typename std::vector<T>::const_iterator first = vector.begin() + start;
+    typename std::vector<T>::const_iterator last = vector.begin() + end;
+	return std::vector<T>(first, last);
 };
 
 double maxVectorValue(Vector3 &vector);
