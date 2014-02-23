@@ -50,8 +50,7 @@ MarkovChain::large_step() const {
     return Result;
 }
 
-MarkovChain
-MarkovChain::mutate(int width, int height) const {
+MarkovChain MarkovChain::mutate(int width, int height) const {
     MarkovChain Result;
     Result.u.push_back(perturb(u[0], 2.0 / double(width + height), 0.1));
     Result.u.push_back(perturb(u[1], 2.0 / double(width + height), 0.1));

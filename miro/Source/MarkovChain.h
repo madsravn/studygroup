@@ -2,6 +2,7 @@
 #define MARKOVCHAIN_H_CSE68
 #include <vector>
 #include "Constants.h"
+#include "PathContribution.h"
 
 const int states = Constants::NumStates;
 
@@ -17,6 +18,7 @@ class MarkovChain {
         int imageWidth, imageHeight;
         mutable int pos;
         mutable int count;
+		PathContribution contribution;
         double get(int i) const;
 };
 

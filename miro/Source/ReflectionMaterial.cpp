@@ -36,6 +36,6 @@ Ray ReflectionMaterial::bounceRay(const Ray& ray, const HitInfo& hit, const int 
 	return Ray(Vector3(hit.P), vReflect);
 }
 
-double ReflectionMaterial::getPDF(Vector3 direction0, Vector3 direction1, Vector3 normal) const {
+double ReflectionMaterial::getPDF(Vector3 in, Vector3 out, Vector3 normal) const {
 	return 0.0f;
 }

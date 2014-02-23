@@ -52,7 +52,7 @@ public:
     inline const Vector3 & up() const       {return m_up;}
     inline const Vector3 & eye() const      {return m_eye;}
     inline const Vector3 & bgColor() const  {return m_bgColor;}
-	inline const float distance() const		{return m_distance;}
+	inline const float getDistance() const		{return m_distance;}
 
     Ray eyeRay(int x, int y, int imageWidth, int imageHeight);
 

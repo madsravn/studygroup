@@ -66,6 +66,9 @@ void MLT::run() {
 
     double LargeStepProb = 0.3;
 
+	double b = 0.0f;
+	// TODO: Estimate normalization constant
+
     bool running = true;
     MarkovChain current(img->width(), img->height());
     MarkovChain proposal(img->width(), img->height());
@@ -82,23 +85,28 @@ void MLT::run() {
             proposal = current.mutate(img->width(), img->height()); //TODO: Fix
         }
         //InitRandomNumbersByChain(proposal); // Det tror jeg ikke vi behøver - vi sender vores MarkovChain med i stedet.
-
-        //proposal.C = CombinePaths(Gene......); // Det skal vi lige have fikset
+        
         
         double a = 0.5;
 
-
         Ray ray = cam->randomRay(img->width(), img->height(), current);
-
         cam->rayToPixels(ray, ai, bi, img->width(), img->height());
 
-        std::vector<HitInfo> path;
+        std::vector<HitInfo> path = generateEyePath(ray, MC); // TODO: Skal den her evt. være et eller andet
+
+		proposal.contribution = calcPathContribution(path);
 
         Vector3 shadeResult = pathTraceFromPath(path, ray);
 
-        img->setPixel(ai,bi, shadeResult);
+        img->setPixel(ai, bi, shadeResult);
 
         i++;
+
+		// TODO: accumulate samples
+		if (proposal.contribution.scalarContribution > 0.0f)
+			accumulatePathContribution(proposal.contribution, (a + isLargeStepDone)/(proposal.contribution.scalarContribution/b + isLargeStepDone));
+		if (current.contribution.scalarContribution > 0.0f)
+			accumulatePathContribution(current.contribution, (1.0 - a)/(current.contribution.scalarContribution/b + isLargeStepDone));
 
         if(rnd() <= a) {
             current = proposal;
@@ -106,14 +114,12 @@ void MLT::run() {
 
         printf("Rendering Progress: %.3f%%\r", i/float(count)*100.0f);
         fflush(stdout);
-
     }
 
     for(int j = 0; j < img->height(); ++j) {
         img->drawScanline(j);
         glFinish();
     }
-
 }
 
 Vector3 MLT::pathTraceFromPath(std::vector<HitInfo> path, Ray &ray) const{
@@ -131,26 +137,17 @@ Vector3 MLT::pathTraceFromPath(std::vector<HitInfo> path, Ray &ray) const{
 	return shadeResult;
 }
 
-void MLT::accumulatePathContribution(const std::vector<HitInfo> path, const double scaling) const {
-	
-	for (int i = 0; i < path.size(); i++) {
-		const HitInfo &hit = path.at(i);
-		const int ix = 0, iy = 0;	// skal være pixel position
-		const Vector3 color;		// Skal være fladens farve * scaling
-		if (ix >= 0 && ix < img->width() && iy >= 0 && iy < img->height()) {
-			// pixel(x,y) += color
+
+// TODO: Ikke færdig
+void MLT::accumulatePathContribution(const PathContribution pathContribution, const double scaling) const {	
+	for (int i = 0; i < pathContribution.colors.size(); i++) {
+		const int ix = int(pathContribution.colors.at(i).x);
+		const int iy = int(pathContribution.colors.at(i).y);
+		//const Vector3 color = pathContribution.colors * scaling;		// TODO: Skal være fladens farve * scaling
+		if (ix >= 0 && ix < img->width() && iy >= 0 && iy < img->height()) {		
+			//img->setPixel(img->getPixel(x, y) + color);				// TODO: Implementer getPixel()
 		}
 	}
-	
-	/*
-	if (pc.sc == 0) return;
-	for (int i = 0; i < pc.n; i++) {
-		const int ix = int(pc.c[i].x), iy = int(pc.c[i].y); 
-		const Vec c = pc.c[i].c * mScaling;													// Scaled by a scalar
-		if ((ix < 0) || (ix >= PixelWidth) || (iy < 0) || (iy >= PixelHeight)) continue;	// Quits if the pixel exists?
-		img[ix + iy*PixelWidth] = img[ix + iy*PixelWidth] + c;								// Add color to pixel
-	}
-	*/
 }
 
 PathContribution MLT::calcPathContribution(const std::vector<HitInfo> path) const {
@@ -166,14 +163,18 @@ PathContribution MLT::calcPathContribution(const std::vector<HitInfo> path) cons
 			Vector3 direction = (path.at(1).P - path.at(0).P).normalized();
 
 			double px = -1.0f, py = -1.0f;
-			// Set px and py based on the direction
+			// TODO: Set px and py based on the direction
 
-			Vector3 throughput = pathTroughput(subPath);
-			double probabilityDensity = pathProbabilityDensity(subPath, pathLength);	// Denne bliver også kørt inde i MISWeight, overflødigt
+			Vector3 throughput = pathTraceFromPath(path); //pathTroughput(subPath);
+
+			double probabilityDensity = pathProbabilityDensity(subPath, pathLength);	// Denne bliver også kørt inde i MISWeight, overflødigt? Nææh
+			if (probabilityDensity <= 0.0f) continue;
+
 			double weight = MISWeight(subPath, pathLength);
-			if (weight <= 0.0f || probabilityDensity <= 0.0f) continue;
+			if (weight <= 0.0f) continue;
 
 			Vector3 color = throughput * (weight / probabilityDensity);
+
 			// Assert color is positive
 			if (maxVectorValue(color) <= 0.0f) continue;
 
@@ -184,15 +185,14 @@ PathContribution MLT::calcPathContribution(const std::vector<HitInfo> path) cons
 	return result;
 }
 
+// Jeg antager at dette er shade-funktionen
 Vector3 MLT::pathTroughput(const std::vector<HitInfo> path) const {
-
+	return pathTraceFromPath(path);
 }
 
 // Probability density for path with a specific number of vertices
-double MLT::pathProbabilityDensity(const std::vector<HitInfo> path, int numEyeVertices) const {
-	double sumPDFs = 0.0f;
+double MLT::pathProbabilityDensity(const std::vector<HitInfo> path, int numEyeVertices) const {	
 
-	// extended BPT
 	double p = 1.0;
 
 	// sampling from the eye
@@ -201,16 +201,16 @@ double MLT::pathProbabilityDensity(const std::vector<HitInfo> path, int numEyeVe
 			p *= 1.0 / double(img->width() * img->height());						// divided by image size
 			Vector3 direction = (path.at(i + 1).P - path.at(i).P).normalized();		// Direction from first to second hit
 			double cosTheta = dot(direction, cam->viewDir());						// Cosine of angle from camera
-			double distanceToScreen = cam->distance() / cosTheta;					// Distance to screen from canvas/lens/whatever
+			double distanceToScreen = cam->getDistance() / cosTheta;				// Distance to screen from canvas/lens/whatever
 			distanceToScreen = distanceToScreen * distanceToScreen;					// Distance to screen squared
 			p /= (cosTheta / distanceToScreen);										// Divided by cosine of angle divided by distance to screen squared				
 
 		} else {																	// Other hits
 			// PDF of sampling ith vertex
-			Vector3 direction0 = (path.at(i - 1).P - path.at(i).P).normalized();
-			Vector3 direction1 = (path.at(i + 1).P - path.at(i).P).normalized();
+			Vector3 directionIn = (path.at(i - 1).P - path.at(i).P).normalized();
+			Vector3 directionOut = (path.at(i + 1).P - path.at(i).P).normalized();
 
-			p *= path.at(i).material->getPDF(direction0, direction1, path.at(i).N);					
+			p *= path.at(i).material->getPDF(directionIn, directionOut, path.at(i).N);					
 		}
 		p *= directionToArea(path.at(i), path.at(i + 1));
 	}
@@ -221,19 +221,17 @@ double MLT::pathProbabilityDensity(const std::vector<HitInfo> path, int numEyeVe
 double MLT::pathProbabilityDensity(const std::vector<HitInfo> path) const {
 	double p = 0.0f;
 	for (int numEyeVertices = 0; numEyeVertices <= path.size() + 1; numEyeVertices++) {
-		p += pathProbabilityDensity(path, numEyeVertices);
+		p += pathProbabilityDensity(path, numEyeVertices);										//Hvis vi skal bruge TKhanAdder ligesom Toshiya skal den tilføjes her
 	}
 	return p;
 }
 
-
-double MLT::MISWeight(const std::vector<HitInfo> path, const int pathLength) const
-{
+double MLT::MISWeight(const std::vector<HitInfo> path, const int pathLength) const {
 	int numEyeVertices = path.size();
 	const double p_i = pathProbabilityDensity(path, numEyeVertices);
 	const double p_all = pathProbabilityDensity(path);
 
-	if(p_i || p_all == 0.0f) {    // Er dette rigtigt? Fancy C shit
+	if(p_i == 0.0f || p_all == 0.0f) {    // Kan man skrive (!p_i || !p_all) bare for at være et jerk?
 		return 0.0f;
 	} else {
 		return std::max(std::min(p_i / p_all, 1.0), 0.0);
@@ -246,8 +244,8 @@ double MLT::directionToArea(const HitInfo current, const HitInfo next) const {
 	return abs(dot(next.N, dv)) / (d2 * sqrt(d2));			// dot product of next normal and distance divided by d^3
 }
 
+// TODO: Bliver ikke brugt
 float acceptProb(float x, float y) {
 	// T(y > x) / T(x > y)
 	return 0;
 }
- 
