@@ -11,6 +11,11 @@ MarkovChain::MarkovChain() {
     }
 }
 
+double
+MarkovChain::get(int i) const {
+    return u.at(i);
+}
+
 void
 MarkovChain::reset() {
     count = 0;

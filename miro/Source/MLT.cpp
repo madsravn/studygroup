@@ -1,7 +1,7 @@
 #include "MLT.h"
+#include "Constants.h"
 
-const int maxRecDepth  = 10; // TODO: Flyt denne konstant, evt. til en klasse med konstanter
-const int maxEyeEvents = 10;
+const int maxRecDepth  = Constants::MaxPathLength; // TODO: Flyt denne konstant, evt. til en klasse med konstanter
 
 
 MLT::MLT(Scene& scene, Image* image, Camera* camera, int pathSamples) : scene(scene), img(image), cam(camera), samples(pathSamples) {
@@ -24,7 +24,7 @@ void MLT::tracePath(std::vector<HitInfo>& path, const Ray &ray, int recDepth, co
 	
 	path.push_back(HitInfo(hit));	
 	
-	Ray randomRay = hit.material->bounceRay(ray, hit, MC);		// TODO: Reflection and Refraction
+	Ray randomRay = hit.material->bounceRay(ray, hit, recDepth, MC);		// TODO: Reflection and Refraction
     //TODO: FIX!
 	if (randomRay.d == Vector3(0.0f)) return;
 
