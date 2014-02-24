@@ -96,7 +96,7 @@ void MLT::run() {
 
 		proposal.contribution = calcPathContribution(path);
 
-        Vector3 shadeResult = pathTraceFromPath(path, ray);
+        Vector3 shadeResult = pathTraceFromPath(path);
 
         img->setPixel(ai, bi, shadeResult);
 
@@ -122,21 +122,16 @@ void MLT::run() {
     }
 }
 
-Vector3 MLT::pathTraceFromPath(std::vector<HitInfo> path, Ray &ray) const{
+Vector3 MLT::pathTraceFromPath(std::vector<HitInfo> path) const{
 	// Recursive shading
 	Vector3 shadeResult = Vector3(0.0f);
-
-	float inverseSamples = 1.0f / (float)(samples);
-	for(int i = 0; i < samples; i++) {
-		path = generateEyePath(ray, MC);
-		if (path.size() >= 2) {
-			shadeResult += path.at(1).material->shade(path, 1, scene) * inverseSamples;
-			
-		}
-	}	
+	
+	if (path.size() >= 2) {
+		shadeResult += path.at(1).material->shade(path, 1, scene);			
+	}
+		
 	return shadeResult;
 }
-
 
 // TODO: Ikke færdig
 void MLT::accumulatePathContribution(const PathContribution pathContribution, const double scaling) const {	

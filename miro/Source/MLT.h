@@ -19,7 +19,7 @@ public:
     void run();    
 	void tracePath(std::vector<HitInfo>& path, const Ray &ray, int recDepth, const MarkovChain& MC, bool log = false) const;
 	std::vector<HitInfo> generateEyePath(const Ray& eyeRay, const MarkovChain& MC) const;
-	Vector3 pathTraceFromPath(std::vector<HitInfo> path, Ray &ray) const;
+	Vector3 pathTraceFromPath(std::vector<HitInfo> path) const;
 	void accumulatePathContribution(const PathContribution pathContribution, const double scaling) const;
 	PathContribution calcPathContribution(const std::vector<HitInfo> path) const;
 	Vector3 pathTroughput(const std::vector<HitInfo> path) const;	

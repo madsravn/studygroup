@@ -133,5 +133,5 @@ Ray Lambert::bounceRay(const Ray& ray, const HitInfo& hit, const int recDepth, c
 }
 
 double Lambert::getPDF(Vector3 in, Vector3 out, Vector3 normal) const {
-	abs(dot(out, normal)) / PI;
+	return abs(dot(out, normal)) / PI;
 }
