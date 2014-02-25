@@ -110,11 +110,7 @@ void MLT::run() {
         } else {
             isLargeStepDone = 0.0;
             proposal = current.mutate(img->width(), img->height()); //TODO: Fix
-        }
-        //InitRandomNumbersByChain(proposal); // Det tror jeg ikke vi behøver - vi sender vores MarkovChain med i stedet.
-        
-        
-        double a = 0.5;
+        }       
 
         Ray ray = cam->randomRay(img->width(), img->height(), current);
         cam->rayToPixels(ray, ai, bi, img->width(), img->height());
@@ -122,25 +118,22 @@ void MLT::run() {
         std::vector<HitInfo> path = generateEyePath(ray, MC); // TODO: Skal den her evt. være et eller andet
 
 		proposal.contribution = calcPathContribution(path);
-
-        Vector3 shadeResult = pathTraceFromPath(path);
-
-        img->setPixel(ai, bi, shadeResult);
-        img->drawPixel(ai,bi);
-        glFinish();
-
-        i++;
+        
+		double a = acceptProb(current, proposal);
 
 		// TODO: accumulate samples
 		if (proposal.contribution.scalarContribution > 0.0f)
-			accumulatePathContribution(proposal.contribution, (a + isLargeStepDone)/(proposal.contribution.scalarContribution/b + isLargeStepDone));
+			accumulatePathContribution(proposal.contribution, 
+			(a + isLargeStepDone)/(proposal.contribution.scalarContribution/b + isLargeStepDone));
 		if (current.contribution.scalarContribution > 0.0f)
-			accumulatePathContribution(current.contribution, (1.0 - a)/(current.contribution.scalarContribution/b + isLargeStepDone));
+			accumulatePathContribution(current.contribution, 
+			(1.0 - a)/(current.contribution.scalarContribution/b + isLargeStepDone));
 
         if(rnd() <= a) {
             current = proposal;
         }
         
+		i++;
         
         printf("Rendering Progress: %.3f%%\r", i/float(count)*100.0f);
         fflush(stdout);
@@ -170,7 +163,7 @@ void MLT::accumulatePathContribution(const PathContribution pathContribution, co
 	for (int i = 0; i < pathContribution.colors.size(); i++) {
 		const int ix = int(pathContribution.colors.at(i).x);
 		const int iy = int(pathContribution.colors.at(i).y);
-		//const Vector3 color = pathContribution.colors * scaling;		// TODO: Skal være fladens farve * scaling
+		Vector3 color;		// TODO: Skal være fladens farve * scaling
 		if (ix >= 0 && ix < img->width() && iy >= 0 && iy < img->height()) {		
 			//img->setPixel(img->getPixel(x, y) + color);				// TODO: Implementer getPixel()
             Vector3 color = Vector3(0.0f);
@@ -280,8 +273,15 @@ double MLT::directionToArea(const HitInfo current, const HitInfo next) const {
 	return abs(dot(next.N, dv)) / (d2 * sqrt(d2));			// dot product of next normal and distance divided by d^3
 }
 
-// TODO: Bliver ikke brugt
-float acceptProb(float x, float y) {
+double MLT::acceptProb(MarkovChain& current, MarkovChain& proposal) const {
 	// T(y > x) / T(x > y)
-	return 0;
+	double a = 0.5;        
+	if (current.contribution.scalarContribution > 0.0){
+		double cont_proposal = proposal.contribution.scalarContribution;
+		double cont_current = current.contribution.scalarContribution;
+		a = cont_proposal / cont_current;
+		a = std::min(1.0, a); // Clamp value
+		a = std::max(a, 0.0);
+	}
+	return a;
 }
