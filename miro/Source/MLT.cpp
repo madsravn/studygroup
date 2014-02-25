@@ -168,7 +168,7 @@ void MLT::accumulatePathContribution(const PathContribution pathContribution, co
 			//img->setPixel(img->getPixel(x, y) + color);				// TODO: Implementer getPixel()
             Vector3 color = Vector3(0.0f);
             color = color + picture[iy*img->width() + ix];
-			int colPos = iy*img->width() + ix;           
+            //picture.at(iy*img->width() + ix).set(color);
 		}
 	}
 }
