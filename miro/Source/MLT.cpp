@@ -12,6 +12,7 @@ MLT::MLT(Scene& scene, Image* image, Camera* camera, int pathSamples) : scene(sc
 
  //Recursive path tracing
 void MLT::tracePath(std::vector<HitInfo>& path, const Ray &ray, int recDepth, const MarkovChain& MC, bool log) const {
+	//std::cout << "tracePath" << std::endl;
 	
 	if(recDepth >= maxRecDepth)	return;
 	
@@ -33,6 +34,7 @@ void MLT::tracePath(std::vector<HitInfo>& path, const Ray &ray, int recDepth, co
 
 // Trace path from eye
 std::vector<HitInfo> MLT::generateEyePath(const Ray& eyeRay, const MarkovChain& MC) const {
+	//std::cout << "generateEyePath" << std::endl;
 	std::vector<HitInfo> result;	
 	result.push_back(HitInfo(0.0f, eyeRay.o));
 
@@ -42,6 +44,7 @@ std::vector<HitInfo> MLT::generateEyePath(const Ray& eyeRay, const MarkovChain& 
 
 // Random mutation of a path
 float MLT::mutate(float value) {
+	//std::cout << "mutate" << std::endl;
 	float s1 = 1.0f / 1024, s2 = 1.0f/64;
 	float dv = s2 * exp(-log(s2/s1)*rnd());
 	if (rnd() < 0.5f) {
@@ -58,10 +61,24 @@ float MLT::mutate(float value) {
 
 // Builds an initial path
 std::vector<HitInfo> initialPath() {
+	std::cout << "initialPath" << std::endl;
 	return std::vector<HitInfo>();
 }
 
 void MLT::run() {    
+
+	/*	
+	function metropolisLightTransport()
+		x <- initialPath()
+		image <- { array of zeros }
+		for i <- 1 to N
+			y <- mutate(x)
+			a <- acceptProb(x -> y
+			if random < a
+				then x <- y
+			recordSample(image, x)
+		return image	
+	*/
     int ai, bi;
 
     double LargeStepProb = 0.3;
@@ -75,6 +92,7 @@ void MLT::run() {
     const int count = 512*512;
     int i = 0;
     while( i < count) {
+		std::cout << i << std::endl;
 
         double isLargeStepDone;
         if(rnd() <= LargeStepProb) {
@@ -123,6 +141,7 @@ void MLT::run() {
 }
 
 Vector3 MLT::pathTraceFromPath(std::vector<HitInfo> path) const{
+	//std::cout << "pathTraceFromPath" << std::endl;
 	// Recursive shading
 	Vector3 shadeResult = Vector3(0.0f);
 	
@@ -135,6 +154,7 @@ Vector3 MLT::pathTraceFromPath(std::vector<HitInfo> path) const{
 
 // TODO: Ikke færdig
 void MLT::accumulatePathContribution(const PathContribution pathContribution, const double scaling) const {	
+	//std::cout << "accumulatePathContribution" << std::endl;
 	for (int i = 0; i < pathContribution.colors.size(); i++) {
 		const int ix = int(pathContribution.colors.at(i).x);
 		const int iy = int(pathContribution.colors.at(i).y);
@@ -146,12 +166,14 @@ void MLT::accumulatePathContribution(const PathContribution pathContribution, co
 }
 
 PathContribution MLT::calcPathContribution(const std::vector<HitInfo> path) const {
+	//std::cout << "calcPathContribution" << std::endl;
 	PathContribution result = PathContribution();
 
 	for (int pathLength = 3; pathLength <= 13; pathLength++) {
 		for (int numEyeVertices = 1; numEyeVertices <= std::min(pathLength + 1, (int)path.size()); numEyeVertices++) {
 
 			if (numEyeVertices > path.size()) continue;
+			if (pathLength > numEyeVertices) continue;
 
 			std::vector<HitInfo> subPath = subVector(path, 0, numEyeVertices);
 			
@@ -187,11 +209,12 @@ Vector3 MLT::pathTroughput(const std::vector<HitInfo> path) const {
 
 // Probability density for path with a specific number of vertices
 double MLT::pathProbabilityDensity(const std::vector<HitInfo> path, int numEyeVertices) const {	
+	//std::cout << "pathProbabilityDensity(numEyeVertices = " << numEyeVertices << ")" << std::endl;
 
 	double p = 1.0;
 
 	// sampling from the eye
-	for (int i = 1; i < numEyeVertices; i++) {		
+	for (int i = 1; i < numEyeVertices - 1; i++) {		
 		if (i == 1) {  // First hit
 			p *= 1.0 / double(img->width() * img->height());						// divided by image size
 			Vector3 direction = (path.at(i + 1).P - path.at(i).P).normalized();		// Direction from first to second hit
@@ -214,14 +237,16 @@ double MLT::pathProbabilityDensity(const std::vector<HitInfo> path, int numEyeVe
 
 // Probability density for path with all numbers of vertices
 double MLT::pathProbabilityDensity(const std::vector<HitInfo> path) const {
+	//std::cout << "pathProbabilityDensity" << std::endl;
 	double p = 0.0f;
-	for (int numEyeVertices = 0; numEyeVertices <= path.size() + 1; numEyeVertices++) {
+	for (int numEyeVertices = 0; numEyeVertices <= path.size(); numEyeVertices++) {
 		p += pathProbabilityDensity(path, numEyeVertices);										//Hvis vi skal bruge TKhanAdder ligesom Toshiya skal den tilføjes her
 	}
 	return p;
 }
 
 double MLT::MISWeight(const std::vector<HitInfo> path, const int pathLength) const {
+	//std::cout << "MISWeight" << std::endl;
 	int numEyeVertices = path.size();
 	const double p_i = pathProbabilityDensity(path, numEyeVertices);
 	const double p_all = pathProbabilityDensity(path);
@@ -234,6 +259,7 @@ double MLT::MISWeight(const std::vector<HitInfo> path, const int pathLength) con
 }
 
 double MLT::directionToArea(const HitInfo current, const HitInfo next) const {
+	//std::cout << "directionToArea" << std::endl;
 	const Vector3 dv = next.P - current.P;					// Distance between vertices
 	const double d2 = dot(dv, dv);							// Distance squared
 	return abs(dot(next.N, dv)) / (d2 * sqrt(d2));			// dot product of next normal and distance divided by d^3
