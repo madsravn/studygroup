@@ -173,7 +173,9 @@ void MLT::accumulatePathContribution(const PathContribution pathContribution, co
 		//const Vector3 color = pathContribution.colors * scaling;		// TODO: Skal være fladens farve * scaling
 		if (ix >= 0 && ix < img->width() && iy >= 0 && iy < img->height()) {		
 			//img->setPixel(img->getPixel(x, y) + color);				// TODO: Implementer getPixel()
-            //picture[iy*img->width() + ix] = picture[iy*img->width() + ix] + color;
+            Vector3 color = Vector3(0.0f);
+            color = color + picture[iy*img->width() + ix];
+            picture[iy*img->width() + ix] = color;
 		}
 	}
 }
