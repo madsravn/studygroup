@@ -15,7 +15,7 @@ class Vector3
 {
 
 public:
-    float x, y, z;      // The x & y & z coordinates.
+    mutable float x, y, z;      // The x & y & z coordinates. => mutable is const hack.
 
     Vector3() :
         x(0), y(0), z(0) {}
@@ -41,7 +41,7 @@ public:
 
     void set(float a) {x = y = z = a;}
     void set(float a, float b, float c) {x = a; y = b; z = c;}
-    void set(const Vector3 & v) {x = v.x; y = v.y; z = v.z;}
+    void set(const Vector3 & v) const {x = v.x; y = v.y; z = v.z;} // const hack
     
     
     //! Access operator.        
