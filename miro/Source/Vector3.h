@@ -31,6 +31,7 @@ public:
         Assigns the values from \a a to this Vec3.
     */
     const Vector3 & operator=(const Vector3& a) {x = a.x; y = a.y; z = a.z; return *this;}
+
     
     //! Assignment operator.
     /*!
