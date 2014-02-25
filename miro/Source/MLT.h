@@ -27,6 +27,7 @@ public:
 	double pathProbabilityDensity(const std::vector<HitInfo> path, int numEyeVertices) const;
 	double MISWeight(const std::vector<HitInfo> path, const int pathLength) const;
 	double directionToArea(const HitInfo current, const HitInfo next) const;
+	double acceptProb(MarkovChain& current, MarkovChain& proposal) const;
 private:
 	Scene& scene;
     Image* img;
