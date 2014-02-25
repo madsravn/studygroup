@@ -7,6 +7,9 @@ const int maxRecDepth  = Constants::MaxPathLength; // TODO: Flyt denne konstant,
 MLT::MLT(Scene& scene, Image* image, Camera* camera, int pathSamples) : scene(scene), img(image), cam(camera), samples(pathSamples) {
     MC.imageWidth = image->width();
     MC.imageHeight = image->height();
+    for(int i = 0; i < img->height()*img->width(); ++i) {
+        picture.push_back(Vector3(0.0f));
+    }
 }
 
 
@@ -170,6 +173,7 @@ void MLT::accumulatePathContribution(const PathContribution pathContribution, co
 		//const Vector3 color = pathContribution.colors * scaling;		// TODO: Skal være fladens farve * scaling
 		if (ix >= 0 && ix < img->width() && iy >= 0 && iy < img->height()) {		
 			//img->setPixel(img->getPixel(x, y) + color);				// TODO: Implementer getPixel()
+            //picture[iy*img->width() + ix] = picture[iy*img->width() + ix] + color;
 		}
 	}
 }

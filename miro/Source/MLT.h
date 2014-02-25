@@ -33,6 +33,7 @@ private:
     Camera* cam;
 	int samples;
     MarkovChain MC;
+    std::vector<Vector3> picture;
 };
 
 #endif // CSE168_MLT_H_INCLUDED
