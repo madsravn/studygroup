@@ -91,8 +91,14 @@ void MLT::run() {
     MarkovChain proposal(img->width(), img->height());
     const int count = 512*512;
     int i = 0;
+
+    // Paint over the geometry scene
+    for(int j = 0; j < img->height(); ++j) {
+        img->drawScanline(j);
+        glFinish();
+    }
     while( i < count) {
-		std::cout << i << std::endl;
+		//std::cout << i << std::endl;
 
         double isLargeStepDone;
         if(rnd() <= LargeStepProb) {
@@ -117,6 +123,8 @@ void MLT::run() {
         Vector3 shadeResult = pathTraceFromPath(path);
 
         img->setPixel(ai, bi, shadeResult);
+        img->drawPixel(ai,bi);
+        glFinish();
 
         i++;
 
@@ -129,7 +137,8 @@ void MLT::run() {
         if(rnd() <= a) {
             current = proposal;
         }
-
+        
+        
         printf("Rendering Progress: %.3f%%\r", i/float(count)*100.0f);
         fflush(stdout);
     }
