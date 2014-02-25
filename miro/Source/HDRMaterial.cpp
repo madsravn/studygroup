@@ -16,7 +16,7 @@ Vector3 HDRMaterial::shade(const Ray& ray, const HitInfo& hit,
 		return 0;
 };
 
-Ray HDRMaterial::bounceRay(const Ray& ray, const HitInfo& hit) const {
+Ray HDRMaterial::bounceRay(const Ray& ray, const HitInfo& hit, const int recDepth, const MarkovChain& MC) const {
 	return Ray();
 }
 

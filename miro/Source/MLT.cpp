@@ -66,6 +66,9 @@ void MLT::run() {
 
     double LargeStepProb = 0.3;
 
+	double b = 0.0f;
+	// TODO: Estimate normalization constant
+
     bool running = true;
     MarkovChain current(img->width(), img->height());
     MarkovChain proposal(img->width(), img->height());
@@ -82,23 +85,28 @@ void MLT::run() {
             proposal = current.mutate(img->width(), img->height()); //TODO: Fix
         }
         //InitRandomNumbersByChain(proposal); // Det tror jeg ikke vi behøver - vi sender vores MarkovChain med i stedet.
-
-        //proposal.C = CombinePaths(Gene......); // Det skal vi lige have fikset
+        
         
         double a = 0.5;
 
-
         Ray ray = cam->randomRay(img->width(), img->height(), current);
-
         cam->rayToPixels(ray, ai, bi, img->width(), img->height());
 
-        std::vector<HitInfo> path;
+        std::vector<HitInfo> path = generateEyePath(ray, MC); // TODO: Skal den her evt. være et eller andet
 
-        Vector3 shadeResult = pathTraceFromPath(path, ray);
+		proposal.contribution = calcPathContribution(path);
 
-        img->setPixel(ai,bi, shadeResult);
+        Vector3 shadeResult = pathTraceFromPath(path);
+
+        img->setPixel(ai, bi, shadeResult);
 
         i++;
+
+		// TODO: accumulate samples
+		if (proposal.contribution.scalarContribution > 0.0f)
+			accumulatePathContribution(proposal.contribution, (a + isLargeStepDone)/(proposal.contribution.scalarContribution/b + isLargeStepDone));
+		if (current.contribution.scalarContribution > 0.0f)
+			accumulatePathContribution(current.contribution, (1.0 - a)/(current.contribution.scalarContribution/b + isLargeStepDone));
 
         if(rnd() <= a) {
             current = proposal;
@@ -106,61 +114,132 @@ void MLT::run() {
 
         printf("Rendering Progress: %.3f%%\r", i/float(count)*100.0f);
         fflush(stdout);
-
     }
 
     for(int j = 0; j < img->height(); ++j) {
         img->drawScanline(j);
         glFinish();
     }
-
-
-    /*for (int j = 0; j < img->height(); ++j)
-	{
-		for (int i = 0; i < img->width(); ++i)
-		{
-			//Ray ray = cam->eyeRay(i, j, img->width(), img->height());				
-            Ray ray = cam->randomRay(img->width(), img->height(), MC);
-
-            cam->rayToPixels(ray, a, b, img->width(), img->height());
-
-			
-			std::vector<HitInfo> path;
-			
-			Vector3 shadeResult = pathTraceFromPath(path, ray);
-			//img->setPixel(i, j, shadeResult);
-            img->setPixel(a, b, shadeResult);
-            std::cout << "MC.count = " << MC.count << std::endl;
-            MC.reset();
-
-		}
-		//img->drawScanline(j);
-		//glFinish();
-		printf("Rendering Progress: %.3f%%\r", j/float(img->height())*100.0f);
-		fflush(stdout);
-	}
-    for(int j = 0; j < img->height(); ++j) {
-        img->drawScanline(j);
-        glFinish();
-    }*/
 }
 
-Vector3 MLT::pathTraceFromPath(std::vector<HitInfo> path, Ray &ray) const{
+Vector3 MLT::pathTraceFromPath(std::vector<HitInfo> path) const{
 	// Recursive shading
 	Vector3 shadeResult = Vector3(0.0f);
-
-	float inverseSamples = 1.0f / (float)(samples);
-	for(int i = 0; i < samples; i++) {
-		path = generateEyePath(ray, MC);
-		if (path.size() >= 2) {
-			shadeResult += path.at(1).material->shade(path, 1, scene) * inverseSamples;
-			
-		}
-	}	
+	
+	if (path.size() >= 2) {
+		shadeResult += path.at(1).material->shade(path, 1, scene);			
+	}
+		
 	return shadeResult;
 }
 
+// TODO: Ikke færdig
+void MLT::accumulatePathContribution(const PathContribution pathContribution, const double scaling) const {	
+	for (int i = 0; i < pathContribution.colors.size(); i++) {
+		const int ix = int(pathContribution.colors.at(i).x);
+		const int iy = int(pathContribution.colors.at(i).y);
+		//const Vector3 color = pathContribution.colors * scaling;		// TODO: Skal være fladens farve * scaling
+		if (ix >= 0 && ix < img->width() && iy >= 0 && iy < img->height()) {		
+			//img->setPixel(img->getPixel(x, y) + color);				// TODO: Implementer getPixel()
+		}
+	}
+}
 
+PathContribution MLT::calcPathContribution(const std::vector<HitInfo> path) const {
+	PathContribution result = PathContribution();
+
+	for (int pathLength = 3; pathLength <= 13; pathLength++) {
+		for (int numEyeVertices = 1; numEyeVertices <= std::min(pathLength + 1, (int)path.size()); numEyeVertices++) {
+
+			if (numEyeVertices > path.size()) continue;
+
+			std::vector<HitInfo> subPath = subVector(path, 0, numEyeVertices);
+			
+			Vector3 direction = (path.at(1).P - path.at(0).P).normalized();
+
+			double px = -1.0f, py = -1.0f;
+			// TODO: Set px and py based on the direction
+
+			Vector3 throughput = pathTraceFromPath(path); //pathTroughput(subPath);
+
+			double probabilityDensity = pathProbabilityDensity(subPath, pathLength);	// Denne bliver også kørt inde i MISWeight, overflødigt? Nææh
+			if (probabilityDensity <= 0.0f) continue;
+
+			double weight = MISWeight(subPath, pathLength);
+			if (weight <= 0.0f) continue;
+
+			Vector3 color = throughput * (weight / probabilityDensity);
+
+			// Assert color is positive
+			if (maxVectorValue(color) <= 0.0f) continue;
+
+			result.colors.push_back(Contribution(px, py, color));
+			result.scalarContribution = std::max(maxVectorValue(color), result.scalarContribution);
+		}
+	}
+	return result;
+}
+
+// Jeg antager at dette er shade-funktionen
+Vector3 MLT::pathTroughput(const std::vector<HitInfo> path) const {
+	return pathTraceFromPath(path);
+}
+
+// Probability density for path with a specific number of vertices
+double MLT::pathProbabilityDensity(const std::vector<HitInfo> path, int numEyeVertices) const {	
+
+	double p = 1.0;
+
+	// sampling from the eye
+	for (int i = 1; i < numEyeVertices; i++) {		
+		if (i == 1) {  // First hit
+			p *= 1.0 / double(img->width() * img->height());						// divided by image size
+			Vector3 direction = (path.at(i + 1).P - path.at(i).P).normalized();		// Direction from first to second hit
+			double cosTheta = dot(direction, cam->viewDir());						// Cosine of angle from camera
+			double distanceToScreen = cam->getDistance() / cosTheta;				// Distance to screen from canvas/lens/whatever
+			distanceToScreen = distanceToScreen * distanceToScreen;					// Distance to screen squared
+			p /= (cosTheta / distanceToScreen);										// Divided by cosine of angle divided by distance to screen squared				
+
+		} else {																	// Other hits
+			// PDF of sampling ith vertex
+			Vector3 directionIn = (path.at(i - 1).P - path.at(i).P).normalized();
+			Vector3 directionOut = (path.at(i + 1).P - path.at(i).P).normalized();
+
+			p *= path.at(i).material->getPDF(directionIn, directionOut, path.at(i).N);					
+		}
+		p *= directionToArea(path.at(i), path.at(i + 1));
+	}
+	return p;
+}
+
+// Probability density for path with all numbers of vertices
+double MLT::pathProbabilityDensity(const std::vector<HitInfo> path) const {
+	double p = 0.0f;
+	for (int numEyeVertices = 0; numEyeVertices <= path.size() + 1; numEyeVertices++) {
+		p += pathProbabilityDensity(path, numEyeVertices);										//Hvis vi skal bruge TKhanAdder ligesom Toshiya skal den tilføjes her
+	}
+	return p;
+}
+
+double MLT::MISWeight(const std::vector<HitInfo> path, const int pathLength) const {
+	int numEyeVertices = path.size();
+	const double p_i = pathProbabilityDensity(path, numEyeVertices);
+	const double p_all = pathProbabilityDensity(path);
+
+	if(p_i == 0.0f || p_all == 0.0f) {    // Kan man skrive (!p_i || !p_all) bare for at være et jerk?
+		return 0.0f;
+	} else {
+		return std::max(std::min(p_i / p_all, 1.0), 0.0);
+	}
+}
+
+double MLT::directionToArea(const HitInfo current, const HitInfo next) const {
+	const Vector3 dv = next.P - current.P;					// Distance between vertices
+	const double d2 = dot(dv, dv);							// Distance squared
+	return abs(dot(next.N, dv)) / (d2 * sqrt(d2));			// dot product of next normal and distance divided by d^3
+}
+
+// TODO: Bliver ikke brugt
 float acceptProb(float x, float y) {
 	// T(y > x) / T(x > y)
 	return 0;
