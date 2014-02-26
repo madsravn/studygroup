@@ -99,6 +99,11 @@ void MLT::run() {
     bool running = true;
     MarkovChain current(img->width(), img->height());
     MarkovChain proposal(img->width(), img->height());
+
+    // Initialize current
+    Ray tRay = cam->randomRay(img->width(), img->height(), current);
+    std::vector<HitInfo> tPath = generateEyePath(tRay, current);
+    current.contribution = calcPathContribution(tPath);
     const int count = 512*512;
     int i = 0;
 
@@ -116,13 +121,13 @@ void MLT::run() {
             proposal = current.large_step();
         } else {
             isLargeStepDone = 0.0;
-            proposal = current.mutate(img->width(), img->height()); //TODO: Fix
+            proposal = current.mutate(img->width(), img->height());
         }       
 
         Ray ray = cam->randomRay(img->width(), img->height(), current);
         cam->rayToPixels(ray, ai, bi, img->width(), img->height());
 
-        std::vector<HitInfo> path = generateEyePath(ray, MC); // TODO: Skal den her evt. være et eller andet
+        std::vector<HitInfo> path = generateEyePath(ray, current); // TODO: Skal den her evt. være et eller andet
 
 		proposal.contribution = calcPathContribution(path);
         
