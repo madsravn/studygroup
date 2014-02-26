@@ -88,6 +88,13 @@ void MLT::run() {
 
 	double b = 0.0f;
 	// TODO: Estimate normalization constant
+	for (int i = 0; i < 10000; i++) {
+		fprintf(stderr, "\rPSMLT Initializing: %5.2f", 100.0 * i / (10000));		
+		MarkovChain normChain(img->width(), img->height());
+		b += calcPathContribution(generateEyePath(cam->randomRay(img->width(), img->height(), normChain), MC)).scalarContribution;
+	}
+	b /= double(10000);	// average
+
 
     bool running = true;
     MarkovChain current(img->width(), img->height());
@@ -285,3 +292,15 @@ double MLT::acceptProb(MarkovChain& current, MarkovChain& proposal) const {
 	}
 	return a;
 }
+
+/*
+tentativeTransitionFunction(x -> y){
+	make tentative sample X'_i
+
+	if (acceptProb(X_i-1, X'_i)) {
+		return X'_i;
+	} else {
+		return X_i-i;
+	}
+}
+*/

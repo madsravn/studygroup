@@ -72,7 +72,7 @@ Ray RefractionMaterial::bounceRay(const Ray& ray, const HitInfo& hit, const int 
 
 	int p = (into ? 1 : -1);
 	
-	Vector3 vRefract = (my * ray.d - hit.N * ((p * my * dot(hit.N, ray.d) + sqrt(costheta2)))).normalized();	// New ray direction
+	Vector3 vRefract = (my * ray.d - hit.N * (p * my * dot(hit.N, ray.d) + sqrt(costheta2))).normalized();	// New ray direction
 		
 	/*
 	std::cout << "my * dot(hit.N, ray.d)                                  \t" << my * dot(hit.N, ray.d) << std::endl;

@@ -11,7 +11,7 @@ Vector3 generateRandomRayDirection();
 Vector3 generateRandomRayDirection(Vector3 normal);
 
 template <class T> 
-std::vector<T> subVector(const std::vector<T> vector, int start, int end) {
+std::vector<T> subVector(const std::vector<T> &vector, int start, int end) {
     typename std::vector<T>::const_iterator first = vector.begin() + start;
     typename std::vector<T>::const_iterator last = vector.begin() + end;
 	return std::vector<T>(first, last);
