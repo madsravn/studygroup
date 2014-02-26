@@ -10,7 +10,7 @@ class MarkovChain {
     public:
         MarkovChain();
         MarkovChain(int width, int height);
-        MarkovChain large_step() const;
+        MarkovChain large_step(int width, int height) const;
         MarkovChain mutate(int width, int height) const;
         void reset();
         double getNext() const;

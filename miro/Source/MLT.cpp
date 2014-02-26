@@ -109,11 +109,11 @@ void MLT::run() {
     }
     while( i < count) {
 		//std::cout << i << std::endl;
-
+		
         double isLargeStepDone;
         if(rnd() <= LargeStepProb) {
             isLargeStepDone = 1.0;
-            proposal = current.large_step();
+            proposal = current.large_step(img->width(), img->height());
         } else {
             isLargeStepDone = 0.0;
             proposal = current.mutate(img->width(), img->height()); //TODO: Fix
@@ -125,16 +125,22 @@ void MLT::run() {
         std::vector<HitInfo> path = generateEyePath(ray, MC); // TODO: Skal den her evt. være et eller andet
 
 		proposal.contribution = calcPathContribution(path);
+
+		//std::cout << proposal.contribution.scalarContribution << std::endl;
         
 		double a = acceptProb(current, proposal);
 
 		// TODO: accumulate samples
 		if (proposal.contribution.scalarContribution > 0.0f)
 			accumulatePathContribution(proposal.contribution, 
-			(a + isLargeStepDone)/(proposal.contribution.scalarContribution/b + isLargeStepDone));
+				(a + isLargeStepDone)/
+				(proposal.contribution.scalarContribution/b + isLargeStepDone)
+			);
 		if (current.contribution.scalarContribution > 0.0f)
 			accumulatePathContribution(current.contribution, 
-			(1.0 - a)/(current.contribution.scalarContribution/b + isLargeStepDone));
+				(1.0 - a)/
+				(current.contribution.scalarContribution/b + isLargeStepDone)
+			);
 
         if(rnd() <= a) {
             current = proposal;
@@ -167,15 +173,24 @@ Vector3 MLT::pathTraceFromPath(std::vector<HitInfo> path) const{
 // TODO: Ikke færdig
 void MLT::accumulatePathContribution(const PathContribution pathContribution, const double scaling) const {	
 	//std::cout << "accumulatePathContribution" << std::endl;
-	for (int i = 0; i < pathContribution.colors.size(); i++) {
-		const int ix = int(pathContribution.colors.at(i).x);
-		const int iy = int(pathContribution.colors.at(i).y);
-		Vector3 color;		// TODO: Skal være fladens farve * scaling
+	for (int i = 1; i < pathContribution.colors.size(); i++) {    // Start at first hit, [0] is camera
+		Contribution currentColor = pathContribution.colors.at(i);
+
+		const int ix = int(currentColor.x);
+		const int iy = int(currentColor.y);
+
+		std::cout << "(" << ix << ", " << iy << ")" << std::endl;
+		Vector3 color = currentColor.color;		// TODO: Skal være fladens farve * scaling
 		if (ix >= 0 && ix < img->width() && iy >= 0 && iy < img->height()) {		
 			//img->setPixel(img->getPixel(x, y) + color);				// TODO: Implementer getPixel()
             Vector3 color = Vector3(0.0f);
             color = color + picture[iy*img->width() + ix];
             (picture.at(iy*img->width() + ix)).set(color);
+			img->setPixel(ix, iy, color);
+
+			////////
+			img->drawScanline(iy);
+			glFinish();
 		}
 	}
 }
@@ -184,35 +199,31 @@ PathContribution MLT::calcPathContribution(const std::vector<HitInfo> path) cons
 	//std::cout << "calcPathContribution" << std::endl;
 	PathContribution result = PathContribution();
 
-	for (int pathLength = 3; pathLength <= 13; pathLength++) {
-		for (int numEyeVertices = 1; numEyeVertices <= std::min(pathLength + 1, (int)path.size()); numEyeVertices++) {
+	for (int pathLength = 1; pathLength < std::min(13, (int)path.size()); pathLength++) {       // TODO: Vi skal lige være sikre på de to intervaller her		
 
-			if (numEyeVertices > path.size()) continue;
-			if (pathLength > numEyeVertices) continue;
-
-			std::vector<HitInfo> subPath = subVector(path, 0, numEyeVertices);
+		std::vector<HitInfo> subPath = subVector(path, 0, pathLength);
 			
-			Vector3 direction = (path.at(1).P - path.at(0).P).normalized();
+		Vector3 direction = (path.at(1).P - path.at(0).P).normalized();
 
-			double px = -1.0f, py = -1.0f;
-			// TODO: Set px and py based on the direction
+		double px = -1.0f, py = -1.0f;
+		// TODO: Set px and py based on the direction
+		calcCoordinates(subPath, px, py);
 
-			Vector3 throughput = pathTraceFromPath(path); //pathTroughput(subPath);
+		Vector3 throughput = pathTraceFromPath(path); //pathTroughput(subPath);
 
-			double probabilityDensity = pathProbabilityDensity(subPath, pathLength);	// Denne bliver også kørt inde i MISWeight, overflødigt? Nææh
-			if (probabilityDensity <= 0.0f) continue;
+		double probabilityDensity = pathProbabilityDensity(subPath, pathLength);	// Denne bliver også kørt inde i MISWeight, overflødigt? Nææh
+		if (probabilityDensity <= 0.0f) continue;
 
-			double weight = MISWeight(subPath, pathLength);
-			if (weight <= 0.0f) continue;
+		double weight = MISWeight(subPath, pathLength);
+		if (weight <= 0.0f) continue;
 
-			Vector3 color = throughput * (weight / probabilityDensity);
+		Vector3 color = throughput * (weight / probabilityDensity);
 
-			// Assert color is positive
-			if (maxVectorValue(color) <= 0.0f) continue;
+		// Assert color is positive
+		if (maxVectorValue(color) <= 0.0f) continue;
 
-			result.colors.push_back(Contribution(px, py, color));
-			result.scalarContribution = std::max(maxVectorValue(color), result.scalarContribution);
-		}
+		result.colors.push_back(Contribution(px, py, color));
+		result.scalarContribution = std::max(maxVectorValue(color), result.scalarContribution);
 	}
 	return result;
 }
@@ -292,6 +303,26 @@ double MLT::acceptProb(MarkovChain& current, MarkovChain& proposal) const {
 	}
 	return a;
 }
+
+bool MLT::calcCoordinates(std::vector<HitInfo> path, double &px, double &py) const {
+	Vector3 Direction;
+	const HitInfo &Xeye_e = path.at(path.size() - 1);	
+
+	if (path.size() >= 2) {				
+		Direction = (path.at(1).P - path.at(0).P).normalized();
+	}
+
+	// get the pixel location		// TODO: Verify this shit
+	Vector3 ScreenCenter = cam->eye() + (cam->viewDir() * cam->getDistance());
+	Vector3 ScreenPosition = cam->eye() + (Direction * (cam->getDistance() / dot(Direction, cam->getDistance()))) - ScreenCenter;
+
+	Vector3 u = cross(g_camera->viewDir(), g_camera->up());
+
+	px = dot(u, ScreenPosition) + (img->width() * 0.5);
+	py = -dot(cam->up(), ScreenPosition) + (img->height() * 0.5);
+	return ((px >= 0) && (px < img->width()) && (py >= 0) && (py < img->height()));
+}
+
 
 /*
 tentativeTransitionFunction(x -> y){
