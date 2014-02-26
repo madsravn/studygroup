@@ -52,6 +52,7 @@
     <ClCompile Include="..\Source\MiroWindow.cpp" />
     <ClCompile Include="..\Source\MLT.cpp" />
     <ClCompile Include="..\Source\Node.cpp" />
+    <ClCompile Include="..\Source\PathContribution.cpp" />
     <ClCompile Include="..\Source\PFMLoader.cpp" />
     <ClCompile Include="..\Source\ReflectionMaterial.cpp" />
     <ClCompile Include="..\Source\RefractionMaterial.cpp" />

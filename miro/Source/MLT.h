@@ -28,6 +28,7 @@ public:
 	double MISWeight(const std::vector<HitInfo> path, const int pathLength) const;
 	double directionToArea(const HitInfo current, const HitInfo next) const;
 	double acceptProb(MarkovChain& current, MarkovChain& proposal) const;
+	void calcCoordinates(std::vector<HitInfo> path, int &px, int &py) const;
 private:
 	Scene& scene;
     Image* img;
