@@ -64,7 +64,7 @@ float MLT::mutate(float value) {
 
 // Builds an initial path
 std::vector<HitInfo> initialPath() {
-	std::cout << "initialPath" << std::endl;
+	//std::cout << "initialPath" << std::endl;
 	return std::vector<HitInfo>();
 }
 
@@ -99,7 +99,7 @@ void MLT::run() {
     bool running = true;
     MarkovChain current(img->width(), img->height());
     MarkovChain proposal(img->width(), img->height());
-    const int count = 512*512;
+    const int count = 1024*1024;
     int i = 0;
 
     // Paint over the geometry scene
@@ -178,18 +178,17 @@ void MLT::accumulatePathContribution(const PathContribution pathContribution, co
 
 		const int ix = int(currentColor.x);
 		const int iy = int(currentColor.y);
-
-		std::cout << "(" << ix << ", " << iy << ")" << std::endl;
-		Vector3 color = currentColor.color;		// TODO: Skal være fladens farve * scaling
-		if (ix >= 0 && ix < img->width() && iy >= 0 && iy < img->height()) {		
-			//img->setPixel(img->getPixel(x, y) + color);				// TODO: Implementer getPixel()
-            Vector3 color = Vector3(0.0f);
+		
+		Vector3 color = currentColor.color * scaling;		// TODO: Skal være fladens farve * scaling
+		if (ix >= 0 && ix < img->width() && iy >= 0 && iy < img->height()) {					        
             color = color + picture[iy*img->width() + ix];
             (picture.at(iy*img->width() + ix)).set(color);
 			img->setPixel(ix, iy, color);
 
+			//std::cout << "(" << ix << ", " << iy << ") = " << color << std::endl;
+
 			////////
-			img->drawScanline(iy);
+			img->drawPixel(ix, iy);
 			glFinish();
 		}
 	}
@@ -205,7 +204,7 @@ PathContribution MLT::calcPathContribution(const std::vector<HitInfo> path) cons
 			
 		Vector3 direction = (path.at(1).P - path.at(0).P).normalized();
 
-		double px = -1.0f, py = -1.0f;
+		int px = -1, py = -1;
 		// TODO: Set px and py based on the direction
 		calcCoordinates(subPath, px, py);
 
@@ -304,23 +303,13 @@ double MLT::acceptProb(MarkovChain& current, MarkovChain& proposal) const {
 	return a;
 }
 
-bool MLT::calcCoordinates(std::vector<HitInfo> path, double &px, double &py) const {
-	Vector3 Direction;
-	const HitInfo &Xeye_e = path.at(path.size() - 1);	
+void MLT::calcCoordinates(std::vector<HitInfo> path, int &px, int &py) const {
+	Vector3 direction;	
 
 	if (path.size() >= 2) {				
-		Direction = (path.at(1).P - path.at(0).P).normalized();
-	}
-
-	// get the pixel location		// TODO: Verify this shit
-	Vector3 ScreenCenter = cam->eye() + (cam->viewDir() * cam->getDistance());
-	Vector3 ScreenPosition = cam->eye() + (Direction * (cam->getDistance() / dot(Direction, cam->getDistance()))) - ScreenCenter;
-
-	Vector3 u = cross(g_camera->viewDir(), g_camera->up());
-
-	px = dot(u, ScreenPosition) + (img->width() * 0.5);
-	py = -dot(cam->up(), ScreenPosition) + (img->height() * 0.5);
-	return ((px >= 0) && (px < img->width()) && (py >= 0) && (py < img->height()));
+		direction = (path.at(1).P - path.at(0).P).normalized();
+		cam->rayToPixels(Ray(cam->eye(), direction), px, py, img->width(), img->height());
+	}	
 }
 
 
