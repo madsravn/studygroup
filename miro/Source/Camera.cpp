@@ -175,8 +175,21 @@ Camera::rayToPixels(const Ray& ray, int& x, int& y, int imageWidth, int imageHei
     float imPlaneVPos = divideBy(vDirProjection*scalar, vDir)/(aspectRatio * FILM_SIZE);
     //std::cout << "imPlaneVPos = " << imPlaneVPos << std::endl;
     // TODO: ceil?
-    x = std::ceil((0.5f - imPlaneUPos)*imageWidth - 0.5f);
-    y = std::ceil((0.5f - imPlaneVPos)*imageHeight - 0.5f);
+    float tx = (0.5f - imPlaneUPos)*imageWidth - 0.5f;
+    int itx = std::floor(tx);
+    if(tx - itx > 0.5f) {
+        x = std::ceil(tx);
+    } else {
+        x = std::floor(tx);
+    }
+
+    float ty = (0.5f - imPlaneVPos)*imageHeight - 0.5f;
+    int ity = std::floor(ty);
+    if(ty - ity > 0.5f) {
+        y = std::ceil(ty);
+    } else {
+        y = std::floor(ty);
+    }
     //std::cout << "x = " << x << " og y = " << y << std::endl;
     //const float imPlaneUPos = -((x + 0.5f) / (float)imageWidth - 0.5f); 
 	//const float imPlaneVPos = -((y + 0.5f) / (float)imageHeight - 0.5f); 
