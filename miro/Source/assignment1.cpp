@@ -135,11 +135,21 @@ void makeCornellBox() {
 	xform *= rotate(30, 0, 1, 0);
     xform *= translate(-1, 0, 3);
     mesh = new TriangleMesh;
-    mesh->load("mesh/teapot.obj", xform);
+    mesh->load("mesh/cube.obj", xform);
 	material = new Lambert(Vector3(0, 0, 1.0f));
     addMeshTrianglesToScene(mesh, material);
+
+    xform.setIdentity();
+	xform *= scale(.2, .2, .2);
+	xform *= rotate(30, 0, 1, 0);
+    xform *= translate(1, 0, 2);
+    mesh = new TriangleMesh;
+    mesh->load("mesh/cube.obj", xform);
+	material = new Lambert(Vector3(0, 0, 1.0f));
+    addMeshTrianglesToScene(mesh, material);
+
 	
-	xform.setIdentity();
+	/*xform.setIdentity();
 	xform *= scale(.5, .5, .5);
     xform *= translate(.5, 1.0, -.5);
     mesh = new TriangleMesh;
@@ -169,7 +179,7 @@ void makeCornellBox() {
 	mesh = new TriangleMesh;
 	mesh->load("mesh/cube.obj", xform);
 	material = new Lambert(Vector3(1.0, 1.0, .5f));
-	addMeshTrianglesToScene(mesh, material);
+	addMeshTrianglesToScene(mesh, material);*/
 		
     /*xform.setIdentity();
 	xform *= scale(.3, .3, .3);
@@ -382,33 +392,44 @@ void makeCornellBox2() {
 	TriangleMesh * mesh;
 
     // teapot	
-    /*xform.setIdentity();
+    xform.setIdentity();
 	xform *= scale(.2, .2, .2);
 	xform *= rotate(30, 0, 1, 0);
     xform *= translate(-1, 0, 3);
     mesh = new TriangleMesh;
-    mesh->load("mesh/teapot.obj", xform);
+    mesh->load("mesh/cube.obj", xform);
 	material = new Lambert(Vector3(0, 0, 0.5f));
-    addMeshTrianglesToScene(mesh, material);*/
-	//
+    addMeshTrianglesToScene(mesh, material);
+
+
+    xform.setIdentity();
+	xform *= scale(.3, .4, .5);
+	xform *= rotate(60, 0, 1, 0);
+    xform *= translate(1, 0, 1);
+    mesh = new TriangleMesh;
+    mesh->load("mesh/cube.obj", xform);
+	material = new Lambert(Vector3(0, 0, 0.5f));
+    addMeshTrianglesToScene(mesh, material);
+
+    
 
  //   // Sphere
-	//xform.setIdentity();
-	//xform *= scale(.4, .4, .4);
- //   xform *= translate(.5, 1.0, -.5);
- //   mesh = new TriangleMesh;
- //   mesh->load("mesh/sphere.obj", xform);
-	//material = new RefractionMaterial(1.31f);
- //   addMeshTrianglesToScene(mesh, material);
+	/*xform.setIdentity();
+	xform *= scale(.4, .4, .4);
+    xform *= translate(.5, 1.0, -.5);
+    mesh = new TriangleMesh;
+    mesh->load("mesh/sphere.obj", xform);
+	material = new RefractionMaterial(1.31f);
+    addMeshTrianglesToScene(mesh, material);
 
  //   // Sphere
-	//xform.setIdentity();
-	//xform *= scale(.3, .3, .3);
- //   xform *= translate(-2, 4, 1);
- //   mesh = new TriangleMesh;
- //   mesh->load("mesh/sphere.obj", xform);
-	//material = new ReflectionMaterial();
- //   addMeshTrianglesToScene(mesh, material);	
+	xform.setIdentity();
+	xform *= scale(.3, .3, .3);
+    xform *= translate(-2, 4, 1);
+    mesh = new TriangleMesh;
+    mesh->load("mesh/sphere.obj", xform);
+	material = new ReflectionMaterial();
+    addMeshTrianglesToScene(mesh, material);	*/
 
 	/*
     xform.setIdentity();

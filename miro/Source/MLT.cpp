@@ -42,7 +42,7 @@ std::vector<HitInfo> MLT::generateEyePath(const Ray& eyeRay, const MarkovChain& 
 
 	cam->rayToPixels(eyeRay, x, y, img->width(), img->height());
 
-	std::cout << "(" << x << ", " << y << ")" << std::endl;
+	//std::cout << "(" << x << ", " << y << ")" << std::endl;
 
 	img->setPixel(x,y,Vector3(0.0f));
 	img->drawPixel(x, y);
@@ -313,7 +313,7 @@ double MLT::acceptProb(MarkovChain& current, MarkovChain& proposal) const {
 		double cont_proposal = proposal.contribution.scalarContribution;
 		double cont_current = current.contribution.scalarContribution;
 		a = cont_proposal / cont_current;
-        std::cout << "a = " << a << std::endl;
+        //std::cout << "a = " << a << std::endl;
 		a = std::min(1.0, a); // Clamp value
 		a = std::max(a, 0.0);
 	}
