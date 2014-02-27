@@ -115,7 +115,7 @@ void MLT::run() {
     Ray tRay = cam->randomRay(img->width(), img->height(), current);
     std::vector<HitInfo> tPath = generateEyePath(tRay, current);
     current.contribution = calcPathContribution(tPath);
-    const int count = 1024*1024;
+    const int count = 512*512;
     int i = 0;
 
     // Paint over the geometry scene
@@ -133,9 +133,9 @@ void MLT::run() {
         } else {
             isLargeStepDone = 0.0;
             proposal = current.mutate(img->width(), img->height());
-        }       
+        }
 
-        Ray ray = cam->randomRay(img->width(), img->height(), current);	// TOD: Efter noget tid laver denne linje den samme ray altid.
+        Ray ray = cam->randomRay(img->width(), img->height(), current);	// TODO: Efter noget tid laver denne linje den samme ray altid.
         cam->rayToPixels(ray, ai, bi, img->width(), img->height());
 
         std::vector<HitInfo> path = generateEyePath(ray, current); // TODO: Skal den her evt. være et eller andet
@@ -213,35 +213,41 @@ void MLT::accumulatePathContribution(const PathContribution pathContribution, co
 }
 
 PathContribution MLT::calcPathContribution(const std::vector<HitInfo> path) const {
+
 	//std::cout << "calcPathContribution" << std::endl;
 	PathContribution result = PathContribution();
 
-	for (int pathLength = 1; pathLength < std::min(13, (int)path.size()); pathLength++) {       // TODO: Vi skal lige være sikre på de to intervaller her		
+	if (path.size() < 2)
+		return result;
 
-		std::vector<HitInfo> subPath = subVector(path, 0, pathLength);
-			
-		Vector3 direction = (path.at(1).P - path.at(0).P).normalized();
+	int px = -1, py = -1;
+	Vector3 direction = (path.at(1).P - path.at(0).P).normalized();
 
-		int px = -1, py = -1;
+	cam->rayToPixels(Ray(cam->eye(), direction), px, py, img->width(), img->height());
+
+	//for (int pathLength = 1; pathLength < std::min(13, (int)path.size()); pathLength++) {       // TODO: Vi skal lige være sikre på de to intervaller her		
+
+		std::vector<HitInfo> subPath = subVector(path, 0, path.size());	
+		
 		// TODO: Set px and py based on the direction
-		calcCoordinates(subPath, px, py);
+		//calcCoordinates(subPath, px, py);
 
 		Vector3 throughput = pathTraceFromPath(path); //pathTroughput(subPath);
 
-		double probabilityDensity = pathProbabilityDensity(subPath, pathLength);	// Denne bliver også kørt inde i MISWeight, overflødigt? Nææh
-		if (probabilityDensity <= 0.0f) continue;
+		double probabilityDensity = pathProbabilityDensity(subPath, path.size());	// Denne bliver også kørt inde i MISWeight, overflødigt? Nææh
+		if (probabilityDensity <= 0.0f) return result;
 
-		double weight = MISWeight(subPath, pathLength);
-		if (weight <= 0.0f) continue;
+		double weight = MISWeight(subPath, path.size());
+		if (weight <= 0.0f) return result;
 
 		Vector3 color = throughput * (weight / probabilityDensity);
 
 		// Assert color is positive
-		if (maxVectorValue(color) <= 0.0f) continue;
+		if (maxVectorValue(color) <= 0.0f) return result;
 
 		result.colors.push_back(Contribution(px, py, color));
 		result.scalarContribution = std::max(maxVectorValue(color), result.scalarContribution);
-	}
+	//}
 	return result;
 }
 
@@ -260,11 +266,14 @@ double MLT::pathProbabilityDensity(const std::vector<HitInfo> path, int numEyeVe
 	for (int i = 1; i < numEyeVertices - 1; i++) {		
 		if (i == 1) {  // First hit
 			p *= 1.0 / double(img->width() * img->height());						// divided by image size
-			Vector3 direction = (path.at(i + 1).P - path.at(i).P).normalized();		// Direction from first to second hit
+			Vector3 direction = (path.at(i).P - path.at(i - 1).P).normalized();		// Direction from first to second hit
 			double cosTheta = dot(direction, cam->viewDir());						// Cosine of angle from camera
-			double distanceToScreen = cam->getDistance() / cosTheta;				// Distance to screen from canvas/lens/whatever
+			double distanceToScreen = cam->getDistance() / cosTheta;				// Distance to screen
 			distanceToScreen = distanceToScreen * distanceToScreen;					// Distance to screen squared
-			p /= (cosTheta / distanceToScreen);										// Divided by cosine of angle divided by distance to screen squared				
+			p /= (cosTheta / distanceToScreen);										// Divided by cosine of angle divided by distance to screen squared	
+
+			if ( p < 0.0f)
+				std::cout << "P is negative, I think this is bad: " <<p << std::endl;
 
 		} else {																	// Other hits
 			// PDF of sampling ith vertex

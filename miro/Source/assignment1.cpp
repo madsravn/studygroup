@@ -201,7 +201,7 @@ void makeCornellBox2() {
     g_image = new Image;
 	Triangle* t;
 
-    g_image->resize(32, 32);
+    g_image->resize(512, 512);
     
     // set up the camera
     g_camera->setBGColor(Vector3(0.0f, 0.0f, 0.3f));
@@ -392,24 +392,24 @@ void makeCornellBox2() {
 	TriangleMesh * mesh;
 
     // teapot	
-    xform.setIdentity();
+	/*xform.setIdentity();
 	xform *= scale(.2, .2, .2);
 	xform *= rotate(30, 0, 1, 0);
-    xform *= translate(-1, 0, 3);
-    mesh = new TriangleMesh;
-    mesh->load("mesh/cube.obj", xform);
+	xform *= translate(-1, 0, 3);
+	mesh = new TriangleMesh;
+	mesh->load("mesh/cube.obj", xform);
 	material = new Lambert(Vector3(0, 0, 0.5f));
-    addMeshTrianglesToScene(mesh, material);
+	addMeshTrianglesToScene(mesh, material);
 
 
-    xform.setIdentity();
+	xform.setIdentity();
 	xform *= scale(.3, .4, .5);
 	xform *= rotate(60, 0, 1, 0);
-    xform *= translate(1, 0, 1);
-    mesh = new TriangleMesh;
-    mesh->load("mesh/cube.obj", xform);
+	xform *= translate(1, 0, 1);
+	mesh = new TriangleMesh;
+	mesh->load("mesh/cube.obj", xform);
 	material = new Lambert(Vector3(0, 0, 0.5f));
-    addMeshTrianglesToScene(mesh, material);
+	addMeshTrianglesToScene(mesh, material);*/
 
     
 
