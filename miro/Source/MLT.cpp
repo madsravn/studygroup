@@ -42,7 +42,7 @@ std::vector<HitInfo> MLT::generateEyePath(const Ray& eyeRay, const MarkovChain& 
 
 	cam->rayToPixels(eyeRay, x, y, img->width(), img->height());
 
-	std::cout << "(" << x << ", " << y << ")" << std::endl;
+	//std::cout << "(" << x << ", " << y << ")" << std::endl;
 
 	img->setPixel(x,y,Vector3(0.0f));
 	img->drawPixel(x, y);
@@ -143,6 +143,8 @@ void MLT::run() {
 		//std::cout << proposal.contribution.scalarContribution << std::endl;
         
 		double a = acceptProb(current, proposal);
+
+		//std::cout << a << std::endl;
 
 		// TODO: accumulate samples
 		if (proposal.contribution.scalarContribution > 0.0f)
@@ -306,11 +308,12 @@ double MLT::directionToArea(const HitInfo current, const HitInfo next) const {
 
 double MLT::acceptProb(MarkovChain& current, MarkovChain& proposal) const {
 	// T(y > x) / T(x > y)
-	double a = 0.5;        
+	double a = 1.0;        
 	if (current.contribution.scalarContribution > 0.0){
-		double cont_proposal = proposal.contribution.scalarContribution;
+		double cont_proposal = proposal.contribution.scalarContribution;	// TODO: Kan blive 0. Det skal den nok ikke være
 		double cont_current = current.contribution.scalarContribution;
 		a = cont_proposal / cont_current;
+		std::cout << a << std::endl;
 		a = std::min(1.0, a); // Clamp value
 		a = std::max(a, 0.0);
 	}
