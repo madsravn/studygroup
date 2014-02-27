@@ -89,10 +89,12 @@ void MLT::run() {
 	double b = 0.0f;
 	// TODO: Estimate normalization constant
 	for (int i = 0; i < 10000; i++) {
-		fprintf(stderr, "\rPSMLT Initializing: %5.2f", 100.0 * i / (10000));		
+		fprintf(stdout, "\rPSMLT Initializing: %5.2f", 100.0 * i / (10000));		
+        fflush(stdout);
 		MarkovChain normChain(img->width(), img->height());
 		b += calcPathContribution(generateEyePath(cam->randomRay(img->width(), img->height(), normChain), MC)).scalarContribution;
 	}
+    printf("\n");
 	b /= double(10000);	// average
 	
     bool running = true;
@@ -152,8 +154,8 @@ void MLT::run() {
         
 		i++;
         
-        //printf("Rendering Progress: %.3f%%\r", i/float(count)*100.0f);
-        //fflush(stdout);
+        printf("Rendering Progress: %.3f%%\r", i/float(count)*100.0f);
+        fflush(stdout);
     }
 
     for(int j = 0; j < img->height(); ++j) {
@@ -301,6 +303,7 @@ double MLT::acceptProb(MarkovChain& current, MarkovChain& proposal) const {
 		double cont_proposal = proposal.contribution.scalarContribution;
 		double cont_current = current.contribution.scalarContribution;
 		a = cont_proposal / cont_current;
+        std::cout << "a = " << a << std::endl;
 		a = std::min(1.0, a); // Clamp value
 		a = std::max(a, 0.0);
 	}
