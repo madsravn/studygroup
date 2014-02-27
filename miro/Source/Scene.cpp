@@ -105,8 +105,7 @@ void
 
 	int pfmWidth = 1500, pfmHeight = 1500;
 	pfmImage = readPFMImage("hdr/stpeters_probe.pfm", &pfmWidth, &pfmWidth);
-/*
-#if !defined (_WIN32)
+/*#if !defined (_WIN32)
     std::cout << "Multithreaded" << std::endl;
     std::vector<std::future<void>> futures;
     for(int j = 0; j < img->height(); ++j) {
@@ -131,10 +130,9 @@ void
     for(int j = 0; j < img->height(); ++j) {
         img->drawScanline(j);
     }
-    glFinish();
+    glFinish();*/
 
-#else
-*/
+//#else
     //OLD STUFF
     
 	// loop over all pixels in the image
