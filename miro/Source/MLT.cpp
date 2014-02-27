@@ -121,7 +121,7 @@ void MLT::run() {
         img->drawScanline(j);
         glFinish();
     }
-    while( i < count) {
+    while( true ) {
 		//std::cout << i << std::endl;
 		
         double isLargeStepDone;
@@ -133,7 +133,7 @@ void MLT::run() {
             proposal = current.mutate(img->width(), img->height());
         }       
 
-        Ray ray = cam->randomRay(img->width(), img->height(), current);
+        Ray ray = cam->randomRay(img->width(), img->height(), current);	// TOD: Efter noget tid laver denne linje den samme ray altid.
         cam->rayToPixels(ray, ai, bi, img->width(), img->height());
 
         std::vector<HitInfo> path = generateEyePath(ray, current); // TODO: Skal den her evt. være et eller andet
@@ -307,13 +307,13 @@ double MLT::directionToArea(const HitInfo current, const HitInfo next) const {
 }
 
 double MLT::acceptProb(MarkovChain& current, MarkovChain& proposal) const {
-	// T(y > x) / T(x > y)
+	// T(y > x) / T(x > y)	
 	double a = 1.0;        
 	if (current.contribution.scalarContribution > 0.0){
 		double cont_proposal = proposal.contribution.scalarContribution;	// TODO: Kan blive 0. Det skal den nok ikke være
 		double cont_current = current.contribution.scalarContribution;
 		a = cont_proposal / cont_current;
-		std::cout << a << std::endl;
+		//std::cout << a << std::endl;
 		a = std::min(1.0, a); // Clamp value
 		a = std::max(a, 0.0);
 	}

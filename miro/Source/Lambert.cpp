@@ -10,7 +10,7 @@ double M_PI = 3.14159265358979;
 double M_1_PI = 1.0/M_PI;
 #endif
 
-bool softShadows = true;
+bool softShadows = false;
 
 Lambert::Lambert(const Vector3 & kd, const Vector3 & ka) :
 	m_kd(kd), m_ka(ka)
