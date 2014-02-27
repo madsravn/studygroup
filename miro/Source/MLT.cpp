@@ -189,7 +189,7 @@ void MLT::accumulatePathContribution(const PathContribution pathContribution, co
             (picture.at(iy*img->width() + ix)).set(color);
 			img->setPixel(ix, iy, color);
 
-			std::cout << "(" << ix << ", " << iy << ") = " << color << std::endl;
+			//std::cout << "(" << ix << ", " << iy << ") = " << color << std::endl;
 
 			////////
 			img->drawPixel(ix, iy);

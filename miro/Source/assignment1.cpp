@@ -191,7 +191,7 @@ void makeCornellBox2() {
     g_image = new Image;
 	Triangle* t;
 
-    g_image->resize(64, 64);
+    g_image->resize(512, 512);
     
     // set up the camera
     g_camera->setBGColor(Vector3(0.0f, 0.0f, 0.3f));
