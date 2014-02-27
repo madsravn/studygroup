@@ -94,8 +94,7 @@ void MLT::run() {
 		b += calcPathContribution(generateEyePath(cam->randomRay(img->width(), img->height(), normChain), MC)).scalarContribution;
 	}
 	b /= double(10000);	// average
-
-
+	
     bool running = true;
     MarkovChain current(img->width(), img->height());
     MarkovChain proposal(img->width(), img->height());
@@ -190,7 +189,7 @@ void MLT::accumulatePathContribution(const PathContribution pathContribution, co
             (picture.at(iy*img->width() + ix)).set(color);
 			img->setPixel(ix, iy, color);
 
-			//std::cout << "(" << ix << ", " << iy << ") = " << color << std::endl;
+			std::cout << "(" << ix << ", " << iy << ") = " << color << std::endl;
 
 			////////
 			img->drawPixel(ix, iy);
