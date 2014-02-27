@@ -38,6 +38,16 @@ void MLT::tracePath(std::vector<HitInfo>& path, const Ray &ray, int recDepth, co
 // Trace path from eye
 std::vector<HitInfo> MLT::generateEyePath(const Ray& eyeRay, const MarkovChain& MC) const {
 	//std::cout << "generateEyePath" << std::endl;
+	int x, y;
+
+	cam->rayToPixels(eyeRay, x, y, img->width(), img->height());
+
+	std::cout << "(" << x << ", " << y << ")" << std::endl;
+
+	img->setPixel(x,y,Vector3(0.0f));
+	img->drawPixel(x, y);
+	glFinish();
+
 	std::vector<HitInfo> result;	
 	result.push_back(HitInfo(0.0f, eyeRay.o));
 
