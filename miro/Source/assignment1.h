@@ -5,3 +5,4 @@ void makeSponzaScene();
 void makeCornellBox();
 void makeCornellBox2();
 void makeCornellBoxFromObj();
+void makePBRTScene();

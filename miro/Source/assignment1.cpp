@@ -59,6 +59,45 @@ void makeSquare(Vector3 c1, Vector3 c2, Vector3 c3, Vector3 c4, Vector3 n,
 
 }
 
+void makePBRTScene() {
+
+    g_camera = new Camera;
+    g_scene = new Scene;
+    g_image = new Image;
+	Triangle* t;
+
+    g_image->resize(512, 512);
+    
+    // set up the camera
+    g_camera->setBGColor(Vector3(0.0f, 0.0f, 0.3f));
+    g_camera->setEye(Vector3(278, 278, 279.5));
+    g_camera->setLookAt(Vector3(0, 0, 0));
+    // TODO: Udregn rigtig UP
+    g_camera->setUp(Vector3(0, 1, 0));
+    g_camera->setFOV(55);
+	g_camera->lensSize = 0.001f;
+	g_camera->focusDistance = 4; 
+	g_camera->aperture = 0.01;
+	g_camera->focalLength = 0.04;
+	g_camera->fNumber = 3.5;
+
+
+    PointLight * light = new PointLight;
+    light->setPosition(Vector3(0, 200, 0));    
+    // TODO: Rigtig farve
+	light->setColor(Vector3(1.0f));
+    light->setWattage(10);
+    light->setRadius(0.5f);
+    g_scene->addLight(light);
+
+    makeSquare(Vector3(0,0,560), Vector3(550,0,560), Vector3(0,0,0), Vector3(550,0,0), Vector3(0,1,0),		new Lambert(Vector3(0, 1.0f, 1.0f)), g_scene);
+
+}
+
+
+
+
+
 
 void makeCornellBox() {
 	g_camera = new Camera;
