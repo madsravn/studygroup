@@ -1,6 +1,6 @@
 MAKE		= make
 AR		= @ar
-CC              = @clang++
+CC              = @g++
 MV		= @mv
 RM		= @rm -rf
 MKDIR		= @mkdir

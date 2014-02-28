@@ -118,7 +118,7 @@ void MLT::run() {
     Ray tRay = cam->randomRay(img->width(), img->height(), current);
     std::vector<HitInfo> tPath = generateEyePath(tRay, current);
     current.contribution = calcPathContribution(tPath);
-    const int count = 512*512;
+    int count = 0;
     int i = 0;
 
     // Paint over the geometry scene
@@ -126,7 +126,7 @@ void MLT::run() {
         img->drawScanline(j);
         glFinish();
     }
-    while( true ) {
+    while( count < 200 ) {
 		//std::cout << i << std::endl;
 		
         double isLargeStepDone;
@@ -166,8 +166,9 @@ void MLT::run() {
         }
         
 		i++;
-		if(i % 1000000 == 0) {
+		if(i % 100000 == 0) {
 			i = 0;
+            count++;
 		    for(int j = 0; j < img->height(); ++j) {
 		        img->drawScanline(j);
 		        glFinish();
