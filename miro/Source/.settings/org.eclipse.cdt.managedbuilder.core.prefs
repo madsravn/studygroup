@@ -1,0 +1,13 @@
+eclipse.preferences.version=1
+environment/buildEnvironmentInclude/cdt.managedbuild.toolchain.llvm.clang.linux.base.1913535036/CPATH/delimiter=\:
+environment/buildEnvironmentInclude/cdt.managedbuild.toolchain.llvm.clang.linux.base.1913535036/CPATH/operation=remove
+environment/buildEnvironmentInclude/cdt.managedbuild.toolchain.llvm.clang.linux.base.1913535036/CPLUS_INCLUDE_PATH/delimiter=\:
+environment/buildEnvironmentInclude/cdt.managedbuild.toolchain.llvm.clang.linux.base.1913535036/CPLUS_INCLUDE_PATH/operation=remove
+environment/buildEnvironmentInclude/cdt.managedbuild.toolchain.llvm.clang.linux.base.1913535036/C_INCLUDE_PATH/delimiter=\:
+environment/buildEnvironmentInclude/cdt.managedbuild.toolchain.llvm.clang.linux.base.1913535036/C_INCLUDE_PATH/operation=remove
+environment/buildEnvironmentInclude/cdt.managedbuild.toolchain.llvm.clang.linux.base.1913535036/append=true
+environment/buildEnvironmentInclude/cdt.managedbuild.toolchain.llvm.clang.linux.base.1913535036/appendContributed=true
+environment/buildEnvironmentLibrary/cdt.managedbuild.toolchain.llvm.clang.linux.base.1913535036/LIBRARY_PATH/delimiter=\:
+environment/buildEnvironmentLibrary/cdt.managedbuild.toolchain.llvm.clang.linux.base.1913535036/LIBRARY_PATH/operation=remove
+environment/buildEnvironmentLibrary/cdt.managedbuild.toolchain.llvm.clang.linux.base.1913535036/append=true
+environment/buildEnvironmentLibrary/cdt.managedbuild.toolchain.llvm.clang.linux.base.1913535036/appendContributed=true
