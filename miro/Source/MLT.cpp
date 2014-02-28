@@ -205,8 +205,14 @@ void MLT::accumulatePathContribution(const PathContribution pathContribution, co
 		const int iy = int(currentColor.y);
 		
 		Vector3 color = currentColor.color * scaling;		// TODO: Skal være fladens farve * scaling
-		if (ix >= 0 && ix < img->width() && iy >= 0 && iy < img->height()) {					        
-            color = color + picture[iy*img->width() + ix];
+		if (ix >= 0 && ix < img->width() && iy >= 0 && iy < img->height()) {	
+
+			Vector3 newColor = color + picture[iy*img->width() + ix];
+
+			if(newColor.x < color.x || newColor.y < color.y || newColor.z < color.z)
+				std::cout << "new color is darker. Old color: " << color << "\tNew color: " << newColor <<std::endl;
+
+            color = newColor;
             (picture.at(iy*img->width() + ix)).set(color);
 			img->setPixel(ix, iy, color);
 
