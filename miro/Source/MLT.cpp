@@ -102,6 +102,7 @@ void MLT::run() {
 		fprintf(stdout, "\rPSMLT Initializing: %5.2f", 100.0 * i / (10000));		
         fflush(stdout);
 		MarkovChain normChain(img->width(), img->height());
+        //TODO: Er det virkelig MC der skal bruges her? 
 		b += calcPathContribution(generateEyePath(cam->randomRay(img->width(), img->height(), normChain), MC)).scalarContribution;
 	}
     printf("\n");
