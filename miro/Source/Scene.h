@@ -6,6 +6,7 @@
 #include "PointLight.h"
 #include "BVH.h"
 #include "MLT.h"
+#include "PathTracer.h"
 
 class Camera;
 class Image;
@@ -29,7 +30,6 @@ public:
     bool trace(HitInfo& minHit, const Ray& ray,
                float tMin = 0.0f, float tMax = MIRO_TMAX) const;
 	Vector3 basicShading(const Ray &ray);
-	Vector3 pathTraceShading(const Ray &ray, bool log = false);
 	Vector3 tracePath(const Ray &ray, int recDepth, bool log = false);
 	Vector3 biPathTraceShading(const Ray &ray);	
 	Vector3 pathTraceFromPath(std::vector<HitInfo> path);

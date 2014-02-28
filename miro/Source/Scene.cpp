@@ -92,76 +92,26 @@ void Scene::preCalc() {
 
 void Scene::multithread( Ray ray, Camera* cam, Image* img, int i, int j) {      
     ray = cam->eyeRay(i, j, img->width(), img->height());					
-    Vector3 shadeResult = pathTraceShading(ray);
+    Vector3 shadeResult = Vector3(0.0f);//pathTraceShading(ray);
     img->setPixel(i, j, shadeResult);
 }
 
 void
 	Scene::raytraceImage(Camera *cam, Image *img)
 {
-	Ray ray;
-	HitInfo hitInfo;
-	Vector3 shadeResult;
+
 
 	int pfmWidth = 1500, pfmHeight = 1500;
 	pfmImage = readPFMImage("hdr/stpeters_probe.pfm", &pfmWidth, &pfmWidth);
-/*#if !defined (_WIN32)
-    std::cout << "Multithreaded" << std::endl;
-    std::vector<std::future<void>> futures;
-    for(int j = 0; j < img->height(); ++j) {
-        for(int i = 0; i < img->width(); ++i) {
-            futures.push_back(std::async(&Scene::multithread, this, ray, cam, img, i, j));
-        }
-    }
-    auto size = futures.size();
-    int progress = 0;
-    for(auto &e : futures) {
-        try {
-            e.get();
-            progress++;
-            printf("Rendering Progress: %.3f%%\r", progress/float(size)*100.0f);
-            fflush(stdout);
 
-        } catch (const std::exception& e) {
-            std::cerr << "EXCEPTION: " << e.what() << std::endl;
-        }
-    }
-
-    for(int j = 0; j < img->height(); ++j) {
-        img->drawScanline(j);
-    }
-    glFinish();*/
-
-//#else
     //OLD STUFF
     
-	// loop over all pixels in the image
+	
+	PathTracer pathTracer = PathTracer(*this, img, cam, pathSamples);
+	pathTracer.run();
+	/*MLT mlt = MLT(*this, img, cam, pathSamples);
+	mlt.run();*/
 
-	MLT mlt = MLT(*this, img, cam, pathSamples);
-	mlt.run();
-	//for (int j = 0; j < img->height(); ++j)
-	//{
-	//	for (int i = 0; i < img->width(); ++i)
-	//	{
-	//		ray = cam->eyeRay(i, j, img->width(), img->height());				
-	//					
-	//		std::vector<HitInfo> path = mlt.generateEyePath(ray);
-	//		
-	//		//shadeResult = basicShading(ray);
-	//		shadeResult = pathTraceShading(ray);
-	//		//shadeResult = biPathTraceShading(ray);
-	//		//shadeResult = pathTraceFromPath(path);			
-
-	//		/*if(shadeResult.x > 1 && shadeResult.y > 1 && shadeResult.z > 1)
-	//			std::cout << i << ", " << j << ":\t" << shadeResult << std::endl;	*/		
-	//		img->setPixel(i, j, shadeResult);
-	//	}
-	//	img->drawScanline(j);
-	//	glFinish();
-	//	printf("Rendering Progress: %.3f%%\r", j/float(img->height())*100.0f);
-	//	fflush(stdout);
-	//}
-	//#endif
 
 	printf("Rendering Progress: 100.000%%\n");
 	debug("done Raytracing!\n");
@@ -193,22 +143,7 @@ Vector3 Scene::tracePath(const Ray &ray, int recDepth, bool log) {
 	return shadeResult;
 }
 
-Vector3 Scene::pathTraceShading(const Ray &ray, bool log) {
-	HitInfo hitInfo;
-	Vector3 shadeResult = 0;
 
-    if(log) std::cout << "Ray is " << ray << std::endl;		
-
-	float inversePathSamples = 1.0f / (float)(pathSamples);
-	for (int i = 0; i < pathSamples; ++i) {	
-		// Trace new ray
-		if (trace(hitInfo, ray, 0.0001f)) {
-			shadeResult += hitInfo.material->shade(ray, hitInfo, *this, 0) * inversePathSamples;		
-		} 
-	}		
-
-	return shadeResult;
-}
 
 Vector3 Scene::basicShading(const Ray &ray) {
 	

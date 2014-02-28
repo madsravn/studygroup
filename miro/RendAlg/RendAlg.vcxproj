@@ -53,6 +53,7 @@
     <ClCompile Include="..\Source\MLT.cpp" />
     <ClCompile Include="..\Source\Node.cpp" />
     <ClCompile Include="..\Source\PathContribution.cpp" />
+    <ClCompile Include="..\Source\PathTracer.cpp" />
     <ClCompile Include="..\Source\PFMLoader.cpp" />
     <ClCompile Include="..\Source\ReflectionMaterial.cpp" />
     <ClCompile Include="..\Source\RefractionMaterial.cpp" />
@@ -69,6 +70,7 @@
     <ClInclude Include="..\Source\BVH.h" />
     <ClInclude Include="..\Source\Camera.h" />
     <ClInclude Include="..\Source\Console.h" />
+    <ClInclude Include="..\Source\Constants.h" />
     <ClInclude Include="..\Source\Contribution.h" />
     <ClInclude Include="..\Source\HDRMaterial.h" />
     <ClInclude Include="..\Source\Image.h" />
@@ -83,6 +85,7 @@
     <ClInclude Include="..\Source\Object.h" />
     <ClInclude Include="..\Source\OpenGL.h" />
     <ClInclude Include="..\Source\PathContribution.h" />
+    <ClInclude Include="..\Source\PathTracer.h" />
     <ClInclude Include="..\Source\PFMLoader.h" />
     <ClInclude Include="..\Source\PointLight.h" />
     <ClInclude Include="..\Source\Ray.h" />
