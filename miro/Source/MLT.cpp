@@ -1,5 +1,6 @@
 #include "MLT.h"
 #include "Constants.h"
+#include <limits>
 
 const int maxRecDepth  = Constants::MaxPathLength;
 
@@ -7,8 +8,8 @@ const int maxRecDepth  = Constants::MaxPathLength;
 MLT::MLT(Scene& scene, Image* image, Camera* camera, int pathSamples) : scene(scene), img(image), cam(camera), samples(pathSamples) {
     MC.imageWidth = image->width();
     MC.imageHeight = image->height();
-    for(int i = 0; i < img->height()*img->width(); ++i) {
-        picture.push_back(Vector3(0.0f));
+    for(int i = 0; i < 3*img->height()*img->width(); ++i) {
+        picture.push_back(0.0f);
     }
 }
 
@@ -93,6 +94,7 @@ void MLT::run() {
 		return image	
 	*/
     
+    const int INTMAXHALF = std::numeric_limits<int>::max() / 2;
 
     double LargeStepProb = 0.3;
 
@@ -164,7 +166,7 @@ void MLT::run() {
         }
         
 		i++;
-		if(i % 30000 == 0) {
+		if(i % 1000000 == 0) {
 			i = 0;
 		    for(int j = 0; j < img->height(); ++j) {
 		        img->drawScanline(j);
@@ -206,14 +208,17 @@ void MLT::accumulatePathContribution(const PathContribution pathContribution, co
 		
 		Vector3 color = currentColor.color * scaling;		// TODO: Skal være fladens farve * scaling
 		if (ix >= 0 && ix < img->width() && iy >= 0 && iy < img->height()) {	
+            int pixelpos = iy*img->width() + ix;
 
-			Vector3 newColor = color + picture[iy*img->width() + ix];
+			Vector3 newColor = color + Vector3(picture[3*pixelpos], picture[3*pixelpos+1], picture[3*pixelpos+2]);
 
 			if(newColor.x < color.x || newColor.y < color.y || newColor.z < color.z)
 				std::cout << "new color is darker. Old color: " << color << "\tNew color: " << newColor <<std::endl;
 
             color = newColor;
-            (picture.at(iy*img->width() + ix)).set(color);
+            picture[3*pixelpos] = color.x;
+            picture[3*pixelpos+1] = color.y;
+            picture[3*pixelpos+2] = color.z;
 			img->setPixel(ix, iy, color);
 
 			//std::cout << "(" << ix << ", " << iy << ") = " << color << std::endl;
