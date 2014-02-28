@@ -1,7 +1,7 @@
 #include "MLT.h"
 #include "Constants.h"
 
-const int maxRecDepth  = Constants::MaxPathLength; // TODO: Flyt denne konstant, evt. til en klasse med konstanter
+const int maxRecDepth  = Constants::MaxPathLength;
 
 
 MLT::MLT(Scene& scene, Image* image, Camera* camera, int pathSamples) : scene(scene), img(image), cam(camera), samples(pathSamples) {
@@ -45,8 +45,8 @@ std::vector<HitInfo> MLT::generateEyePath(const Ray& eyeRay, const MarkovChain& 
 	//std::cout << "(" << x << ", " << y << ")" << std::endl;
 
 	img->setPixel(x,y,Vector3(0.0f));
-	img->drawPixel(x, y);
-	glFinish();
+	//img->drawPixel(x, y);
+	//glFinish();
 
 	std::vector<HitInfo> result;	
 	result.push_back(HitInfo(0.0f, eyeRay.o));
@@ -164,9 +164,17 @@ void MLT::run() {
         }
         
 		i++;
+		if(i % 30000 == 0) {
+			i = 0;
+		    for(int j = 0; j < img->height(); ++j) {
+		        img->drawScanline(j);
+		        glFinish();
+		    }
+
+		}
         
-        printf("Rendering Progress: %.3f%%\r", i/float(count)*100.0f);
-        fflush(stdout);
+        //printf("Rendering Progress: %.3f%%\r", i/float(count)*100.0f);
+        //fflush(stdout);
     }
 
     for(int j = 0; j < img->height(); ++j) {
@@ -205,8 +213,8 @@ void MLT::accumulatePathContribution(const PathContribution pathContribution, co
 			//std::cout << "(" << ix << ", " << iy << ") = " << color << std::endl;
 
 			////////
-			img->drawPixel(ix, iy);
-			glFinish();
+			//img->drawPixel(ix, iy);
+			//glFinish();
 		}
 	}
 }

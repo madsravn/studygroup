@@ -4,7 +4,7 @@
 //#include <mmintrin.h>
 //#include <xmmintrin.h>
 //#include <emmintrin.h>
-#include <smmintrin.h>
+//#include <smmintrin.h>
 Triangle::Triangle(TriangleMesh * m, unsigned int i) :
     m_mesh(m), m_index(i)
 {
