@@ -92,7 +92,7 @@ void MLT::run() {
 			recordSample(image, x)
 		return image	
 	*/
-    int ai, bi;
+    
 
     double LargeStepProb = 0.3;
 
@@ -135,11 +135,9 @@ void MLT::run() {
             proposal = current.mutate(img->width(), img->height());
         }
 
-        Ray ray = cam->randomRay(img->width(), img->height(), current);	// TODO: Efter noget tid laver denne linje den samme ray altid.
-        cam->rayToPixels(ray, ai, bi, img->width(), img->height());
 
-        std::vector<HitInfo> path = generateEyePath(ray, current); // TODO: Skal den her evt. være et eller andet
-
+		std::vector<HitInfo> path = generateEyePathFromChain(proposal);		
+		
 		proposal.contribution = calcPathContribution(path);
 
 		//std::cout << proposal.contribution.scalarContribution << std::endl;
@@ -191,7 +189,7 @@ Vector3 MLT::pathTraceFromPath(std::vector<HitInfo> path) const{
 // TODO: Ikke færdig
 void MLT::accumulatePathContribution(const PathContribution pathContribution, const double scaling) const {	
 	//std::cout << "accumulatePathContribution" << std::endl;
-	for (int i = 1; i < pathContribution.colors.size(); i++) {    // Start at first hit, [0] is camera
+	for (int i = 0; i < pathContribution.colors.size(); i++) {    // Start at first hit, [0] is camera
 		Contribution currentColor = pathContribution.colors.at(i);
 
 		const int ix = int(currentColor.x);
@@ -227,12 +225,17 @@ PathContribution MLT::calcPathContribution(const std::vector<HitInfo> path) cons
 
 	//for (int pathLength = 1; pathLength < std::min(13, (int)path.size()); pathLength++) {       // TODO: Vi skal lige være sikre på de to intervaller her		
 
+		//std::vector<HitInfo> subPath = subVector(path, 0, pathLength);
 		std::vector<HitInfo> subPath = subVector(path, 0, path.size());	
 		
 		// TODO: Set px and py based on the direction
+		//int px = -1, py = -1;
 		//calcCoordinates(subPath, px, py);
 
 		Vector3 throughput = pathTraceFromPath(path); //pathTroughput(subPath);
+
+		//double probabilityDensity = pathProbabilityDensity(subPath, pathLength);
+		//if (probabilityDensity <= 0.0f) continue;
 
 		double probabilityDensity = pathProbabilityDensity(subPath, path.size());	// Denne bliver også kørt inde i MISWeight, overflødigt? Nææh
 		if (probabilityDensity <= 0.0f) return result;
@@ -341,6 +344,13 @@ void MLT::calcCoordinates(std::vector<HitInfo> path, int &px, int &py) const {
 	}	
 }
 
+std::vector<HitInfo> MLT::generateEyePathFromChain(MarkovChain chain) const {
+	//int ai, bi;
+	Ray ray = cam->randomRay(img->width(), img->height(), chain);
+	//cam->rayToPixels(ray, ai, bi, img->width(), img->height());
+
+	return generateEyePath(ray, chain);
+}
 
 /*
 tentativeTransitionFunction(x -> y){

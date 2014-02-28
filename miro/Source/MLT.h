@@ -29,6 +29,7 @@ public:
 	double directionToArea(const HitInfo current, const HitInfo next) const;
 	double acceptProb(MarkovChain& current, MarkovChain& proposal) const;
 	void calcCoordinates(std::vector<HitInfo> path, int &px, int &py) const;
+	std::vector<HitInfo> generateEyePathFromChain(MarkovChain chain) const;
 private:
 	Scene& scene;
     Image* img;
