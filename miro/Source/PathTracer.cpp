@@ -50,7 +50,6 @@ std::vector<HitInfo> PathTracer::generatePath(const Ray& eyeRay) const {
 	std::vector<HitInfo> path = std::vector<HitInfo>();
 	path.push_back(HitInfo(0.0f, eyeRay.o, eyeRay.d));	// Eye position
 
-
 	Ray ray = eyeRay;
 	HitInfo hitInfo;
 	for (int i = 0; i < maxRecDepth; i++)
