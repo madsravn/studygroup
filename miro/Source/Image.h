@@ -28,6 +28,9 @@ public:
     void writePPM(char* pcFile); // write data to a ppm image file
     void writePPM(char *pcName, unsigned char *data, int width, int height);
 
+    Vector3 getPixel(int x, int y);
+
+
     unsigned char* getCharPixels()  {return (unsigned char*)m_pixels;}
     int width() const               {return m_width;}
     int height() const              {return m_height;}

@@ -58,6 +58,12 @@ float toneMapping(float V_in) {
 	return (V_in / (V_in + 1));
 }
 
+Vector3 Image::getPixel(int x, int y) {
+    return Vector3(m_pixels[y*m_width+x].r,m_pixels[y*m_width+x].g,m_pixels[y*m_width+x].b);
+}
+
+
+
 void Image::setPixel(int x, int y, const Vector3& p)
 {
 	//Vector3 p_t  = p;

@@ -126,7 +126,7 @@ void MLT::run() {
         img->drawScanline(j);
         glFinish();
     }
-    while( count < 200 ) {
+    while( count < 50 ) {
 		//std::cout << i << std::endl;
 		
         double isLargeStepDone;
@@ -173,6 +173,7 @@ void MLT::run() {
 		        img->drawScanline(j);
 		        glFinish();
 		    }
+            std::cout << "PIXEL (262,78) = " << img->getPixel(262,78) << std::endl;
 
 		}
         
