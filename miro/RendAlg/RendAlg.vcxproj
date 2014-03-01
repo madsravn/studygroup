@@ -39,6 +39,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Source\assignment1.cpp" />
+    <ClCompile Include="..\Source\BasicShader.cpp" />
     <ClCompile Include="..\Source\BLPatch.cpp" />
     <ClCompile Include="..\Source\BVH.cpp" />
     <ClCompile Include="..\Source\Camera.cpp" />
@@ -66,6 +67,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Source\assignment1.h" />
+    <ClInclude Include="..\Source\BasicShader.h" />
     <ClInclude Include="..\Source\BLPatch.h" />
     <ClInclude Include="..\Source\BVH.h" />
     <ClInclude Include="..\Source\Camera.h" />

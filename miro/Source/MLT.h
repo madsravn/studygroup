@@ -9,6 +9,7 @@
 #include "Camera.h"
 #include "MarkovChain.h"
 #include "PathContribution.h"
+#include "PathTracer.h"
 
 class MLT
 {

@@ -9,7 +9,7 @@ Material::~Material()
 }
 
 Vector3
-Material::shade(const Ray&, const HitInfo&, const Scene&, const int recDepth, bool log) const
+Material::shade(const Ray&, const HitInfo&, const Scene&, const int recDepth, int maxRecDepth, bool log) const
 {
     return Vector3(1.0f, 1.0f, 1.0f);
 }
@@ -20,6 +20,10 @@ Vector3 Material::shade(const std::vector<HitInfo>& path, const int pathPosition
 }
 
 Ray Material::bounceRay(const Ray& ray, const HitInfo& hit,const int recDepth, const MarkovChain& MC) const {
+	return Ray();
+}
+
+Ray Material::bounceRay(const Ray& ray, const HitInfo& hit) const {
 	return Ray();
 }
 

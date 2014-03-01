@@ -3,10 +3,9 @@
 #include "Scene.h"
 #include "PFMLoader.h"
 
-Vector3 ReflectionMaterial::shade(const Ray& ray, const HitInfo& hit, const Scene& scene, int recDepth, bool log) const {
-
-	if (recDepth > 5) {
-		return Vector3(0,0,0);
+Vector3 ReflectionMaterial::shade(const Ray& ray, const HitInfo& hit, const Scene& scene, int recDepth, int maxRecDepth, bool log) const {
+	if (recDepth > maxRecDepth && maxRecDepth != 1) {    // Skulle gerne reflektere selvom det er basic shading
+		return Vector3(0.0f);
 	}
 
 	// specular reflection
@@ -15,9 +14,8 @@ Vector3 ReflectionMaterial::shade(const Ray& ray, const HitInfo& hit, const Scen
 	Ray rayReflect = Ray(Vector3(hit.P), vReflect);
 
 	if(scene.trace(reflectionHit, rayReflect, 0.001f, 100.0f)) {
-		return reflectionHit.material->shade(rayReflect, reflectionHit, scene, recDepth + 1);
-	}
-	else {
+		return reflectionHit.material->shade(rayReflect, reflectionHit, scene, recDepth + 1, maxRecDepth);
+	} else {
 		//Image based
 		return scene.getHDRColorFromVector(rayReflect.d);
 	}

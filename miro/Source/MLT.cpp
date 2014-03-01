@@ -12,7 +12,6 @@ MLT::MLT(Scene& scene, Image* image, Camera* camera, int pathSamples) : scene(sc
     }
 }
 
-
  //Recursive path tracing
 void MLT::tracePath(std::vector<HitInfo>& path, const Ray &ray, int recDepth, const MarkovChain& MC, bool log) const {
 	//std::cout << "tracePath" << std::endl;
@@ -92,7 +91,6 @@ void MLT::run() {
 			recordSample(image, x)
 		return image	
 	*/
-    
 
     double LargeStepProb = 0.3;
 
@@ -102,7 +100,7 @@ void MLT::run() {
 		fprintf(stdout, "\rPSMLT Initializing: %5.2f", 100.0 * i / (10000));		
         fflush(stdout);
 		MarkovChain normChain(img->width(), img->height());
-        //TODO: Er det virkelig MC der skal bruges her? 
+        
 		b += calcPathContribution(generateEyePath(cam->randomRay(img->width(), img->height(), normChain), MC)).scalarContribution;
 	}
     printf("\n");
@@ -195,7 +193,6 @@ Vector3 MLT::pathTraceFromPath(std::vector<HitInfo> path) const{
 	return shadeResult;
 }
 
-// TODO: Ikke færdig
 void MLT::accumulatePathContribution(const PathContribution pathContribution, const double scaling) const {	
 	//std::cout << "accumulatePathContribution" << std::endl;
 	for (int i = 0; i < pathContribution.colors.size(); i++) {    // Start at first hit, [0] is camera
@@ -215,12 +212,6 @@ void MLT::accumulatePathContribution(const PathContribution pathContribution, co
             color = newColor;
             (picture.at(iy*img->width() + ix)).set(color);
 			img->setPixel(ix, iy, color);
-
-			//std::cout << "(" << ix << ", " << iy << ") = " << color << std::endl;
-
-			////////
-			//img->drawPixel(ix, iy);
-			//glFinish();
 		}
 	}
 }
@@ -230,42 +221,29 @@ PathContribution MLT::calcPathContribution(const std::vector<HitInfo> path) cons
 	//std::cout << "calcPathContribution" << std::endl;
 	PathContribution result = PathContribution();
 
-	if (path.size() < 2)
-		return result;
+	if (path.size() < 2) return result;
 
 	int px = -1, py = -1;
 	Vector3 direction = (path.at(1).P - path.at(0).P).normalized();
 
-	cam->rayToPixels(Ray(cam->eye(), direction), px, py, img->width(), img->height());
+	cam->rayToPixels(Ray(cam->eye(), direction), px, py, img->width(), img->height());	
 
-	//for (int pathLength = 1; pathLength < std::min(13, (int)path.size()); pathLength++) {       // TODO: Vi skal lige være sikre på de to intervaller her		
+	Vector3 throughput = pathTraceFromPath(path);
 
-		//std::vector<HitInfo> subPath = subVector(path, 0, pathLength);
-		std::vector<HitInfo> subPath = subVector(path, 0, path.size());	
-		
-		// TODO: Set px and py based on the direction
-		//int px = -1, py = -1;
-		//calcCoordinates(subPath, px, py);
+	double probabilityDensity = pathProbabilityDensity(path, path.size());	// Denne bliver også kørt inde i MISWeight, overflødigt? Nææh
+	if (probabilityDensity <= 0.0f) return result;
 
-		Vector3 throughput = pathTraceFromPath(path); //pathTroughput(subPath);
+	double weight = MISWeight(path, path.size());
+	if (weight <= 0.0f) return result;
 
-		//double probabilityDensity = pathProbabilityDensity(subPath, pathLength);
-		//if (probabilityDensity <= 0.0f) continue;
+	Vector3 color = throughput * (weight / probabilityDensity);
 
-		double probabilityDensity = pathProbabilityDensity(subPath, path.size());	// Denne bliver også kørt inde i MISWeight, overflødigt? Nææh
-		if (probabilityDensity <= 0.0f) return result;
+	// Assert color is positive
+	if (maxVectorValue(color) <= 0.0f) return result;
 
-		double weight = MISWeight(subPath, path.size());
-		if (weight <= 0.0f) return result;
-
-		Vector3 color = throughput * (weight / probabilityDensity);
-
-		// Assert color is positive
-		if (maxVectorValue(color) <= 0.0f) return result;
-
-		result.colors.push_back(Contribution(px, py, color));
-		result.scalarContribution = std::max(maxVectorValue(color), result.scalarContribution);
-	//}
+	result.colors.push_back(Contribution(px, py, color));
+	result.scalarContribution = std::max(maxVectorValue(color), result.scalarContribution);
+	
 	return result;
 }
 

@@ -108,27 +108,15 @@ void
     
 	
 	/*PathTracer pathTracer = PathTracer(*this, img, cam, pathSamples);
-	pathTracer.run();*/
+	pathTracer.run();*//*
 	MLT mlt = MLT(*this, img, cam, pathSamples);
-	mlt.run();
-
+	mlt.run();*/
+	/*BasicShader basicShader = BasicShader(*this, img, cam);
+	basicShader.run();*/
 
 	printf("Rendering Progress: 100.000%%\n");
 	debug("done Raytracing!\n");
 }
-
-/*Vector3 Scene::pathTraceFromMLT(const Ray &ray, MLT &mlt) {	
-	Vector3 shadeResult = Vector3(0.0f);	
-
-	float inversePathSamples = 1.0f / (float)(pathSamples);
-	for(int i = 0; i < pathSamples; i++) {
-		if (path.size() > 1) {
-			shadeResult += path.at(1).material->shade(path, 1, *this) * inversePathSamples;
-		}
-	}
-
-	return shadeResult;
-}*/
 
 Vector3 Scene::tracePath(const Ray &ray, int recDepth, bool log) {
 
@@ -137,13 +125,11 @@ Vector3 Scene::tracePath(const Ray &ray, int recDepth, bool log) {
 
     if(log) std::cout << "Ray is " << ray << std::endl;
 	if (trace(hitInfo, ray, 0.0001f)) {
-		shadeResult += hitInfo.material->shade(ray, hitInfo, *this, recDepth);		
+		shadeResult += hitInfo.material->shade(ray, hitInfo, *this, recDepth, 7);		
 	}
-
+	
 	return shadeResult;
 }
-
-
 
 Vector3 Scene::basicShading(const Ray &ray) {
 	
@@ -152,7 +138,7 @@ Vector3 Scene::basicShading(const Ray &ray) {
 	
 	if (trace(hitInfo, ray, 0.0001f))
 	{
-		shadeResult += (hitInfo.material->shade(ray, hitInfo, *this, recDepth));
+		shadeResult += (hitInfo.material->shade(ray, hitInfo, *this, recDepth, 1));
 	}	
 
 	return shadeResult;
