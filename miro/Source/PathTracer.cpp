@@ -1,7 +1,6 @@
 #include "PathTracer.h"
 
 bool buildPath = true;	// Build path before shading
-int maxRecDepth = 7;
 
 PathTracer::PathTracer(Scene& scene, Image* image, Camera* camera, int pathSamples)  : scene(scene), img(image), cam(camera), samples(pathSamples) {
 
@@ -27,7 +26,7 @@ void PathTracer::run() {
 				Vector3 pathResult = Vector3(0.0f);
 				if (!buildPath) {
 					if (scene.trace(hitInfo, ray, 0.0001f)) {
-						traceResult = hitInfo.material->shade(ray, hitInfo, scene, 0, maxRecDepth, 0);		
+						traceResult = hitInfo.material->shade(ray, hitInfo, scene, 0, Constants::maxRecDepth, 0);		
 						shadeResult += traceResult * inverseSamples;
 					}
 				} else {
@@ -52,7 +51,7 @@ std::vector<HitInfo> PathTracer::generatePath(const Ray& eyeRay) const {
 
 	Ray ray = eyeRay;
 	HitInfo hitInfo;
-	for (int i = 0; i < maxRecDepth; i++)
+	for (int i = 0; i < Constants::maxRecDepth; i++)
 	{
 		if(scene.trace(hitInfo, ray, 0.001f)) {
 			path.push_back(hitInfo);

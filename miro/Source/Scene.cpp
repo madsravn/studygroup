@@ -55,8 +55,8 @@ Vector3 Scene::getHDRColorFromVector(const Vector3 &direction) const {
     area = (realx-estimatedx)*(estimatedy-realy);
     ret += area*pfmImage[estimatedx + estimatedy*pfmWidth];
 
-	//return ret;
-    return Vector3(0,0,0);
+	return ret;
+    //return Vector3(0,0,0);
 }
 
 void
@@ -108,9 +108,9 @@ void
     
 	
 	/*PathTracer pathTracer = PathTracer(*this, img, cam, pathSamples);
-	pathTracer.run();*//*
+	pathTracer.run();*/
 	MLT mlt = MLT(*this, img, cam, pathSamples);
-	mlt.run();*/
+	mlt.run();
 	/*BasicShader basicShader = BasicShader(*this, img, cam);
 	basicShader.run();*/
 
@@ -141,57 +141,6 @@ Vector3 Scene::basicShading(const Ray &ray) {
 		shadeResult += (hitInfo.material->shade(ray, hitInfo, *this, recDepth, 1));
 	}	
 
-	return shadeResult;
-}
-
-// Unused
-Vector3 Scene::biPathTraceShading(const Ray &ray) {
-	HitInfo hitInfo;
-	Vector3 shadeResult = 0;
-	
-	HitInfo eyePath[pathBounces];
-	// Walk from eye
-	if (trace(hitInfo, ray, 0.0001f)) {	
-		Vector3 direction = generateRandomRayDirection(hitInfo.N);
-		Ray randomRay = Ray(hitInfo.P, direction);
-		for(int i = 0; i < pathBounces; ++i) {
-
-			eyePath[i] = hitInfo;
-
-			if (trace(hitInfo, randomRay, 0.0001f)) {
-
-			//TODO: Do something
-			}
-		}
-	} else {
-
-	}
-
-	// Walk from lights
-	for (int i = 0; i < g_scene->lights()->size(); ++i) {
-		HitInfo lightPath[pathBounces];		
-
-		const PointLight *light = (g_scene->lights())->at(i);
-
-		// First entry is the light's own position				// Maybe find an alternative to this
-		lightPath[0] = HitInfo(0.0f, light->position());
-
-		Vector3 direction = generateRandomRayDirection();
-		Ray randomRay = Ray(light->position(), direction);
-
-		for(int i = 1; i < pathBounces; ++i) {
-
-			lightPath[i] = hitInfo;
-
-			if (trace(hitInfo, ray, 0.0001f)) {
-				
-				// TODO: Do something
-
-				Vector3 direction = generateRandomRayDirection(hitInfo.N);
-				randomRay = Ray(hitInfo.P, direction);
-			}		
-		}
-	}
 	return shadeResult;
 }
 

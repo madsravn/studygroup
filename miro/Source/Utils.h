@@ -17,6 +17,14 @@ std::vector<T> subVector(const std::vector<T> &vector, int start, int end) {
 	return std::vector<T>(first, last);
 };
 
+template <class T>
+std::vector<T> concatVectors(const std::vector<T> &A, const std::vector<T> &B) {
+	std::vector<T> AB = std::vector<T>(A);
+	AB.insert(AB.end(), B.begin(), B.end());
+
+	return AB;
+}
+
 double maxVectorValue(Vector3 &vector);
 double luminance(Vector3 color);
 Vector3 clamp(Vector3 vector, float lowerBound, float upperBound);
@@ -34,6 +42,10 @@ inline double perturb(const double value, const double s1, const double s2) {
 	}
     //std::cout << "Result = " << Result << std::endl;
 	return Result;
+}
+
+inline double max(const Vector3 vector) {
+	return std::max(vector.x, std::max(vector.y, vector.z));
 }
 
 

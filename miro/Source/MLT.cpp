@@ -13,6 +13,114 @@ MLT::MLT(Scene& scene, Image* image, Camera* camera, int pathSamples) : scene(sc
     }
 }
 
+
+void MLT::run() {    
+
+	/*	
+	function metropolisLightTransport()
+		x <- initialPath()
+		image <- { array of zeros }
+		for i <- 1 to N
+			y <- mutate(x)
+			a <- acceptProb(x -> y
+			if random < a
+				then x <- y
+			recordSample(image, x)
+		return image	
+	*/
+   
+    const int INTMAXHALF = std::numeric_limits<int>::max() / 2;
+
+    double LargeStepProb = 0.3;
+
+	double b = 0.0f;
+	// Estimate normalization constant
+	for (int i = 0; i < 10000; i++) {
+		fprintf(stdout, "\rPSMLT Initializing: %5.2f", 100.0 * i / (10000));		
+        fflush(stdout);
+		MarkovChain normChain(img->width(), img->height());
+        
+		b += calcPathContribution(generateEyePath(cam->randomRay(img->width(), img->height(), normChain), MC)).scalarContribution;
+	}
+    printf("\n");
+	b /= double(10000);	// average
+	
+    bool running = true;
+    MarkovChain current(img->width(), img->height());
+    MarkovChain proposal(img->width(), img->height());
+
+    // Initialize current
+    Ray tRay = cam->randomRay(img->width(), img->height(), current);
+    std::vector<HitInfo> tPath = generateEyePath(tRay, current);
+    current.contribution = calcPathContribution(tPath);
+    int count = 0;
+    int i = 0;
+
+    // Paint over the geometry scene
+    for(int j = 0; j < img->height(); ++j) {
+        img->drawScanline(j);
+        glFinish();
+    }
+    while( count < 50 ) {
+		//std::cout << i << std::endl;
+		
+        double isLargeStepDone;
+        if(rnd() <= LargeStepProb) {
+            isLargeStepDone = 1.0;
+            proposal = current.large_step(img->width(), img->height());
+        } else {
+            isLargeStepDone = 0.0;
+            proposal = current.mutate(img->width(), img->height());
+        }
+
+		std::vector<HitInfo> path = generateEyePathFromChain(proposal);		
+		
+		proposal.contribution = calcPathContribution(path);
+
+		//std::cout << proposal.contribution.scalarContribution << std::endl;
+        
+		double a = acceptProb(current, proposal);
+
+		//std::cout << a << std::endl;
+
+		// accumulate samples
+		if (proposal.contribution.scalarContribution > 0.0f)
+			accumulatePathContribution(proposal.contribution, 
+				(a + isLargeStepDone)/
+				(proposal.contribution.scalarContribution/b + isLargeStepDone)
+			);
+		if (current.contribution.scalarContribution > 0.0f)
+			accumulatePathContribution(current.contribution, 
+				(1.0 - a)/
+				(current.contribution.scalarContribution/b + isLargeStepDone)
+			);
+
+        if(rnd() <= a) {
+            current = proposal;
+        }
+        
+		i++;
+		if(i % 100000 == 0) {
+			i = 0;
+            count++;
+		    for(int j = 0; j < img->height(); ++j) {
+		        img->drawScanline(j);
+		        glFinish();
+		    }
+            std::cout << "PIXEL (262,78) = " << img->getPixel(262,78) << std::endl;
+
+		}
+        
+        //printf("Rendering Progress: %.3f%%\r", i/float(count)*100.0f);
+        //fflush(stdout);
+    }
+
+    for(int j = 0; j < img->height(); ++j) {
+        img->drawScanline(j);
+        glFinish();
+    }
+}
+
  //Recursive path tracing
 void MLT::tracePath(std::vector<HitInfo>& path, const Ray &ray, int recDepth, const MarkovChain& MC, bool log) const {
 	//std::cout << "tracePath" << std::endl;
@@ -78,114 +186,6 @@ std::vector<HitInfo> initialPath() {
 	return std::vector<HitInfo>();
 }
 
-void MLT::run() {    
-
-	/*	
-	function metropolisLightTransport()
-		x <- initialPath()
-		image <- { array of zeros }
-		for i <- 1 to N
-			y <- mutate(x)
-			a <- acceptProb(x -> y
-			if random < a
-				then x <- y
-			recordSample(image, x)
-		return image	
-	*/
-   
-    const int INTMAXHALF = std::numeric_limits<int>::max() / 2;
-
-    double LargeStepProb = 0.3;
-
-	double b = 0.0f;
-	// TODO: Estimate normalization constant
-	for (int i = 0; i < 10000; i++) {
-		fprintf(stdout, "\rPSMLT Initializing: %5.2f", 100.0 * i / (10000));		
-        fflush(stdout);
-		MarkovChain normChain(img->width(), img->height());
-        
-		b += calcPathContribution(generateEyePath(cam->randomRay(img->width(), img->height(), normChain), MC)).scalarContribution;
-	}
-    printf("\n");
-	b /= double(10000);	// average
-	
-    bool running = true;
-    MarkovChain current(img->width(), img->height());
-    MarkovChain proposal(img->width(), img->height());
-
-    // Initialize current
-    Ray tRay = cam->randomRay(img->width(), img->height(), current);
-    std::vector<HitInfo> tPath = generateEyePath(tRay, current);
-    current.contribution = calcPathContribution(tPath);
-    int count = 0;
-    int i = 0;
-
-    // Paint over the geometry scene
-    for(int j = 0; j < img->height(); ++j) {
-        img->drawScanline(j);
-        glFinish();
-    }
-    while( count < 50 ) {
-		//std::cout << i << std::endl;
-		
-        double isLargeStepDone;
-        if(rnd() <= LargeStepProb) {
-            isLargeStepDone = 1.0;
-            proposal = current.large_step(img->width(), img->height());
-        } else {
-            isLargeStepDone = 0.0;
-            proposal = current.mutate(img->width(), img->height());
-        }
-
-
-		std::vector<HitInfo> path = generateEyePathFromChain(proposal);		
-		
-		proposal.contribution = calcPathContribution(path);
-
-		//std::cout << proposal.contribution.scalarContribution << std::endl;
-        
-		double a = acceptProb(current, proposal);
-
-		//std::cout << a << std::endl;
-
-		// TODO: accumulate samples
-		if (proposal.contribution.scalarContribution > 0.0f)
-			accumulatePathContribution(proposal.contribution, 
-				(a + isLargeStepDone)/
-				(proposal.contribution.scalarContribution/b + isLargeStepDone)
-			);
-		if (current.contribution.scalarContribution > 0.0f)
-			accumulatePathContribution(current.contribution, 
-				(1.0 - a)/
-				(current.contribution.scalarContribution/b + isLargeStepDone)
-			);
-
-        if(rnd() <= a) {
-            current = proposal;
-        }
-        
-		i++;
-		if(i % 100000 == 0) {
-			i = 0;
-            count++;
-		    for(int j = 0; j < img->height(); ++j) {
-		        img->drawScanline(j);
-		        glFinish();
-		    }
-            std::cout << "PIXEL (262,78) = " << img->getPixel(262,78) << std::endl;
-
-		}
-        
-        //printf("Rendering Progress: %.3f%%\r", i/float(count)*100.0f);
-        //fflush(stdout);
-    }
-
-    for(int j = 0; j < img->height(); ++j) {
-        img->drawScanline(j);
-        glFinish();
-    }
-}
-
 Vector3 MLT::pathTraceFromPath(std::vector<HitInfo> path) const{
 	//std::cout << "pathTraceFromPath" << std::endl;
 	// Recursive shading
@@ -206,7 +206,7 @@ void MLT::accumulatePathContribution(const PathContribution pathContribution, co
 		const int ix = int(currentColor.x);
 		const int iy = int(currentColor.y);
 		
-		Vector3 color = currentColor.color * scaling;		// TODO: Skal være fladens farve * scaling
+		Vector3 color = currentColor.color * scaling;
 		if (ix >= 0 && ix < img->width() && iy >= 0 && iy < img->height()) {	
             int pixelpos = iy*img->width() + ix;
 
@@ -325,7 +325,7 @@ double MLT::acceptProb(MarkovChain& current, MarkovChain& proposal) const {
 	// T(y > x) / T(x > y)	
 	double a = 1.0;        
 	if (current.contribution.scalarContribution > 0.0){
-		double cont_proposal = proposal.contribution.scalarContribution;	// TODO: Kan blive 0. Det skal den nok ikke være
+		double cont_proposal = proposal.contribution.scalarContribution;
 		double cont_current = current.contribution.scalarContribution;
 		a = cont_proposal / cont_current;
 		//std::cout << a << std::endl;

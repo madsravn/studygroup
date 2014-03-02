@@ -20,19 +20,6 @@ Lambert::Lambert(const Vector3 & kd, const Vector3 & ka) :
 	pfmImage = readPFMImage("hdr/stpeters_probe.pfm", &pfmWidth, &pfmHeight);
 }
 
-Vector3 Lambert::getHDRColorFromVector(const Vector3 &direction) const {
-
-	Vector3 ret;
-	int pfmWidth = 1500, pfmHeight = 1500;
-
-	float r = (1/PI) * acos(direction.z)/sqrt(pow(direction.x, 2) + pow(direction.y, 2));
-
-	ret = pfmImage[
-		(int)(((direction.x * r) + 1) / 2 * pfmWidth) + 
-			(int)(((direction.y * r) + 1) / 2 * pfmHeight) * pfmHeight];
-		return ret;
-}
-
 Lambert::~Lambert()
 {
 }

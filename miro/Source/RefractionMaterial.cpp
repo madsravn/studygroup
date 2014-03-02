@@ -37,11 +37,11 @@ Vector3 RefractionMaterial::shade(const Ray& ray, const HitInfo& hit, const Scen
 	Ray rayRefract = Ray(Vector3(hit.P), vRefract);
 	HitInfo refractionHit;
 	if(scene.trace(refractionHit, rayRefract, 0.001f)) {
-		refractionColor *= refractionHit.material->shade(rayRefract, refractionHit, scene, recDepth + 1, maxRecDepth, log);
+		refractionColor = refractionHit.material->shade(rayRefract, refractionHit, scene, recDepth + 1, maxRecDepth, log);
 	}
 	else {
 		//Image based
-		refractionColor *= scene.getHDRColorFromVector(rayRefract.d);
+		refractionColor = scene.getHDRColorFromVector(rayRefract.d);
 	}
 
 	return refractionColor;
