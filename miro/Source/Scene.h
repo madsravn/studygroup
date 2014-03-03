@@ -7,6 +7,7 @@
 #include "BVH.h"
 #include "MLT.h"
 #include "PathTracer.h"
+#include "BiPathTracer.h"
 #include "BasicShader.h"
 
 class Camera;

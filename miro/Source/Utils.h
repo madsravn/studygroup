@@ -44,7 +44,7 @@ inline double perturb(const double value, const double s1, const double s2) {
 	return Result;
 }
 
-inline double max(const Vector3 vector) {
+inline double max(const Vector3& vector) {
 	return std::max(vector.x, std::max(vector.y, vector.z));
 }
 
