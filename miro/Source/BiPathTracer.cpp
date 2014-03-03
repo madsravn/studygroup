@@ -1,4 +1,5 @@
 #include "BiPathTracer.h"
+#include <algorithm>
 
 
 

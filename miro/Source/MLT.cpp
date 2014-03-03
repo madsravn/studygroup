@@ -108,6 +108,9 @@ void MLT::run() {
 		        glFinish();
 		    }
             std::cout << "PIXEL (262,78) = " << img->getPixel(262,78) << std::endl;
+            std::cout << "picture[] = " << picture[3*(78*img->width() + 262)] << ", "  << picture[3*(78*img->width() + 262) + 1] << ", "  << picture[3*(78*img->width() + 262) + 2] << std::endl;
+
+
 
 		}
         
