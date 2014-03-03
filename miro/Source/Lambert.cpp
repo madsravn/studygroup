@@ -33,7 +33,7 @@ Vector3	Lambert::shade(const Ray& ray, const HitInfo& hit, const Scene& scene, c
         }
     }
 
-	Vector3 illumination_direct = Vector3(0.0f);
+	Vector3 illumination_direct;
 	Vector3 illumination_indirect = Vector3(0.0f);
 
 	HitInfo t_hit(hit);
@@ -69,7 +69,7 @@ Vector3 Lambert::shade(const std::vector<HitInfo>& path, const int pathPosition,
 		}
 	}
 
-	Vector3 illumination_direct = Vector3(0.0f);
+	Vector3 illumination_direct;
 	Vector3 illumination_indirect = Vector3(0.0f);
 
 	HitInfo hit = path.at(pathPosition);

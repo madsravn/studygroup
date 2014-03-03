@@ -16,7 +16,7 @@ MLT::MLT(Scene& scene, Image* image, Camera* camera, int pathSamples) : scene(sc
 
 void MLT::run() {    
 
-	/*	
+	/*
 	function metropolisLightTransport()
 		x <- initialPath()
 		image <- { array of zeros }
@@ -35,7 +35,7 @@ void MLT::run() {
 
 	double b = 0.0f;
 	// Estimate normalization constant
-	for (int i = 0; i < 10000; i++) {
+	for (int i = 0; i < 100000; i++) {
 		fprintf(stdout, "\rPSMLT Initializing: %5.2f", 100.0 * i / (10000));		
         fflush(stdout);
 		MarkovChain normChain(img->width(), img->height());
@@ -43,7 +43,7 @@ void MLT::run() {
 		b += calcPathContribution(generateEyePath(cam->randomRay(img->width(), img->height(), normChain), MC)).scalarContribution;
 	}
     printf("\n");
-	b /= double(10000);	// average
+	b /= double(100000);	// average
 	
     bool running = true;
     MarkovChain current(img->width(), img->height());
@@ -61,7 +61,7 @@ void MLT::run() {
         img->drawScanline(j);
         glFinish();
     }
-    while( count < 50 ) {
+    while( count < 500 ) {
 		//std::cout << i << std::endl;
 		
         double isLargeStepDone;

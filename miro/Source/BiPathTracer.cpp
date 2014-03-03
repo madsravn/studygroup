@@ -4,6 +4,9 @@
 
 
 BiPathTracer::BiPathTracer(Scene& scene, Image* image, Camera* camera, int pathSamples) : scene(scene), img(image), cam(camera), samples(pathSamples) {
+	for(int i = 0; i < 3*img->height()*img->width(); ++i) {
+		picture.push_back(0.0f);
+	}
 }
 
 BiPathTracer::~BiPathTracer(void)
@@ -16,83 +19,123 @@ void BiPathTracer::run() {
 	Vector3 shadeResult;
 
 	double inverseSamples = 1/(double)samples;
-
+	// Paint over the geometry scene
+	for(int j = 0; j < img->height(); ++j) {
+		img->drawScanline(j);
+		glFinish();
+	}
 	// loop over all pixels in the image
 	for (int j = 0; j < img->height(); ++j)
 	{
 		for (int i = 0; i < img->width(); ++i)
 		{
-			ray = cam->eyeRay(i, j, img->width(), img->height());			
-			for (int sampleCounter = 0; sampleCounter < samples; sampleCounter++){
+			
+			ray = cam->eyeRay(i, j, img->width(), img->height());	
 
+			int px, py;
+
+			cam->rayToPixels(ray, px, py, img->width(), img->height());
+			for (int sampleCounter = 0; sampleCounter < samples; sampleCounter++){
+				
 				std::vector<HitInfo> eyePath = generateEyePath(ray);
 				
-				for (int light = 0; light < scene.lights()->size(); light++) {
+				for (int light = 0; light < scene.lights()->size(); light++) {					
 					Vector3 lightPathResult = Vector3(0.0f);
 					
 					const PointLight* pLight = scene.lights()->at(light);
 					std::vector<HitInfo> lightPath = generateLightPath(pLight->position());
-
-					PathContribution pathContribution = calcCombinePaths(eyePath, lightPath);
 					
-					for (int c = 0; c < pathContribution.colors.size(); c++) {
-
-						Contribution contribution = pathContribution.colors.at(c);
-												
-						// TODO: Update pixels
-						// pixelColor += contribution.color * pathContribution.scalarContribution * inverseSamples;
-						// assert pixel is in image
-						// updatePixel(contribution.x, contribution.y, contribution.color);
-					}
+					PathContribution pathContribution = calcCombinePaths(eyePath, lightPath);
+					accumulatePathContribution(pathContribution, inverseSamples);
+				
 				}
 			}
 		}
-		img->drawScanline(j);
-		glFinish();
 		printf("Rendering Progress: %.3f%%\r", j / double(img->height())*100.0f);
 		fflush(stdout);
 	}
+
+	for (int j = 0; j < img->height(); ++j) {
+		img->drawScanline(j);
+		glFinish();
+	}
 }
 
-PathContribution BiPathTracer::calcCombinePaths(std::vector<HitInfo> eyePath, std::vector<HitInfo> lightPath) const {
+PathContribution BiPathTracer::calcCombinePaths(const std::vector<HitInfo> eyePath, const std::vector<HitInfo> lightPath) const {
 	PathContribution pathContribution = PathContribution();		
 
-	for (int combinedPathSize = 2; combinedPathSize < 12; combinedPathSize++) {		
-		for(int eyePathSize = 2; eyePathSize < eyePath.size(); eyePathSize++) {
-			int lightSubPathSize = combinedPathSize - eyePathSize;
-			std::vector<HitInfo> EyeSubPath = subVector(eyePath, 0, eyePathSize);
+	//std::cout << "calcCombinePaths(" << eyePath.size() << ", " << lightPath.size() << ")" << std::endl;
+
+	int px, py;
+
+	for (int combinedPathSize = 3; combinedPathSize <= std::min(12, (int)(eyePath.size() + lightPath.size())); combinedPathSize++) {		
+		for(int eyeSubPathSize = 1; eyeSubPathSize <= std::min(combinedPathSize, (int)eyePath.size()); eyeSubPathSize++) {    // Smallest path is camera to surface (length 2)		
+			int lightSubPathSize = combinedPathSize - eyeSubPathSize;
+			
+			if(lightSubPathSize > lightPath.size()) continue;		
+
+			std::vector<HitInfo> EyeSubPath = subVector(eyePath, 0, eyeSubPathSize);
 			std::vector<HitInfo> reverseLightSubPath = subVector(lightPath, 0, lightSubPathSize);
 			std::reverse(reverseLightSubPath.begin(), reverseLightSubPath.end());
 
-			if(isConnectable(EyeSubPath, reverseLightSubPath));
+			if(!isConnectable(EyeSubPath, reverseLightSubPath)) continue;
 
 			std::vector<HitInfo> combinedPath = concatVectors(EyeSubPath, reverseLightSubPath);
 
-			int px, py;
+			Vector3 rayToPixelsDir = (combinedPath.at(1).P - combinedPath.at(0).P).normalized();
 			cam->rayToPixels(
-				Ray(combinedPath.at(0).P, (combinedPath.at(0).P - combinedPath.at(1).P).normalized()), 
+				Ray(combinedPath.at(0).P, rayToPixelsDir), 
 				px, py, img->width(), img->height());
 
-			Vector3 lightPathResult = pathTraceFromPath(combinedPath);
-			Contribution contribution = Contribution(px, py, lightPathResult);
-			pathContribution.colors.push_back(contribution);
+			if (px >= 0 && px <= img->width() && py >= 0 && py <= img->height()) {							
+				Vector3 lightPathResult = pathTraceFromPath(combinedPath);
+				Contribution contribution = Contribution(px, py, lightPathResult);
+				pathContribution.colors.push_back(contribution);
 
-			pathContribution.scalarContribution = std::max(pathContribution.scalarContribution, max(contribution.color));
+				pathContribution.scalarContribution = std::max(pathContribution.scalarContribution, max(contribution.color));
+			}			
 		}
-	}
-	
-	Vector3 lightPathResult = Vector3(0.0f);
-
-	if(isConnectable(eyePath, lightPath)) {
-		std::vector<HitInfo> combinedPath = concatVectors(eyePath, lightPath);
-
-		lightPathResult += pathTraceFromPath(combinedPath);
 	}
 
 	return pathContribution;
 }
 
-bool BiPathTracer::isConnectable(std::vector<HitInfo> eyePath, std::vector<HitInfo> lightPath) const {
+void BiPathTracer::accumulatePathContribution(const PathContribution pathContribution, const double scaling) const {	
+	//std::cout << "accumulatePathContribution" << std::endl;
+	for (int i = 0; i < pathContribution.colors.size(); i++) {    // Start at first hit, [0] is camera
+		Contribution currentColor = pathContribution.colors.at(i);
+
+		const int ix = int(currentColor.x);
+		const int iy = int(currentColor.y);
+
+		Vector3 color = currentColor.color * scaling;
+		if (ix >= 0 && ix < img->width() && iy >= 0 && iy < img->height()) {	
+			int pixelpos = iy*img->width() + ix;
+
+			Vector3 newColor = color + Vector3(picture[3*pixelpos], picture[3*pixelpos+1], picture[3*pixelpos+2]);
+
+			if(newColor.x < color.x || newColor.y < color.y || newColor.z < color.z)
+				std::cout << "new color is darker. Old color: " << color << "\tNew color: " << newColor <<std::endl;
+
+			color = newColor;
+			picture[3*pixelpos] = color.x;
+			picture[3*pixelpos+1] = color.y;
+			picture[3*pixelpos+2] = color.z;
+			img->setPixel(ix, iy, color);
+
+			//std::cout << ix << ", " << iy << " = " << color << std::endl;
+
+			/*img->drawPixel(ix, iy);
+			glFinish();*/
+		}
+	}
+}
+
+bool BiPathTracer::isConnectable(const std::vector<HitInfo> eyePath, const std::vector<HitInfo> lightPath) const {
+	//std::cout << "isConnectable(" << eyePath.size() << ", " << lightPath.size() << ")" << std::endl;
+
+	if(lightPath.size() == 0)
+		return true;
 	HitInfo hitInfo;
 	HitInfo lastEyePoint = eyePath.at(eyePath.size() - 1);
 	HitInfo lastLightPoint = lightPath.at(lightPath.size() - 1);
