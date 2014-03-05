@@ -21,7 +21,7 @@ public:
 	void tracePath(std::vector<HitInfo>& path, const Ray &ray, int recDepth, const MarkovChain& MC, bool log = false) const;
 	std::vector<HitInfo> generateEyePath(const Ray& eyeRay, const MarkovChain& MC) const;
 	Vector3 pathTraceFromPath(std::vector<HitInfo> path) const;
-	void accumulatePathContribution(const PathContribution pathContribution, const double scaling) const;
+	void accumulatePathContribution(const PathContribution pathContribution, const double scaling);
 	PathContribution calcPathContribution(const std::vector<HitInfo> path) const;
 	Vector3 pathTroughput(const std::vector<HitInfo> path) const;	
 	double pathProbabilityDensity(const std::vector<HitInfo> path) const;
@@ -37,7 +37,7 @@ private:
     Camera* cam;
 	int samples;
     MarkovChain MC;
-    mutable std::vector<float> picture;
+    std::vector<float> picture;
 };
 
 #endif // CSE168_MLT_H_INCLUDED

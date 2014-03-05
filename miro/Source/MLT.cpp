@@ -11,6 +11,13 @@ MLT::MLT(Scene& scene, Image* image, Camera* camera, int pathSamples) : scene(sc
     for(int i = 0; i < 3*img->height()*img->width(); ++i) {
         picture.push_back(0.0f);
     }
+
+    for(int i = 0; i < img->height(); ++i) {
+        for(int j = 0; j < img->width(); ++j) {
+            img->setPixel(j,i, Vector3(0.0f));
+        }
+    }
+
 }
 
 
@@ -108,6 +115,9 @@ void MLT::run() {
 		        glFinish();
 		    }
             std::cout << "PIXEL (262,78) = " << img->getPixel(262,78) << std::endl;
+            std::cout << "picture[] = " << picture[3*(78*img->width() + 262)] << ", "  << picture[3*(78*img->width() + 262) + 1] << ", "  << picture[3*(78*img->width() + 262) + 2] << std::endl;
+
+
 
 		}
         
@@ -152,7 +162,7 @@ std::vector<HitInfo> MLT::generateEyePath(const Ray& eyeRay, const MarkovChain& 
 
 	//std::cout << "(" << x << ", " << y << ")" << std::endl;
 
-	img->setPixel(x,y,Vector3(0.0f));
+	//img->setPixel(x,y,Vector3(0.0f));
 	//img->drawPixel(x, y);
 	//glFinish();
 
@@ -198,7 +208,7 @@ Vector3 MLT::pathTraceFromPath(std::vector<HitInfo> path) const{
 	return shadeResult;
 }
 
-void MLT::accumulatePathContribution(const PathContribution pathContribution, const double scaling) const {	
+void MLT::accumulatePathContribution(const PathContribution pathContribution, const double scaling) {
 	//std::cout << "accumulatePathContribution" << std::endl;
 	for (int i = 0; i < pathContribution.colors.size(); i++) {    // Start at first hit, [0] is camera
 		Contribution currentColor = pathContribution.colors.at(i);
