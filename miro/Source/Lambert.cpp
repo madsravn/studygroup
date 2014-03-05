@@ -63,9 +63,11 @@ Vector3 Lambert::shade(const std::vector<HitInfo>& path, const int pathPosition,
 
     Vector3 vm_kd(m_kd);
 	float m = maxVectorValue(vm_kd);
-	if (pathPosition > 7 + 1){ 		// Efter 7 bounces
+	if (pathPosition >= 7){ 		// Efter 7 bounces
 		if (rnd() >= m) {
-			return Vector3(0.0f); 						// Hvorfor gør den dette? Skalerer farven til p = 1
+			return Vector3(0.0f);
+		} else {
+			vm_kd *= (1/m);
 		}
 	}
 
@@ -76,7 +78,7 @@ Vector3 Lambert::shade(const std::vector<HitInfo>& path, const int pathPosition,
 
 	const Lights *lightlist = scene.lights();
 	
-	illumination_direct = calcDirectIllum(hit, lightlist, scene, false);
+	illumination_direct = vm_kd * calcDirectIllum(hit, lightlist, scene, false);
 
 	// Next ray bounce
 	if (path.size() > pathPosition + 1) {
@@ -87,7 +89,7 @@ Vector3 Lambert::shade(const std::vector<HitInfo>& path, const int pathPosition,
 		illumination_indirect = rayColor * nDotD * M_1_PI;
 	}
 	
-	return m_kd*(illumination_direct + illumination_indirect);
+	return illumination_direct + illumination_indirect;
 };
 
 Vector3 Lambert::calcDirectIllum(const HitInfo &hit, const Lights *lightlist, const Scene &scene, bool allLights) const {
@@ -101,7 +103,7 @@ Vector3 Lambert::calcDirectIllum(const HitInfo &hit, const Lights *lightlist, co
 			illumination_direct += calcLighting(hit, pLight, scene);
 		}
 	} else {
-		PointLight* pLight = lightlist->at(rand() % lightlist->size());
+		PointLight* pLight = lightlist->at(rand() % lightlist->size());		
 		illumination_direct += calcLighting(hit, pLight, scene);
 	}
 	return illumination_direct;
@@ -122,11 +124,11 @@ Vector3 Lambert::calcLighting(const HitInfo &hit, PointLight* pLight, const Scen
 	HitInfo lightHit;
 	scene.trace(lightHit, Ray(hit.P, lv), 0.001f);		
 	bool isLightHit = Vector3(pLight->position() - hit.P).length() <= lightHit.t;
-	if (isLightHit)
-		illumination_direct += (pLight->wattage() * 
-		pLight->color() * 
-		std::max(dot(lv, hit.N), 0.0f)) 
-		/ pow((pLight->position() - hit.P).length(), 2);
+	if (isLightHit) {
+		double omega = 2 * M_PI;
+		illumination_direct += (pLight->wattage() * pLight->color()) * std::max(dot(lv, hit.N), 0.0f) * M_1_PI;
+		/*illumination_direct += (pLight->wattage() * pLight->color() * std::max(dot(lv, hit.N), 0.0f)) / pow((pLight->position() - hit.P).length(), 2);*/
+	}
 
 	return illumination_direct;
 }

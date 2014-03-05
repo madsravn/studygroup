@@ -40,9 +40,9 @@ void MLT::run() {
 
     double LargeStepProb = 0.3;
 
-	double b = 0.0f;
+	double b = 1.0f;
 	// Estimate normalization constant
-	for (int i = 0; i < 100000; i++) {
+	/*for (int i = 0; i < 10000; i++) {
 		fprintf(stdout, "\rPSMLT Initializing: %5.2f", 100.0 * i / (10000));		
         fflush(stdout);
 		MarkovChain normChain(img->width(), img->height());
@@ -50,7 +50,7 @@ void MLT::run() {
 		b += calcPathContribution(generateEyePath(cam->randomRay(img->width(), img->height(), normChain), MC)).scalarContribution;
 	}
     printf("\n");
-	b /= double(100000);	// average
+	b /= double(10000);*/	// average
 	
     bool running = true;
     MarkovChain current(img->width(), img->height());
@@ -69,7 +69,7 @@ void MLT::run() {
         glFinish();
     }
     while( count < 500 ) {
-		//std::cout << i << std::endl;
+		
 		
         double isLargeStepDone;
         if(rnd() <= LargeStepProb) {
@@ -84,11 +84,7 @@ void MLT::run() {
 		
 		proposal.contribution = calcPathContribution(path);
 
-		//std::cout << proposal.contribution.scalarContribution << std::endl;
-        
 		double a = acceptProb(current, proposal);
-
-		//std::cout << a << std::endl;
 
 		// accumulate samples
 		if (proposal.contribution.scalarContribution > 0.0f)
@@ -101,6 +97,9 @@ void MLT::run() {
 				(1.0 - a)/
 				(current.contribution.scalarContribution/b + isLargeStepDone)
 			);
+
+		/*std::cout << "a = " << a << "\tisLargeStepDone = " << isLargeStepDone << std::endl;
+		std::cout << "current scalar = " << current.contribution.scalarContribution << "proposal scalar = " << proposal.contribution.scalarContribution << std::endl;*/
 
         if(rnd() <= a) {
             current = proposal;
@@ -116,8 +115,6 @@ void MLT::run() {
 		    }
             std::cout << "PIXEL (262,78) = " << img->getPixel(262,78) << std::endl;
             std::cout << "picture[] = " << picture[3*(78*img->width() + 262)] << ", "  << picture[3*(78*img->width() + 262) + 1] << ", "  << picture[3*(78*img->width() + 262) + 2] << std::endl;
-
-
 
 		}
         
@@ -138,7 +135,6 @@ void MLT::tracePath(std::vector<HitInfo>& path, const Ray &ray, int recDepth, co
 	if(recDepth >= maxRecDepth)	return;
 	
 	HitInfo hit;
-	Vector3 shadeResult = 0;
 
     if(log) std::cout << "Ray is " << ray << std::endl;
 	
@@ -155,16 +151,6 @@ void MLT::tracePath(std::vector<HitInfo>& path, const Ray &ray, int recDepth, co
 
 // Trace path from eye
 std::vector<HitInfo> MLT::generateEyePath(const Ray& eyeRay, const MarkovChain& MC) const {
-	//std::cout << "generateEyePath" << std::endl;
-	int x, y;
-
-	cam->rayToPixels(eyeRay, x, y, img->width(), img->height());
-
-	//std::cout << "(" << x << ", " << y << ")" << std::endl;
-
-	//img->setPixel(x,y,Vector3(0.0f));
-	//img->drawPixel(x, y);
-	//glFinish();
 
 	std::vector<HitInfo> result;	
 	result.push_back(HitInfo(0.0f, eyeRay.o));
@@ -333,15 +319,11 @@ double MLT::directionToArea(const HitInfo current, const HitInfo next) const {
 
 double MLT::acceptProb(MarkovChain& current, MarkovChain& proposal) const {
 	// T(y > x) / T(x > y)	
-	double a = 1.0;        
+	double a = 1.0;
 	if (current.contribution.scalarContribution > 0.0){
 		double cont_proposal = proposal.contribution.scalarContribution;
 		double cont_current = current.contribution.scalarContribution;
-		a = cont_proposal / cont_current;
-		//std::cout << a << std::endl;
-        //std::cout << "a = " << a << std::endl;
-		a = std::min(1.0, a); // Clamp value
-		a = std::max(a, 0.0);
+		a = clamp(cont_proposal / cont_current, 0.0, 1.0);
 	}
 	return a;
 }
@@ -355,10 +337,9 @@ void MLT::calcCoordinates(std::vector<HitInfo> path, int &px, int &py) const {
 	}	
 }
 
-std::vector<HitInfo> MLT::generateEyePathFromChain(MarkovChain chain) const {
-	//int ai, bi;
+// Trace path from eye
+std::vector<HitInfo> MLT::generateEyePathFromChain(MarkovChain chain) const {	
 	Ray ray = cam->randomRay(img->width(), img->height(), chain);
-	//cam->rayToPixels(ray, ai, bi, img->width(), img->height());
 
 	return generateEyePath(ray, chain);
 }

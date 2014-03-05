@@ -55,8 +55,11 @@ Vector3 RefractionMaterial::shade(const std::vector<HitInfo>& path, const int pa
 	return shadeResult;
 }
 
-Ray RefractionMaterial::bounceRay(const Ray& ray, const HitInfo& hit, const int recDepth, const MarkovChain& MC) const {
+Ray RefractionMaterial::bounceRay(const Ray& ray, const HitInfo& hit, const int recDepth, const MarkovChain& MC) const {	
+	return bounceRay(ray, hit);
+}
 
+Ray RefractionMaterial::bounceRay(const Ray& ray, const HitInfo& hit) const {
 	// specular refraction
 	float costheta1 = dot(hit.N, -ray.d);
 	bool into = costheta1 > 0;		// Going in?	
@@ -65,9 +68,9 @@ Ray RefractionMaterial::bounceRay(const Ray& ray, const HitInfo& hit, const int 
 	
 	float costheta2 = 1 - pow(my, 2) * (1 - pow(dot(hit.N, ray.d),2));
 
-	if (costheta2 <= 0) {
-		//std::cout << "costheta2 <= 0" << std::endl;
-		return Ray(hit.P, Vector3(0.0f));
+	if (costheta2 < 0) {  // Total internal reflection		
+		Vector3 vReflect = ray.d - 2.0f * dot(ray.d, hit.N) * hit.N;
+		return Ray(hit.P, vReflect);
 	}
 
 	int p = (into ? 1 : -1);

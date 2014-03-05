@@ -1,6 +1,6 @@
 #include "PathTracer.h"
 
-bool buildPath = true;	// Build path before shading
+bool buildPath = false;	// Build path before shading
 
 PathTracer::PathTracer(Scene& scene, Image* image, Camera* camera, int pathSamples)  : scene(scene), img(image), cam(camera), samples(pathSamples) {
 
