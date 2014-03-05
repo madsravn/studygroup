@@ -452,23 +452,23 @@ void makeCornellBox2() {
 
     
 
- //   // Sphere
-	xform.setIdentity();
-	xform *= scale(.4, .4, .4);
-    xform *= translate(.5, 1.0, -.5);
-    mesh = new TriangleMesh;
-    mesh->load("mesh/sphere.obj", xform);
-	material = new RefractionMaterial(1.31f);
-    addMeshTrianglesToScene(mesh, material);
-	
- //   // Sphere
-	xform.setIdentity();
-	xform *= scale(.3, .3, .3);
-    xform *= translate(-2, 4, 1);
-    mesh = new TriangleMesh;
-    mesh->load("mesh/sphere.obj", xform);
-	material = new ReflectionMaterial();
-    addMeshTrianglesToScene(mesh, material);	
+ ////   // Sphere
+	//xform.setIdentity();
+	//xform *= scale(.4, .4, .4);
+ //   xform *= translate(.5, 1.0, -.5);
+ //   mesh = new TriangleMesh;
+ //   mesh->load("mesh/sphere.obj", xform);
+	//material = new RefractionMaterial(1.31f);
+ //   addMeshTrianglesToScene(mesh, material);
+	//
+ ////   // Sphere
+	//xform.setIdentity();
+	//xform *= scale(.3, .3, .3);
+ //   xform *= translate(-2, 4, 1);
+ //   mesh = new TriangleMesh;
+ //   mesh->load("mesh/sphere.obj", xform);
+	//material = new ReflectionMaterial();
+ //   addMeshTrianglesToScene(mesh, material);	
 
 	/*
     xform.setIdentity();

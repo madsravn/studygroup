@@ -9,6 +9,7 @@ Vector3 generateRandomRayDirection(Vector3 normal, float rand1, float rand2);
 Vector3 generateRandomRayDirection(float rand1, float rand2);
 Vector3 generateRandomRayDirection();
 Vector3 generateRandomRayDirection(Vector3 normal);
+void onb(Vector3 &vector, const Vector3 &n);
 
 template <class T> 
 std::vector<T> subVector(const std::vector<T> &vector, int start, int end) {
@@ -35,12 +36,15 @@ inline double perturb(const double value, const double s1, const double s2) {
 	double r = rnd();
 	if (r < 0.5) {
 		r = r * 2.0;
-		Result = value + s2 * exp(-log(s2 / s1) * r); if (Result > 1.0) Result -= 1.0;
+		Result = value + s2 * exp(-log(s2 / s1) * r); 
+		if (Result > 1.0) 
+			Result -= 1.0;
 	} else {
 		r = (r - 0.5) * 2.0;
-		Result = value - s2 * exp(-log(s2 / s1) * r); if (Result < 0.0) Result += 1.0;
-	}
-    //std::cout << "Result = " << Result << std::endl;
+		Result = value - s2 * exp(-log(s2 / s1) * r); 
+		if (Result < 0.0) 
+			Result += 1.0;
+	}    
 	return Result;
 }
 
@@ -48,6 +52,10 @@ inline double max(const Vector3& vector) {
 	return std::max(vector.x, std::max(vector.y, vector.z));
 }
 
+
+inline double clamp (double x, double lowerLimit, double upperLimit) {
+	return std::max(lowerLimit, std::min(upperLimit, x));
+}
 
 
 #endif

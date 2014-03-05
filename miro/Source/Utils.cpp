@@ -14,8 +14,11 @@ double rnd(void) {
 Vector3 generateRandomRayDirection(Vector3 normal, float rand1, float rand2){
 	Vector3 rayDirection = generateRandomRayDirection(rand1, rand2);
 
-	if(dot(rayDirection, normal) < 0) 
+	//onb(rayDirection, normal);
+	if(dot(rayDirection, normal) < 0) {
+		//std::cout << "dot is negative" << std::endl;
 		rayDirection = -rayDirection;
+	}
 
 	return rayDirection;
 }
@@ -28,17 +31,39 @@ Vector3 generateRandomRayDirection(float rand1, float rand2){
 	//float rand1 = rnd();
 	//float rand2 = rnd();
 
+	const float glossiness = 1.0f;
+
 	const float temp1 = 2.0 * PI * rand1;
-	const float temp2 = pow(rand2, 1.0f / (rand1 + 1.0f));
+	const float temp2 = pow(rand2, 2.0f / (glossiness + 1.0f));
+	const float temp3 = pow(rand2, 1.0f / (glossiness + 1.0f));
 	const float s = sin(temp1);
 	const float c = cos(temp1);
-	const float t = sqrt(1.0 - temp2 * temp2);
-
-	Vector3 rayDirection = Vector3(s*t, temp2, c*t);
+	const float t = sqrt(1.0 - temp2);
 	
-	rayDirection.normalize();
+	Vector3 rayDirection = Vector3(s*t, c*t, temp3);
+	
+	rayDirection.normalize();	
 
 	return rayDirection;
+}
+
+void onb(Vector3 &vector, const Vector3 &n) {
+	Vector3 u, w, v = n;
+	if (n.z < -0.9999999) {
+		u = Vector3( 0.0, -1.0, 0.0); 
+		w = Vector3(-1.0, 0.0, 0.0);
+	} 
+	else {
+		const double a = 1.0/(1.0 + n.z); 
+		const double b = -n.x * n.y * a;
+		u = Vector3(1.0 - n.x * n.x * a, b, -n.x); 
+		w = Vector3(b, 1.0 - n.y * n.y * a, -n.y);
+	}
+	Vector3 vx = Vector3(u.x, v.x, w.x);
+	Vector3 vy = Vector3(u.y, v.y, w.y);
+	Vector3 vz = Vector3(u.z, v.z, w.z);
+	Vector3 tempVector = Vector3(dot(vector, vx), dot(vector, vy), dot(vector, vz));
+	vector = tempVector;
 }
 
 Vector3 generateRandomRayDirection() {

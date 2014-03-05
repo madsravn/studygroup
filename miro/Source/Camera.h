@@ -55,8 +55,10 @@ public:
 	inline const float getDistance() const		{return m_distance;}
 
     Ray eyeRay(int x, int y, int imageWidth, int imageHeight);
+	Ray	eyeRay(float x, float y, int imageWidth, int imageHeight);
 
     void rayToPixels(const Ray& ray, int& x, int& y, int imageWidth, int imageHeight);
+	
     
     void drawGL();
 

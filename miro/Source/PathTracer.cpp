@@ -13,28 +13,36 @@ void PathTracer::run() {
 
 	double inverseSamples = 1/(double)samples;
 
+	std::cout << "inverseSamples = " << inverseSamples << std::endl;
+
 	// loop over all pixels in the image
 	for (int j = 0; j < img->height(); ++j)
 	{
 		for (int i = 0; i < img->width(); ++i)
 		{
 			shadeResult = Vector3(0.0f);
-			ray = cam->eyeRay(i, j, img->width(), img->height());
-			for (int sampleCounter = 0; sampleCounter < samples; sampleCounter++){
+			
 
-				Vector3 traceResult = Vector3(0.0f);
-				Vector3 pathResult = Vector3(0.0f);
-				if (!buildPath) {
-					if (scene.trace(hitInfo, ray, 0.0001f)) {
-						traceResult = hitInfo.material->shade(ray, hitInfo, scene, 0, Constants::maxRecDepth, 0);		
-						shadeResult += traceResult * inverseSamples;
+			for (int AAx = 0; AAx < 2; AAx++){
+				for (int AAy = 0; AAy < 2; AAy++) {
+					ray = cam->eyeRay(i - 0.25f + (float)AAx/2, j - 0.25f + (float)AAy/2, img->width(), img->height());
+					for (int sampleCounter = 0; sampleCounter < samples/4; sampleCounter++){
+						
+						Vector3 traceResult = Vector3(0.0f);
+						Vector3 pathResult = Vector3(0.0f);
+						if (!buildPath) {
+							if (scene.trace(hitInfo, ray, 0.0001f)) {
+								traceResult = hitInfo.material->shade(ray, hitInfo, scene, 0, Constants::maxRecDepth, 0);		
+								shadeResult += traceResult * inverseSamples;
+							}
+						} else {
+							std::vector<HitInfo> path = generatePath(ray);
+							pathResult = pathTraceFromPath(path);
+							shadeResult += pathResult * inverseSamples;					
+						}
 					}
-				} else {
-					std::vector<HitInfo> path = generatePath(ray);
-					pathResult = pathTraceFromPath(path);
-					shadeResult += pathResult * inverseSamples;					
 				}
-			}
+			}						
 			img->setPixel(i, j, shadeResult);
 		}
 		img->drawScanline(j);

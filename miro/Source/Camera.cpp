@@ -127,6 +127,28 @@ Camera::eyeRay(int x, int y, int imageWidth, int imageHeight)
 }
 
 Ray
+	Camera::eyeRay(float x, float y, int imageWidth, int imageHeight)
+{
+	// compute the camera coordinate system 
+	const Vector3 wDir = Vector3(-m_viewDir).normalize(); 
+	const Vector3 uDir = cross(m_up, wDir).normalize(); 
+	const Vector3 vDir = cross(wDir, uDir);    
+	//std::cout << wDir << uDir << vDir << std::endl;
+
+	//std::cout << std::endl << std::endl << "NEW RAY" << std::endl;
+	// compute the pixel location in the world coordinate system
+	const float aspectRatio = (float)imageWidth / (float)imageHeight; 
+	const float imPlaneUPos = -((x + 0.5f) / (float)imageWidth - 0.5f); 
+	const float imPlaneVPos = -((y + 0.5f) / (float)imageHeight - 0.5f); 
+	//std::cout << "imPlaneUPos = " << imPlaneUPos << " and imPlaneVPos = " << imPlaneVPos << std::endl;
+	const Vector3 pixelPos = m_eye + (aspectRatio * FILM_SIZE * imPlaneUPos) * uDir + (FILM_SIZE * imPlaneVPos) * vDir + m_distance * wDir;
+	//std::cout << "x = " << x << " og y = " << y << std::endl;
+
+	// set the eye ray
+	return Ray(m_eye, (m_eye - pixelPos).normalize());
+}
+
+Ray
 Camera::randomRay(int imageWidth, int imageHeight, const MarkovChain& MC) {
     // TODO: getNext eller de allerede pertuberede i den størrelse? 
     int x = MC.get(0)*imageWidth;

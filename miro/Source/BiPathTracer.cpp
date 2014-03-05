@@ -67,7 +67,7 @@ PathContribution BiPathTracer::calcCombinePaths(const std::vector<HitInfo> eyePa
 
 	int px, py;
 
-	for (int combinedPathSize = 3; combinedPathSize <= std::min(12, (int)(eyePath.size() + lightPath.size())); combinedPathSize++) {		
+	for (int combinedPathSize = 2; combinedPathSize <= std::min(Constants::maxRecDepth, (int)(eyePath.size() + lightPath.size())); combinedPathSize++) {		
 		for(int eyeSubPathSize = 1; eyeSubPathSize <= std::min(combinedPathSize, (int)eyePath.size()); eyeSubPathSize++) {    // Smallest path is camera to surface (length 2)		
 			int lightSubPathSize = combinedPathSize - eyeSubPathSize;
 			
