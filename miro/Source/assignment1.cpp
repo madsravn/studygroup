@@ -95,9 +95,95 @@ void makePBRTScene() {
 }
 
 
+void makeCBox() {
+	g_camera = new Camera;
+	g_scene = new Scene;
+	g_image = new Image;
+	Triangle* t;
+
+	g_image->resize(512, 512);
+
+	// set up the camera
+	g_camera->setBGColor(Vector3(0.0f, 0.0f, 0.3f));
+	g_camera->setEye(Vector3(278, 273, -800));
+	g_camera->setLookAt(Vector3(278, 273, -799));
+	g_camera->setUp(Vector3(0, 1, 0));
+	g_camera->setFOV(40);
+
+	// create and place a point light source
+	PointLight * light = new PointLight;
+	light->setPosition(Vector3(278, 528.8, 279.5));    
+	light->setColor(Vector3(0.885809, 0.698859, 0.666422));
+	light->setWattage(10);
+	light->setRadius(0.5f);
+	g_scene->addLight(light);
+
+	Matrix4x4 xform;
+	Matrix4x4 xform2;
+	Material* material;
+	TriangleMesh * mesh;
 
 
+	// create the floor triangles
+	makeSquare(
+		Vector3(0,0,559.2), 
+		Vector3(0,0,0), 
+		Vector3(549.6,0,559.2), 		
+		Vector3(552.8,0,0), 
+		Vector3(0,1,0),		
+		new Lambert(Vector3(0.885809, 0.698859, 0.666422)), g_scene);
 
+	// create the ceiling triangles	
+	makeSquare(
+		Vector3(556, 548.8, 0), 
+		Vector3(556, 548.8, 559.2), 
+		Vector3(0, 548.8, 0), 
+		Vector3(0, 548.8, 559.2), 		
+		Vector3(0,-1,0),		
+		new Lambert(Vector3(0.885809, 0.698859, 0.666422)), g_scene);
+
+	// create the backwall triangles
+	makeSquare(
+		Vector3(549.6, 0, 559.2), 
+		Vector3(0, 0, 559.2), 
+		Vector3(556, 548.8, 559.2), 
+		Vector3(0, 548.8, 559.2), 
+		Vector3(0, 0, -1),	
+		new Lambert(Vector3(0.885809, 0.698859, 0.666422)), g_scene);
+
+	// create the rightwall triangles (green)
+	makeSquare(
+		Vector3(0, 0, 559.2), 
+		Vector3(0, 0, 0), 
+		Vector3(0, 548.8, 559.2), 
+		Vector3(0, 548.8, 0), 
+		Vector3(1, 0, 0),
+		new Lambert(Vector3(0.105421, 0.37798, 0.076425)), g_scene);
+
+	// create the leftwall triangles (red)
+	makeSquare(
+		Vector3(552.8, 0, 0), 
+		Vector3(549.6, 0, 559.2), 
+		Vector3(556, 548.8, 0.0f), 
+		Vector3(556, 548.8, 559.2), 
+		Vector3(-1,0,0),	
+		new Lambert(Vector3(0.570068, 0.0430135, 0.0443706)), g_scene);
+
+	xform.setIdentity();
+	mesh = new TriangleMesh;
+	mesh->load("mesh/cbox_smallbox.obj", xform);
+	material = new Lambert(Vector3(0.885809, 0.698859, 0.666422));
+	addMeshTrianglesToScene(mesh, material);
+
+	xform.setIdentity();
+	mesh = new TriangleMesh;
+	mesh->load("mesh/cbox_largebox.obj", xform);
+	material = new Lambert(Vector3(0.885809, 0.698859, 0.666422));
+	addMeshTrianglesToScene(mesh, material);
+
+	// let objects do pre-calculations if needed
+	g_scene->preCalc();
+}
 
 void makeCornellBox() {
 	g_camera = new Camera;
@@ -149,7 +235,12 @@ void makeCornellBox() {
 
    	// create the floor triangles
     
-    makeSquare(Vector3(-1,0,1), Vector3(1,0,1), Vector3(-1,0,-1), Vector3(1,0,-1), Vector3(0,1,0),		new Lambert(Vector3(0, 1.0f, 1.0f)), g_scene);
+    makeSquare(
+		Vector3(-1,0,1), 
+		Vector3(1,0,1), 
+		Vector3(-1,0,-1), 
+		Vector3(1,0,-1), 
+		Vector3(0,1,0),		new Lambert(Vector3(0, 1.0f, 1.0f)), g_scene);
 
 	// create the ceiling triangles
 

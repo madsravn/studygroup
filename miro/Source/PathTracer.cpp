@@ -1,6 +1,6 @@
 #include "PathTracer.h"
 
-bool buildPath = false;	// Build path before shading
+bool buildPath = true;	// Build path before shading
 
 PathTracer::PathTracer(Scene& scene, Image* image, Camera* camera, int pathSamples)  : scene(scene), img(image), cam(camera), samples(pathSamples) {
 
@@ -20,8 +20,7 @@ void PathTracer::run() {
 	{
 		for (int i = 0; i < img->width(); ++i)
 		{
-			shadeResult = Vector3(0.0f);
-			
+			shadeResult = Vector3(0.0f);			
 
 			for (int AAx = 0; AAx < 2; AAx++){
 				for (int AAy = 0; AAy < 2; AAy++) {

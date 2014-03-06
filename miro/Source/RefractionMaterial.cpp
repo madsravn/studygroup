@@ -11,6 +11,33 @@ Vector3 RefractionMaterial::shade(const Ray& ray, const HitInfo& hit, const Scen
 
 	Vector3 refractionColor = Vector3(1.0f);
 
+	Ray rayRefract = bounceRay(ray, hit);
+	HitInfo refractionHit;
+	if(scene.trace(refractionHit, rayRefract, 0.001f)) {
+		refractionColor = refractionHit.material->shade(rayRefract, refractionHit, scene, recDepth + 1, maxRecDepth, log);
+	}
+	else {
+		//Image based
+		refractionColor = scene.getHDRColorFromVector(rayRefract.d);
+	}
+
+	return refractionColor;
+}
+
+Vector3 RefractionMaterial::shade(const std::vector<HitInfo>& path, const int pathPosition, const Scene& scene, bool log) const {
+	Vector3 shadeResult = Vector3(1.0f);
+	if(pathPosition + 1 < path.size()) { // Not last element
+		shadeResult = path.at(pathPosition + 1).material->shade(path, pathPosition + 1, scene, log);	
+	}
+	return shadeResult;
+}
+
+Ray RefractionMaterial::bounceRay(const Ray& ray, const HitInfo& hit, const int recDepth, const MarkovChain& MC) const {	
+	return bounceRay(ray, hit);
+}
+
+Ray RefractionMaterial::bounceRay(const Ray& ray, const HitInfo& hit) const {
+
 	// specular refraction
 	bool into = dot(hit.N, -ray.d) > 0;		// Going in?
 	float costheta1 = dot(hit.N, -ray.d);
@@ -24,67 +51,14 @@ Vector3 RefractionMaterial::shade(const Ray& ray, const HitInfo& hit, const Scen
 	float costheta2 = 1 - pow(my, 2) * (1 - pow(costheta1, 2));
 
 	if (costheta2 <= 0) {
-		//TODO: 
-		// Reflect instead
-		return Vector3(0.0f);
-	}
-
-	int p = (into ? 1 : -1);
-	Vector3 vRefract = my * ray.d - p * (my * costheta1 + sqrt(costheta2)) * hit.N;	// New ray direction
-	vRefract.normalize();
-
-
-	Ray rayRefract = Ray(Vector3(hit.P), vRefract);
-	HitInfo refractionHit;
-	if(scene.trace(refractionHit, rayRefract, 0.001f)) {
-		refractionColor = refractionHit.material->shade(rayRefract, refractionHit, scene, recDepth + 1, maxRecDepth, log);
-	}
-	else {
-		//Image based
-		refractionColor = scene.getHDRColorFromVector(rayRefract.d);
-	}
-
-	return refractionColor;
-}
-//
-Vector3 RefractionMaterial::shade(const std::vector<HitInfo>& path, const int pathPosition, const Scene& scene, bool log) const {
-	Vector3 shadeResult = Vector3(0.0f);
-	if(pathPosition + 1 < path.size()) { // Not last element
-		shadeResult = path.at(pathPosition + 1).material->shade(path, pathPosition + 1, scene, log);	
-	}
-	return shadeResult;
-}
-
-Ray RefractionMaterial::bounceRay(const Ray& ray, const HitInfo& hit, const int recDepth, const MarkovChain& MC) const {	
-	return bounceRay(ray, hit);
-}
-
-Ray RefractionMaterial::bounceRay(const Ray& ray, const HitInfo& hit) const {
-	// specular refraction
-	float costheta1 = dot(hit.N, -ray.d);
-	bool into = costheta1 > 0;		// Going in?	
-	
-	float my = into ? globalIoR/ior : ior/globalIoR;
-	
-	float costheta2 = 1 - pow(my, 2) * (1 - pow(dot(hit.N, ray.d),2));
-
-	if (costheta2 < 0) {  // Total internal reflection		
 		Vector3 vReflect = ray.d - 2.0f * dot(ray.d, hit.N) * hit.N;
+		// Reflect instead
 		return Ray(hit.P, vReflect);
 	}
 
 	int p = (into ? 1 : -1);
-	
-	Vector3 vRefract = (my * ray.d - hit.N * (p * my * dot(hit.N, ray.d) + sqrt(costheta2))).normalized();	// New ray direction
-	
-	/*
-	std::cout << "my * dot(hit.N, ray.d)                                  \t" << my * dot(hit.N, ray.d) << std::endl;
-	std::cout << "sqrt(costheta2)                                         \t" << sqrt(costheta2) << std::endl;
-	std::cout << "p * (my * dot(hit.N, ray.d) + sqrt(costheta2))          \t" << p * (my * dot(hit.N, ray.d) + sqrt(costheta2)) << std::endl;
-	std::cout << "hit.N * (p * (my * dot(hit.N, ray.d) + sqrt(costheta2)))\t" << hit.N * (p * (my * dot(hit.N, ray.d) + sqrt(costheta2))) << std::endl;
-	std::cout << "my * ray.d                                              \t" << my * ray.d <<std::endl;
-	std::cout << "vRefract                                                \t" << vRefract <<std::endl;
-	*/
+	Vector3 vRefract = my * ray.d - p * hit.N * (my * costheta1 + sqrt(costheta2));	// New ray direction
+	vRefract.normalize();
 
 	Ray rayRefract = Ray(Vector3(hit.P), vRefract);
 
