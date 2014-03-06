@@ -1,5 +1,6 @@
 #ifndef UTILS_H_CSE68
 #define UTILS_H_CSE68
+#include <algorithm>
 #include "Vector3.h"
 #include <vector>
 double rnd(void);  
@@ -26,7 +27,7 @@ std::vector<T> concatVectors(const std::vector<T> &A, const std::vector<T> &B) {
 	return AB;
 }
 
-double maxVectorValue(Vector3 &vector);
+double maxVectorValue(const Vector3 &vector);
 double luminance(Vector3 color);
 Vector3 clamp(Vector3 vector, float lowerBound, float upperBound);
 

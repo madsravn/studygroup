@@ -112,10 +112,10 @@ void makeCBox() {
 
 	// create and place a point light source
 	PointLight * light = new PointLight;
-	light->setPosition(Vector3(278, 528.8, 279.5));    
+	light->setPosition(Vector3(278, 518.0, 279.5));    
 	light->setColor(Vector3(18.387, 10.9873, 2.75357));
-	light->setWattage(1);
-	light->setRadius(130.0f);
+	light->setWattage(50);
+	light->setRadius(30.0f);
 	g_scene->addLight(light);
 
 	Matrix4x4 xform;
@@ -166,9 +166,9 @@ void makeCBox() {
 		Vector3(549.6, 0, 559.2), 
 		Vector3(556, 548.8, 0.0f), 
 		Vector3(556, 548.8, 559.2), 
-		Vector3(-1,0,0),	
+		Vector3(-1,0,0),
 		new Lambert(Vector3(0.570068, 0.0430135, 0.0443706)), g_scene);
-
+	
 	xform.setIdentity();
 	mesh = new TriangleMesh;
 	mesh->load("mesh/cbox_smallbox.obj", xform);

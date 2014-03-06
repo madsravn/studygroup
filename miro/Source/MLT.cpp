@@ -3,6 +3,8 @@
 #include <limits>
 
 const int maxRecDepth  = Constants::MaxPathLength;
+int samps = 0;
+const int biasSamples = 100000;
 
 
 MLT::MLT(Scene& scene, Image* image, Camera* camera, int pathSamples) : scene(scene), img(image), cam(camera), samples(pathSamples) {
@@ -42,15 +44,14 @@ void MLT::run() {
 
 	double b = 1.0f;
 	// Estimate normalization constant
-	/*for (int i = 0; i < 10000; i++) {
-		fprintf(stdout, "\rPSMLT Initializing: %5.2f", 100.0 * i / (10000));		
+	for (int i = 0; i < biasSamples; i++) {
+		fprintf(stdout, "\rPSMLT Initializing: %5.2f", 100.0 * i / (biasSamples));
         fflush(stdout);
-		MarkovChain normChain(img->width(), img->height());
-        
+		MarkovChain normChain(img->width(), img->height());        
 		b += calcPathContribution(generateEyePath(cam->randomRay(img->width(), img->height(), normChain), MC)).scalarContribution;
 	}
     printf("\n");
-	b /= double(10000);*/	// average
+	b /= double(biasSamples);	// average
 	
     bool running = true;
     MarkovChain current(img->width(), img->height());
@@ -68,9 +69,9 @@ void MLT::run() {
         img->drawScanline(j);
         glFinish();
     }
-    while( count < 500 ) {
-		
-		
+    while( count < 1000 ) {
+		samps++;
+				
         double isLargeStepDone;
         if(rnd() <= LargeStepProb) {
             isLargeStepDone = 1.0;
@@ -107,14 +108,17 @@ void MLT::run() {
         
 		i++;
 		if(i % 100000 == 0) {
+
+			std::cout << "samps = " << samps << std::endl;
+
 			i = 0;
             count++;
 		    for(int j = 0; j < img->height(); ++j) {
 		        img->drawScanline(j);
 		        glFinish();
 		    }
-            std::cout << "PIXEL (262,78) = " << img->getPixel(262,78) << std::endl;
-            std::cout << "picture[] = " << picture[3*(78*img->width() + 262)] << ", "  << picture[3*(78*img->width() + 262) + 1] << ", "  << picture[3*(78*img->width() + 262) + 2] << std::endl;
+            //std::cout << "PIXEL (262,78) = " << img->getPixel(262,78) << std::endl;
+            //std::cout << "picture[] = " << picture[3*(78*img->width() + 262)] << ", "  << picture[3*(78*img->width() + 262) + 1] << ", "  << picture[3*(78*img->width() + 262) + 2] << std::endl;
 
 		}
         
@@ -123,6 +127,9 @@ void MLT::run() {
     }
 
     for(int j = 0; j < img->height(); ++j) {
+
+
+
         img->drawScanline(j);
         glFinish();
     }
@@ -211,11 +218,13 @@ void MLT::accumulatePathContribution(const PathContribution pathContribution, co
 			if(newColor.x < color.x || newColor.y < color.y || newColor.z < color.z)
 				std::cout << "new color is darker. Old color: " << color << "\tNew color: " << newColor <<std::endl;
 
-            color = newColor;
+			double s = double(img->width() * img->height()) / double(samps);
+
+			color = newColor;
             picture[3*pixelpos] = color.x;
             picture[3*pixelpos+1] = color.y;
             picture[3*pixelpos+2] = color.z;
-			img->setPixel(ix, iy, color);
+			img->setPixel(ix, iy, color * s);
 		}
 	}
 }

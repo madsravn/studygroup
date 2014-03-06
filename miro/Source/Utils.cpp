@@ -70,7 +70,7 @@ Vector3 generateRandomRayDirection() {
     return generateRandomRayDirection(rnd(), rnd());
 }
 
-double maxVectorValue(Vector3 &vector) {
+double maxVectorValue(const Vector3 &vector) {
 	return std::max(vector.x, std::max(vector.y, vector.z));
 }
 
