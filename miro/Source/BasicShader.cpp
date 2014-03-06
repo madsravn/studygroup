@@ -21,10 +21,14 @@ void BasicShader::run() {
 		for (int i = 0; i < img->width(); ++i)
 		{
 			shadeResult = Vector3(0.0f);
-			ray = cam->eyeRay(i, j, img->width(), img->height());
-			if (scene.trace(hitInfo, ray, 0.0001f)) {
-				shadeResult += hitInfo.material->shade(ray, hitInfo, scene, 0, 1);
-			}
+			for (int AAx = 0; AAx < 2; AAx++){
+				for (int AAy = 0; AAy < 2; AAy++) {
+					ray = cam->eyeRay(i - 0.25f + (float)AAx/2, j - 0.25f + (float)AAy/2, img->width(), img->height());
+					if (scene.trace(hitInfo, ray, 0.0001f)) {
+						shadeResult += hitInfo.material->shade(ray, hitInfo, scene, 0, 1) / 4.0;
+					}
+				}
+			}		
 			img->setPixel(i, j, shadeResult);
 		}
 		img->drawScanline(j);

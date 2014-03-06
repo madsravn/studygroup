@@ -10,7 +10,7 @@ double M_PI = 3.14159265358979;
 double M_1_PI = 1.0/M_PI;
 #endif
 
-bool softShadows = false;
+bool softShadows = true;
 
 Lambert::Lambert(const Vector3 & kd, const Vector3 & ka) :
 	m_kd(kd), m_ka(ka)
@@ -124,10 +124,10 @@ Vector3 Lambert::calcLighting(const HitInfo &hit, PointLight* pLight, const Scen
 	HitInfo lightHit;
 	scene.trace(lightHit, Ray(hit.P, lv), 0.001f);		
 	bool isLightHit = Vector3(pLight->position() - hit.P).length() <= lightHit.t;
-	if (isLightHit) {
+	if (isLightHit) {		
 		double omega = 2 * M_PI;
-		illumination_direct += (pLight->wattage() * pLight->color()) * std::max(dot(lv, hit.N), 0.0f) * M_1_PI;
-		/*illumination_direct += (pLight->wattage() * pLight->color() * std::max(dot(lv, hit.N), 0.0f)) / pow((pLight->position() - hit.P).length(), 2);*/
+		illumination_direct += (pLight->wattage() * pLight->color()) * std::max(dot(lv, hit.N), 0.0f) * omega * M_1_PI;
+		//illumination_direct += (pLight->wattage() * pLight->color() * std::max(dot(lv, hit.N), 0.0f)) / pow((pLight->position() - hit.P).length(), 2);
 	}
 
 	return illumination_direct;

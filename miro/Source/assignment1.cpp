@@ -113,9 +113,9 @@ void makeCBox() {
 	// create and place a point light source
 	PointLight * light = new PointLight;
 	light->setPosition(Vector3(278, 528.8, 279.5));    
-	light->setColor(Vector3(0.885809, 0.698859, 0.666422));
-	light->setWattage(10);
-	light->setRadius(0.5f);
+	light->setColor(Vector3(18.387, 10.9873, 2.75357));
+	light->setWattage(1);
+	light->setRadius(130.0f);
 	g_scene->addLight(light);
 
 	Matrix4x4 xform;
