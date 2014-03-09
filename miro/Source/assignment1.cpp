@@ -116,6 +116,7 @@ void makeCBox() {
 	light->setColor(Vector3(18.387, 10.9873, 2.75357));
 	light->setWattage(50);
 	light->setRadius(30.0f);
+	light->setFalloff(1000.0f);
 	g_scene->addLight(light);
 
 	Matrix4x4 xform;
@@ -354,8 +355,9 @@ void makeCornellBox2() {
     light->setPosition(Vector3(0, 1.8, -.5));
     light->setColor(Vector3(.73, 0.596, 0.357));
 	light->setColor(Vector3(1.0f));
-    light->setWattage(2);
-    light->setRadius(0.1f);
+    light->setWattage(50);
+    light->setRadius(0.4f);
+	light->setFalloff(1.0f);
     g_scene->addLight(light);
 
 		// create and place a point light source
@@ -363,7 +365,8 @@ void makeCornellBox2() {
     light->setPosition(Vector3(.5, .5, 1));
     light->setColor(Vector3(.73, 0.596, 0.357));
     light->setWattage(2);
-    light->setRadius(0.2f);
+    light->setRadius(0.5f);
+	light->setFalloff(1.0f);
     g_scene->addLight(light);
 
 
@@ -551,6 +554,16 @@ void makeCornellBox2() {
     mesh->load("mesh/sphere.obj", xform);
 	material = new RefractionMaterial(1.5f);
     addMeshTrianglesToScene(mesh, material);
+	
+	////   // Sphere
+	xform.setIdentity();
+	xform *= translate(-.75, .05, .2);
+	xform *= scale(.04, .04, .04);
+	
+	mesh = new TriangleMesh;
+	mesh->load("mesh/sphere.obj", xform);
+	material = new RefractionMaterial(2.49f);
+	addMeshTrianglesToScene(mesh, material);
 	
  //   // Sphere
 	xform.setIdentity();

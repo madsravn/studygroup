@@ -13,6 +13,7 @@ public:
     void setColor(const Vector3& v)     {m_color = v;}
     void setWattage(float f)            {m_wattage = f;}
     void setRadius(float f)             {m_radius = f;}
+	void setFalloff(float f)			{ m_falloff = f; }
 
     inline bool
     intersect(HitInfo& result, const Ray& ray,
@@ -74,6 +75,7 @@ public:
     float radius() const                {return m_radius;}
     const Vector3 & color() const       {return m_color;}
     const Vector3& position() const     {return m_position;}
+	float falloff() const				{ return m_falloff; }
 
     void preCalc() {} // use this if you need to
 
@@ -82,6 +84,7 @@ protected:
     Vector3 m_color;
     float m_wattage;
     float m_radius;
+	float m_falloff;
 };
 
 typedef std::vector<PointLight*> Lights;

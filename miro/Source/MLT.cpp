@@ -4,7 +4,7 @@
 
 const int maxRecDepth  = Constants::MaxPathLength;
 int samps = 0;
-const int biasSamples = 100000;
+const int biasSamples = 1000000;
 
 
 MLT::MLT(Scene& scene, Image* image, Camera* camera, int pathSamples) : scene(scene), img(image), cam(camera), samples(pathSamples) {
@@ -69,7 +69,7 @@ void MLT::run() {
         img->drawScanline(j);
         glFinish();
     }
-    while( count < 1000 ) {
+    while( count < 500 ) {
 		samps++;
 				
         double isLargeStepDone;
@@ -126,12 +126,19 @@ void MLT::run() {
         //fflush(stdout);
     }
 
+
+	double s = double(img->width() * img->height()) / double(samps);
+	
     for(int j = 0; j < img->height(); ++j) {
+		for (int i = 0; i < img->width(); ++i) {
 
+			int pixelpos = j*img->width() + i;
 
-
-        img->drawScanline(j);
-        glFinish();
+			Vector3 color = Vector3(picture[3 * pixelpos], picture[3 * pixelpos + 1], picture[3 * pixelpos + 2]);
+			img->setPixel(i, j, color * s);
+		}
+		img->drawScanline(j);
+		glFinish();
     }
 }
 
@@ -218,13 +225,13 @@ void MLT::accumulatePathContribution(const PathContribution pathContribution, co
 			if(newColor.x < color.x || newColor.y < color.y || newColor.z < color.z)
 				std::cout << "new color is darker. Old color: " << color << "\tNew color: " << newColor <<std::endl;
 
-			double s = double(img->width() * img->height()) / double(samps);
+			
 
 			color = newColor;
             picture[3*pixelpos] = color.x;
             picture[3*pixelpos+1] = color.y;
             picture[3*pixelpos+2] = color.z;
-			img->setPixel(ix, iy, color * s);
+			//img->setPixel(ix, iy, color * s);
 		}
 	}
 }

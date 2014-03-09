@@ -127,7 +127,7 @@ Vector3 Lambert::calcLighting(const HitInfo &hit, PointLight* pLight, const Scen
 	if (isLightHit) {		
 
 		//illumination_direct = (m_kd * pLight->wattage() * pLight->color() * std::max(dot(lv, hit.N), 0.0f)) / pow((pLight->position() - hit.P).length(), 2);
-		illumination_direct += pLight->wattage() * pLight->color() * std::max(dot(lv, hit.N), 0.0f) * 2 * M_PI * M_1_PI * (pLight->radius() * maxVectorValue(pLight->color())) / (pLight->position() - hit.P).length2();
+		illumination_direct += pLight->wattage() * pLight->color() * std::max(dot(lv, hit.N), 0.0f) * 2 * M_PI * M_1_PI * pLight->falloff() / (pLight->position() - hit.P).length2();
 		//illumination_direct += pLight->wattage() * pLight->color() * std::max(dot(lv, hit.N), 0.0f) / pow((pLight->position() - hit.P).length(), 2);
 	}
 
