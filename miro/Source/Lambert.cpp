@@ -86,7 +86,7 @@ Vector3 Lambert::shade(const std::vector<HitInfo>& path, const int pathPosition,
 		Vector3 nextRayDirection = (nextHit.P - hit.P).normalized();
 		Vector3 rayColor = nextHit.material->shade(path, pathPosition + 1, scene, log);	
 		float nDotD = dot(hit.N, nextRayDirection);
-		illumination_indirect = rayColor * nDotD * M_1_PI;
+		illumination_indirect = m_kd * rayColor * nDotD * M_1_PI;
 	}
 	
 	return illumination_direct + illumination_indirect;
@@ -125,9 +125,10 @@ Vector3 Lambert::calcLighting(const HitInfo &hit, PointLight* pLight, const Scen
 	scene.trace(lightHit, Ray(hit.P, lv), 0.001f);		
 	bool isLightHit = Vector3(pLight->position() - hit.P).length() <= lightHit.t;
 	if (isLightHit) {		
-		double omega = 2 * M_PI;
-		illumination_direct += (pLight->wattage() * pLight->color()) * std::max(dot(lv, hit.N), 0.0f) * omega * M_1_PI;
-		//illumination_direct += (pLight->wattage() * pLight->color() * std::max(dot(lv, hit.N), 0.0f)) / pow((pLight->position() - hit.P).length(), 2);
+
+		//illumination_direct = (m_kd * pLight->wattage() * pLight->color() * std::max(dot(lv, hit.N), 0.0f)) / pow((pLight->position() - hit.P).length(), 2);
+		illumination_direct += pLight->wattage() * pLight->color() * std::max(dot(lv, hit.N), 0.0f) * 2 * M_PI * M_1_PI * (pLight->radius() * maxVectorValue(pLight->color())) / (pLight->position() - hit.P).length2();
+		//illumination_direct += pLight->wattage() * pLight->color() * std::max(dot(lv, hit.N), 0.0f) / pow((pLight->position() - hit.P).length(), 2);
 	}
 
 	return illumination_direct;

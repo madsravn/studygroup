@@ -1,6 +1,7 @@
 #ifndef CSE168_MLT_H_INCLUDED
 #define CSE168_MLT_H_INCLUDED
 
+#include <algorithm>
 #include "Utils.h"
 #include "Scene.h"
 #include "Image.h"

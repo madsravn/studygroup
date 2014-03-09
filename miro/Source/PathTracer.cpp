@@ -22,7 +22,7 @@ void PathTracer::run() {
 		{
 			shadeResult = Vector3(0.0f);			
 
-			for (int AAx = 0; AAx < 2; AAx++){
+			for (int AAx = 0; AAx < 2; AAx++) {
 				for (int AAy = 0; AAy < 2; AAy++) {
 					ray = cam->eyeRay(i - 0.25f + (float)AAx/2, j - 0.25f + (float)AAy/2, img->width(), img->height());
 					for (int sampleCounter = 0; sampleCounter < samples/4; sampleCounter++){
@@ -32,16 +32,19 @@ void PathTracer::run() {
 						if (!buildPath) {
 							if (scene.trace(hitInfo, ray, 0.0001f)) {
 								traceResult = hitInfo.material->shade(ray, hitInfo, scene, 0, Constants::maxRecDepth, 0);		
-								shadeResult += traceResult * inverseSamples;
+								shadeResult += traceResult;
 							}
 						} else {
 							std::vector<HitInfo> path = generatePath(ray);
 							pathResult = pathTraceFromPath(path);
-							shadeResult += pathResult * inverseSamples;					
+							shadeResult += pathResult;					
 						}
 					}
 				}
-			}						
+			}
+
+			shadeResult *= inverseSamples / 4;
+
 			img->setPixel(i, j, shadeResult);
 		}
 		img->drawScanline(j);
