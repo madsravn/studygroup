@@ -3,6 +3,8 @@
 #include <limits>
 
 const int maxRecDepth  = Constants::MaxPathLength;
+int samps = 0;
+int normSamples = 1000;
 
 
 MLT::MLT(Scene& scene, Image* image, Camera* camera, int pathSamples) : scene(scene), img(image), cam(camera), samples(pathSamples) {
@@ -19,7 +21,6 @@ MLT::MLT(Scene& scene, Image* image, Camera* camera, int pathSamples) : scene(sc
     }
 
 }
-
 
 void MLT::run() {    
 
@@ -42,15 +43,15 @@ void MLT::run() {
 
 	double b = 1.0f;
 	// Estimate normalization constant
-	/*for (int i = 0; i < 10000; i++) {
-		fprintf(stdout, "\rPSMLT Initializing: %5.2f", 100.0 * i / (10000));		
+	for (int i = 0; i < normSamples; i++) {
+		fprintf(stdout, "\rPSMLT Initializing: %5.2f", 100.0 * i / (normSamples));		
         fflush(stdout);
 		MarkovChain normChain(img->width(), img->height());
         
 		b += calcPathContribution(generateEyePath(cam->randomRay(img->width(), img->height(), normChain), MC)).scalarContribution;
 	}
     printf("\n");
-	b /= double(10000);*/	// average
+	b /= double(normSamples);	// average
 	
     bool running = true;
     MarkovChain current(img->width(), img->height());
@@ -69,8 +70,9 @@ void MLT::run() {
         glFinish();
     }
     while( count < 500 ) {
-		
-		
+
+		samps++;
+
         double isLargeStepDone;
         if(rnd() <= LargeStepProb) {
             isLargeStepDone = 1.0;
@@ -211,11 +213,13 @@ void MLT::accumulatePathContribution(const PathContribution pathContribution, co
 			if(newColor.x < color.x || newColor.y < color.y || newColor.z < color.z)
 				std::cout << "new color is darker. Old color: " << color << "\tNew color: " << newColor <<std::endl;
 
+			double s = (double)(img->width() * img->height()) / (double)samps;
+
             color = newColor;
             picture[3*pixelpos] = color.x;
             picture[3*pixelpos+1] = color.y;
             picture[3*pixelpos+2] = color.z;
-			img->setPixel(ix, iy, color);
+			img->setPixel(ix, iy, color * s);
 		}
 	}
 }
