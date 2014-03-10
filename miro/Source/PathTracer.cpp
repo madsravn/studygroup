@@ -31,7 +31,7 @@ void PathTracer::run() {
 						Vector3 pathResult = Vector3(0.0f);
 						if (!buildPath) {
 							if (scene.trace(hitInfo, ray, 0.0001f)) {
-								traceResult = hitInfo.material->shade(ray, hitInfo, scene, 0, Constants::maxRecDepth, 0);		
+								traceResult = hitInfo.material->shade(ray, hitInfo, scene, 0, Constants::MaxPathLength, 0);
 								shadeResult += traceResult;
 							}
 						} else {
@@ -54,14 +54,13 @@ void PathTracer::run() {
 	}
 }
 
-
 std::vector<HitInfo> PathTracer::generatePath(const Ray& eyeRay) const {
 	std::vector<HitInfo> path = std::vector<HitInfo>();
 	path.push_back(HitInfo(0.0f, eyeRay.o, eyeRay.d));	// Eye position
 
 	Ray ray = eyeRay;
 	HitInfo hitInfo;
-	for (int i = 0; i < Constants::maxRecDepth; i++)
+	for (int i = 0; i < Constants::MaxPathLength; i++)
 	{
 		if(scene.trace(hitInfo, ray, 0.001f)) {
 			path.push_back(hitInfo);
@@ -73,6 +72,24 @@ std::vector<HitInfo> PathTracer::generatePath(const Ray& eyeRay) const {
 	return path;	
 }
 
+std::vector<HitInfo> PathTracer::generatePath(const Ray& eyeRay, const MarkovChain& MC) const {
+	std::vector<HitInfo> path = std::vector<HitInfo>();
+	path.push_back(HitInfo(0.0f, eyeRay.o, eyeRay.d));	// Eye position
+
+	Ray ray = eyeRay;
+	HitInfo hitInfo;
+	for (int i = 0; i < Constants::MaxPathLength; i++)
+	{
+		if (scene.trace(hitInfo, ray, 0.001f)) {
+			path.push_back(hitInfo);
+			ray = hitInfo.material->bounceRay(ray, hitInfo, i + 1, MC);
+		}
+		else {
+			break;
+		}
+	}
+	return path;
+}
 
 // Bruges af MLT
 Vector3 PathTracer::pathTraceFromPath(std::vector<HitInfo> path) const{	
@@ -116,6 +133,16 @@ PathContribution PathTracer::calcPathContribution(const std::vector<HitInfo> pat
 	return result;
 }
 
+// Probability density for path with all numbers of vertices
+double PathTracer::pathProbabilityDensity(const std::vector<HitInfo> path) const {
+	//std::cout << "pathProbabilityDensity" << std::endl;
+	double p = 0.0f;
+	for (int numEyeVertices = 0; numEyeVertices <= path.size(); numEyeVertices++) {
+		p += pathProbabilityDensity(path, numEyeVertices);										//Hvis vi skal bruge TKhanAdder ligesom Toshiya skal den tilføjes her
+	}
+	return p;
+}
+
 double PathTracer::pathProbabilityDensity(const std::vector<HitInfo> path, int numEyeVertices) const {
 	double p = 1.0;
 
@@ -151,16 +178,6 @@ double PathTracer::MISWeight(const std::vector<HitInfo> path, const int pathLeng
 	else {
 		return std::max(std::min(p_i / p_all, 1.0), 0.0);
 	}
-}
-
-// Probability density for path with all numbers of vertices
-double PathTracer::pathProbabilityDensity(const std::vector<HitInfo> path) const {
-	//std::cout << "pathProbabilityDensity" << std::endl;
-	double p = 0.0f;
-	for (int numEyeVertices = 0; numEyeVertices <= path.size(); numEyeVertices++) {
-		p += pathProbabilityDensity(path, numEyeVertices);										//Hvis vi skal bruge TKhanAdder ligesom Toshiya skal den tilføjes her
-	}
-	return p;
 }
 
 PathTracer::~PathTracer(void)

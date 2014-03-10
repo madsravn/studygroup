@@ -68,7 +68,7 @@ PathContribution BiPathTracer::calcCombinePaths(const std::vector<HitInfo> eyePa
 
 	int px, py;
 
-	for (int combinedPathSize = 2; combinedPathSize <= std::min(Constants::maxRecDepth, (int)(eyePath.size() + lightPath.size())); combinedPathSize++) {		
+	for (int combinedPathSize = Constants::MinPathLength; combinedPathSize <= std::min(Constants::MaxPathLength, (int)(eyePath.size() + lightPath.size())); combinedPathSize++) {
 		for(int eyeSubPathSize = 1; eyeSubPathSize <= std::min(combinedPathSize, (int)eyePath.size()); eyeSubPathSize++) {    // Smallest path is camera to surface (length 2)		
 			int lightSubPathSize = combinedPathSize - eyeSubPathSize;
 			
@@ -165,7 +165,7 @@ std::vector<HitInfo> BiPathTracer::generateEyePath(const Ray& eyeRay) const {
 
 	Ray ray = eyeRay;
 	HitInfo hitInfo;
-	for (int i = 0; i < Constants::maxRecDepth; i++)
+	for (int i = 0; i < Constants::MaxPathLength; i++)
 	{
 		if(scene.trace(hitInfo, ray, 0.001f)) {
 			path.push_back(hitInfo);
@@ -185,7 +185,7 @@ std::vector<HitInfo> BiPathTracer::generateLightPath(const Vector3 lightPos) con
 	Ray ray = Ray(lightPos, lightDir);
 	HitInfo hitInfo;
 
-	for (int i = 0; i < Constants::maxRecDepth; i++) {
+	for (int i = 0; i < Constants::MaxPathLength; i++) {
 		if(scene.trace(hitInfo, ray, 0.001f)) {
 			lightPath.push_back(hitInfo);
 			ray = hitInfo.material->bounceRay(ray, hitInfo);

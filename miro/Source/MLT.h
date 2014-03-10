@@ -25,11 +25,6 @@ public:
 	std::vector<HitInfo> generateEyePath(const Ray& eyeRay, const MarkovChain& MC) const;
 	Vector3 pathTraceFromPath(std::vector<HitInfo> path) const;
 	void accumulatePathContribution(const PathContribution pathContribution, const double scaling);
-	PathContribution calcPathContribution(const std::vector<HitInfo> path) const;
-	Vector3 pathTroughput(const std::vector<HitInfo> path) const;	
-	double pathProbabilityDensity(const std::vector<HitInfo> path) const;
-	double pathProbabilityDensity(const std::vector<HitInfo> path, int numEyeVertices) const;
-	double MISWeight(const std::vector<HitInfo> path, const int pathLength) const;
 	double acceptProb(MarkovChain& current, MarkovChain& proposal) const;
 	void calcCoordinates(std::vector<HitInfo> path, int &px, int &py) const;
 	std::vector<HitInfo> generateEyePathFromChain(MarkovChain chain) const;
