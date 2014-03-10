@@ -12,6 +12,8 @@
 #include "PathContribution.h"
 #include "PathTracer.h"
 
+class PathTracer;
+
 class MLT
 {
 public:	

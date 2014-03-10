@@ -1,4 +1,6 @@
-#pragma once
+#ifndef CSE168_PATHTRACER_H_INCLUDED
+#define CSE168_PATHTRACER_H_INCLUDED
+
 #include "Miro.h"
 #include "Scene.h"
 #include "Camera.h"
@@ -24,3 +26,5 @@ private:
 	Camera* cam;
 	int samples;
 };
+
+#endif
