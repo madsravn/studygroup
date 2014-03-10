@@ -15,7 +15,7 @@
 class MLT
 {
 public:	
-	MLT(Scene& scene, Image* image, Camera* camera, int pathSamples);
+	MLT(Scene& scene, Image* image, Camera* camera, int pathSamples, PathTracer* tracer);
 	~MLT(void) {};
 	float mutate(float value);
     void run();    
@@ -28,7 +28,6 @@ public:
 	double pathProbabilityDensity(const std::vector<HitInfo> path) const;
 	double pathProbabilityDensity(const std::vector<HitInfo> path, int numEyeVertices) const;
 	double MISWeight(const std::vector<HitInfo> path, const int pathLength) const;
-	double directionToArea(const HitInfo current, const HitInfo next) const;
 	double acceptProb(MarkovChain& current, MarkovChain& proposal) const;
 	void calcCoordinates(std::vector<HitInfo> path, int &px, int &py) const;
 	std::vector<HitInfo> generateEyePathFromChain(MarkovChain chain) const;
@@ -39,6 +38,7 @@ private:
 	int samples;
     MarkovChain MC;
     std::vector<float> picture;
+	PathTracer* renderer;
 };
 
 #endif // CSE168_MLT_H_INCLUDED

@@ -7,7 +7,10 @@ int samps = 0;
 const int biasSamples = 1000000;
 
 
-MLT::MLT(Scene& scene, Image* image, Camera* camera, int pathSamples) : scene(scene), img(image), cam(camera), samples(pathSamples) {
+
+
+MLT::MLT(Scene& scene, Image* image, Camera* camera, int pathSamples, PathTracer* tracer) : scene(scene), img(image), cam(camera), samples(pathSamples), renderer(tracer) {
+	
     MC.imageWidth = image->width();
     MC.imageHeight = image->height();
     for(int i = 0; i < 3*img->height()*img->width(); ++i) {
@@ -21,7 +24,6 @@ MLT::MLT(Scene& scene, Image* image, Camera* camera, int pathSamples) : scene(sc
     }
 
 }
-
 
 void MLT::run() {    
 
@@ -48,7 +50,7 @@ void MLT::run() {
 		fprintf(stdout, "\rPSMLT Initializing: %5.2f", 100.0 * i / (biasSamples));
         fflush(stdout);
 		MarkovChain normChain(img->width(), img->height());        
-		b += calcPathContribution(generateEyePath(cam->randomRay(img->width(), img->height(), normChain), MC)).scalarContribution;
+		b += /*renderer->*/calcPathContribution(generateEyePath(cam->randomRay(img->width(), img->height(), normChain), MC)).scalarContribution;
 	}
     printf("\n");
 	b /= double(biasSamples);	// average
@@ -60,7 +62,7 @@ void MLT::run() {
     // Initialize current
     Ray tRay = cam->randomRay(img->width(), img->height(), current);
     std::vector<HitInfo> tPath = generateEyePath(tRay, current);
-    current.contribution = calcPathContribution(tPath);
+	current.contribution = /*renderer->*/calcPathContribution(tPath);
     int count = 0;
     int i = 0;
 
@@ -71,7 +73,6 @@ void MLT::run() {
     }
     while( count < 500 ) {
 		samps++;
-				
         double isLargeStepDone;
         if(rnd() <= LargeStepProb) {
             isLargeStepDone = 1.0;
@@ -83,7 +84,7 @@ void MLT::run() {
 
 		std::vector<HitInfo> path = generateEyePathFromChain(proposal);		
 		
-		proposal.contribution = calcPathContribution(path);
+		proposal.contribution = /*renderer->*/calcPathContribution(path);
 
 		double a = acceptProb(current, proposal);
 
@@ -197,7 +198,6 @@ std::vector<HitInfo> initialPath() {
 }
 
 Vector3 MLT::pathTraceFromPath(std::vector<HitInfo> path) const{
-	//std::cout << "pathTraceFromPath" << std::endl;
 	// Recursive shading
 	Vector3 shadeResult = Vector3(0.0f);
 	
@@ -225,13 +225,13 @@ void MLT::accumulatePathContribution(const PathContribution pathContribution, co
 			if(newColor.x < color.x || newColor.y < color.y || newColor.z < color.z)
 				std::cout << "new color is darker. Old color: " << color << "\tNew color: " << newColor <<std::endl;
 
-			
+			double s = (double)(img->width() * img->height()) / (double)samps;
 
-			color = newColor;
+            color = newColor;
             picture[3*pixelpos] = color.x;
             picture[3*pixelpos+1] = color.y;
             picture[3*pixelpos+2] = color.z;
-			//img->setPixel(ix, iy, color * s);
+			img->setPixel(ix, iy, color * s);
 		}
 	}
 }
@@ -326,13 +326,6 @@ double MLT::MISWeight(const std::vector<HitInfo> path, const int pathLength) con
 	}
 }
 
-double MLT::directionToArea(const HitInfo current, const HitInfo next) const {
-	//std::cout << "directionToArea" << std::endl;
-	const Vector3 dv = next.P - current.P;					// Distance between vertices
-	const double d2 = dot(dv, dv);							// Distance squared
-	return abs(dot(next.N, dv)) / (d2 * sqrt(d2));			// dot product of next normal and distance divided by d^3
-}
-
 double MLT::acceptProb(MarkovChain& current, MarkovChain& proposal) const {
 	// T(y > x) / T(x > y)	
 	double a = 1.0;
@@ -359,15 +352,3 @@ std::vector<HitInfo> MLT::generateEyePathFromChain(MarkovChain chain) const {
 
 	return generateEyePath(ray, chain);
 }
-
-/*
-tentativeTransitionFunction(x -> y){
-	make tentative sample X'_i
-
-	if (acceptProb(X_i-1, X'_i)) {
-		return X'_i;
-	} else {
-		return X_i-i;
-	}
-}
-*/

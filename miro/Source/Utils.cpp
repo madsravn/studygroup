@@ -95,6 +95,12 @@ Vector3 clamp(Vector3 vector, float lowerBound, float upperBound) {
 	return vector;
 }
 
+double directionToArea(HitInfo current, HitInfo next) {
+	const Vector3 dv = next.P - current.P;					// Distance between vertices
+	const double d2 = dot(dv, dv);							// Distance squared
+	return abs(dot(next.N, dv)) / (d2 * sqrt(d2));			// dot product of next normal and distance divided by d^3
+}
+
 
 
 

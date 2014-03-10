@@ -114,14 +114,13 @@ void BiPathTracer::accumulatePathContribution(const PathContribution pathContrib
 
 			Vector3 newColor = color + Vector3(picture[3*pixelpos], picture[3*pixelpos+1], picture[3*pixelpos+2]);
 
-			if(newColor.x < color.x || newColor.y < color.y || newColor.z < color.z)
-				std::cout << "new color is darker. Old color: " << color << "\tNew color: " << newColor <<std::endl;
+			double s = 1.0 / Constants::PathSamples;
 
 			color = newColor;
 			picture[3*pixelpos] = color.x;
 			picture[3*pixelpos+1] = color.y;
 			picture[3*pixelpos+2] = color.z;
-			img->setPixel(ix, iy, color);
+			img->setPixel(ix, iy, color * s);
 
 			//std::cout << ix << ", " << iy << " = " << color << std::endl;
 
