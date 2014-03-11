@@ -156,7 +156,6 @@ Camera::randomRay(int imageWidth, int imageHeight, const MarkovChain& MC) {
     return eyeRay(x,y,imageWidth, imageHeight);
 }
 
-
 float divideBy(Vector3 a, Vector3 b) {
     const float totient = 0.0000001f;
     for(int i = 0; i < 3; ++i) {

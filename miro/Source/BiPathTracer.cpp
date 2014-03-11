@@ -46,8 +46,7 @@ void BiPathTracer::run() {
 					std::vector<HitInfo> lightPath = generateLightPath(pLight->position());
 					
 					PathContribution pathContribution = calcCombinePaths(eyePath, lightPath);
-					accumulatePathContribution(pathContribution, inverseSamples);
-				
+					accumulatePathContribution(pathContribution, inverseSamples);				
 				}
 			}
 		}
@@ -85,6 +84,15 @@ PathContribution BiPathTracer::calcCombinePaths(const std::vector<HitInfo> eyePa
 			std::vector<HitInfo> combinedPath = concatVectors(EyeSubPath, reverseLightSubPath);
 
 			Vector3 rayToPixelsDir = (combinedPath.at(1).P - combinedPath.at(0).P).normalized();
+
+			HitInfo camHit;
+			scene.trace(camHit, Ray(combinedPath.at(1).P, (combinedPath.at(0).P - combinedPath.at(1).P).normalized()));
+			if (camHit.t < (combinedPath.at(0).P - combinedPath.at(1).P).length()){
+				//std::cout << "Camera not hit" << std::endl;
+				continue;
+			}
+				
+
 			cam->rayToPixels(
 				Ray(combinedPath.at(0).P, rayToPixelsDir), 
 				px, py, img->width(), img->height());
@@ -94,7 +102,7 @@ PathContribution BiPathTracer::calcCombinePaths(const std::vector<HitInfo> eyePa
 				Contribution contribution(px, py, lightPathResult);
 				pathContribution.colors.push_back(contribution);
 
-				pathContribution.scalarContribution = std::max(pathContribution.scalarContribution, max(contribution.color));
+				pathContribution.scalarContribution = std::max(pathContribution.scalarContribution, maxVectorValue(contribution.color));
 			}			
 		}
 	}
@@ -135,8 +143,9 @@ void BiPathTracer::accumulatePathContribution(const PathContribution pathContrib
 bool BiPathTracer::isConnectable(const std::vector<HitInfo> eyePath, const std::vector<HitInfo> lightPath) const {
 	//std::cout << "isConnectable(" << eyePath.size() << ", " << lightPath.size() << ")" << std::endl;
 
-	if(lightPath.size() == 0)
+	if(lightPath.size() == 0) {		
 		return true;
+	}
 	HitInfo hitInfo;
 	HitInfo lastEyePoint = eyePath.at(eyePath.size() - 1);
 	HitInfo lastLightPoint = lightPath.at(lightPath.size() - 1);
