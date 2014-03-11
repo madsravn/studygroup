@@ -134,9 +134,9 @@ Vector3 Lambert::calcLighting(const HitInfo &hit, PointLight* pLight, const Scen
 	return illumination_direct;
 }
 
-Ray Lambert::bounceRay(const Ray& ray, const HitInfo& hit, const int recDepth, const MarkovChain& MC) const {
-    double rand1 = MC.get(recDepth*Constants::NumRNGsPerEvent);
-    double rand2 = MC.get(recDepth*Constants::NumRNGsPerEvent + 1);
+Ray Lambert::bounceRay(const Ray& ray, const HitInfo& hit, const MarkovChain& MC) const {
+    double rand1 = MC.getNext();
+    double rand2 = MC.getNext();
 	return Ray(hit.P, generateRandomRayDirection(hit.N, rand1, rand2));	
 }
 

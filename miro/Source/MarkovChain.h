@@ -19,7 +19,7 @@ class MarkovChain {
         mutable int pos;
         mutable int count;
 		PathContribution contribution;
-        double get(int i) const;
+       // double get(int i) const;
 };
 
 class prdns {

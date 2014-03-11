@@ -1,8 +1,6 @@
 #include "BiPathTracer.h"
 #include <algorithm>
 
-
-
 BiPathTracer::BiPathTracer(Scene& scene, Image* image, Camera* camera, int pathSamples) : scene(scene), img(image), cam(camera), samples(pathSamples) {
 	for(int i = 0; i < 3*img->height()*img->width(); ++i) {
 		picture.push_back(0.0f);
@@ -184,10 +182,27 @@ std::vector<HitInfo> BiPathTracer::generateEyePath(const Ray& eyeRay) const {
 	return path;
 }
 
+std::vector<HitInfo> BiPathTracer::generateEyePath(const Ray& eyeRay, const MarkovChain& MC) const {
+	std::vector<HitInfo> path = std::vector<HitInfo>();
+	path.push_back(HitInfo(0.0f, eyeRay.o, eyeRay.d));	// Eye position
+
+	Ray ray = eyeRay;
+	HitInfo hitInfo;
+	for (int i = 0; i < Constants::MaxPathLength; i++)
+	{
+		if(scene.trace(hitInfo, ray, 0.001f)) {
+			path.push_back(hitInfo);
+			ray = hitInfo.material->bounceRay(ray, hitInfo, MC);
+		} else {
+			break;
+		}
+	}
+	return path;
+}
+
 std::vector<HitInfo> BiPathTracer::generateLightPath(const Vector3 lightPos) const {
 	std::vector<HitInfo> lightPath = std::vector<HitInfo>();
-	Vector3 lightDir = generateRandomRayDirection();	
-	//lightPath.push_back(HitInfo(0.0f, lightPos, lightDir));
+	Vector3 lightDir = generateRandomRayDirection();
 
 	Ray ray = Ray(lightPos, lightDir);
 	HitInfo hitInfo;
@@ -202,4 +217,33 @@ std::vector<HitInfo> BiPathTracer::generateLightPath(const Vector3 lightPos) con
 	}	
 
 	return lightPath;
+}
+
+std::vector<HitInfo> BiPathTracer::generateLightPath(const Vector3 lightPos, const MarkovChain& MC) const {
+	std::vector<HitInfo> lightPath = std::vector<HitInfo>();
+	Vector3 lightDir = generateRandomRayDirection(MC.getNext(), MC.getNext());
+
+	Ray ray = Ray(lightPos, lightDir);
+	HitInfo hitInfo;
+
+	for (int i = 0; i < Constants::MaxPathLength; i++) {
+		if(scene.trace(hitInfo, ray, 0.001f)) {
+			lightPath.push_back(hitInfo);
+			ray = hitInfo.material->bounceRay(ray, hitInfo, MC);
+		} else {
+			break;
+		}
+	}
+	return lightPath;
+}
+
+PathContribution BiPathTracer::calcPathContribution(const MarkovChain& MC) const {
+	MarkovChain normChain(img->width(), img->height());
+
+	const PointLight* pLight = scene.lights()->at((int)MC.getNext() % scene.lights()->size()); // Choose random light
+
+	std::vector<HitInfo> eyePath = generateEyePath(cam->randomRay(img->width(), img->height(), normChain), MC);
+	std::vector<HitInfo> lightPath = generateLightPath(pLight->position(), MC);
+
+	return calcCombinePaths(eyePath, lightPath);
 }

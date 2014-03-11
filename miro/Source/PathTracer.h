@@ -14,16 +14,19 @@ public:
 	PathTracer(Scene& scene, Image* image, Camera* camera, int pathSamples);
 	~PathTracer(void);
 	void run();
+
 	Vector3 pathTraceFromPath(std::vector<HitInfo> path) const;
-	std::vector<HitInfo> generatePath(const Ray& eyeRay) const;
-
-
+	
+	PathContribution calcPathContribution(const MarkovChain& MC) const;
 	PathContribution calcPathContribution(const std::vector<HitInfo> path) const;
-	double pathProbabilityDensity(const std::vector<HitInfo> path, int numEyeVertices) const;
-	double MISWeight(const std::vector<HitInfo> path, const int pathLength) const;
+	
 	double pathProbabilityDensity(const std::vector<HitInfo> path) const;
-	std::vector<HitInfo> generateEyePath(const Ray& eyeRay, const MarkovChain& MC) const;
+	double pathProbabilityDensity(const std::vector<HitInfo> path, int numEyeVertices) const;
+	
+	std::vector<HitInfo> generatePath(const Ray& eyeRay) const;
 	std::vector<HitInfo> generatePath(const Ray& eyeRay, const MarkovChain& MC) const;
+
+	double MISWeight(const std::vector<HitInfo> path, const int pathLength) const;	
 private:
 	Scene& scene;
 	Image* img;

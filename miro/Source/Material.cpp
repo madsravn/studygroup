@@ -19,7 +19,7 @@ Vector3 Material::shade(const std::vector<HitInfo>& path, const int pathPosition
 	return Vector3(1.0f, 1.0f, 1.0f);
 }
 
-Ray Material::bounceRay(const Ray& ray, const HitInfo& hit,const int recDepth, const MarkovChain& MC) const {
+Ray Material::bounceRay(const Ray& ray, const HitInfo& hit, const MarkovChain& MC) const {
 	return Ray();
 }
 

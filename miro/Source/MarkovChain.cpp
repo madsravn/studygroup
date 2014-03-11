@@ -11,10 +11,10 @@ MarkovChain::MarkovChain() {
     }
 }
 
-double
-MarkovChain::get(int i) const {
-    return u.at(i);
-}
+//double
+//MarkovChain::get(int i) const {
+//    return u.at(i);
+//}
 
 void
 MarkovChain::reset() {
@@ -22,6 +22,7 @@ MarkovChain::reset() {
     pos = 0;
 }
 
+// TODO: Find ud af om det er et problem hvis den wrapper
 double
 MarkovChain::getNext() const {
     double ret = u.at(pos);
