@@ -137,8 +137,11 @@ void BiPathTracer::accumulatePathContribution(const PathContribution pathContrib
 bool BiPathTracer::isConnectable(const std::vector<HitInfo> eyePath, const std::vector<HitInfo> lightPath) const {
 	//std::cout << "isConnectable(" << eyePath.size() << ", " << lightPath.size() << ")" << std::endl;
 
-	if(lightPath.size() == 0)
+	if(lightPath.size() == 0) {
+        //std::cout << "Returning true due to lightPath.size() == 0" << std::endl;
 		return true;
+    }
+    //std::cout << "Did NOT return true due to lightPath.size() == 0 " << std::endl;
 	HitInfo hitInfo;
 	HitInfo lastEyePoint = eyePath.at(eyePath.size() - 1);
 	HitInfo lastLightPoint = lightPath.at(lightPath.size() - 1);

@@ -1,6 +1,7 @@
 #include "MLT.h"
 #include "Constants.h"
 #include <limits>
+#include "Timer.h"
 
 const int maxRecDepth  = Constants::MaxPathLength;
 int samps = 0;
@@ -70,7 +71,9 @@ void MLT::run() {
         img->drawScanline(j);
         glFinish();
     }
-    while( count < 50 ) {
+    Timer t;
+    t.start();
+    while( running ) {
 		samps++;
         double isLargeStepDone;
         if(rnd() <= LargeStepProb) {
@@ -109,10 +112,13 @@ void MLT::run() {
 		i++;
 		if(i % 100000 == 0) {
 
+            if(t.duration().count()/1000 > Constants::seconds) {
+                running = false;
+                std::cout << "Stopping after " << t.duration().count() << " ms." << std::endl;
+            }
 			std::cout << "samps = " << samps << std::endl;
 
 			i = 0;
-            count++;
 		    for(int j = 0; j < img->height(); ++j) {
 		        img->drawScanline(j);
 		        glFinish();

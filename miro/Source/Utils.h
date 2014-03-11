@@ -5,7 +5,6 @@
 #include <vector>
 #include "Ray.h"
 
-
 double rnd(void);  
 // Based on Toshiyas smallpsmlt
 // theory: http://people.cs.kuleuven.be/~philip.dutre/GI/TotalCompendium.pdf  
