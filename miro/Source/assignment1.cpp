@@ -115,7 +115,7 @@ void makeCBox() {
 	light->setPosition(Vector3(278, 528.8, 279.5));    
 	light->setColor(Vector3(18.387, 10.9873, 2.75357));
 	light->setWattage(1);
-	light->setRadius(130.0f);
+	light->setRadius(30.0f);
 	g_scene->addLight(light);
 
 	Matrix4x4 xform;
