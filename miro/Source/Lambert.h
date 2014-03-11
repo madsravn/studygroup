@@ -30,7 +30,7 @@ public:
 	Vector3 calcLighting(const HitInfo &hit, PointLight* pLight, const Scene &scene) const;
 
 	 	
-	virtual Ray bounceRay(const Ray& ray, const HitInfo& hit, const int recDepth, const  MarkovChain& MC) const;
+	virtual Ray bounceRay(const Ray& ray, const HitInfo& hit, const  MarkovChain& MC) const;
 	virtual Ray bounceRay(const Ray& ray, const HitInfo& hit) const;
 
 	virtual double getPDF(Vector3 in, Vector3 out, Vector3 normal) const;

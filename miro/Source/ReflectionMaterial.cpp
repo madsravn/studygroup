@@ -29,7 +29,7 @@ Vector3 ReflectionMaterial::shade(const std::vector<HitInfo>& path, const int pa
 	return shadeResult;
 };
 
-Ray ReflectionMaterial::bounceRay(const Ray& ray, const HitInfo& hit, const int recDepth, const MarkovChain& MC) const {
+Ray ReflectionMaterial::bounceRay(const Ray& ray, const HitInfo& hit, const MarkovChain& MC) const {
 	return bounceRay(ray, hit);
 }
 

@@ -166,7 +166,7 @@ std::vector<HitInfo> PathTracer::generatePath(const Ray& eyeRay, const MarkovCha
 	{
 		if (scene.trace(hitInfo, ray, 0.001f)) {
 			path.push_back(hitInfo);
-			ray = hitInfo.material->bounceRay(ray, hitInfo, i + 1, MC);
+			ray = hitInfo.material->bounceRay(ray, hitInfo, MC);
 		}
 		else {
 			break;
