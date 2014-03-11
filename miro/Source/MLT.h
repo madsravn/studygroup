@@ -1,6 +1,7 @@
 #ifndef CSE168_MLT_H_INCLUDED
 #define CSE168_MLT_H_INCLUDED
 
+#include <algorithm>
 #include "Utils.h"
 #include "Scene.h"
 #include "Image.h"
@@ -11,10 +12,12 @@
 #include "PathContribution.h"
 #include "PathTracer.h"
 
+class PathTracer;
+
 class MLT
 {
 public:	
-	MLT(Scene& scene, Image* image, Camera* camera, int pathSamples);
+	MLT(Scene& scene, Image* image, Camera* camera, int pathSamples, PathTracer* tracer);
 	~MLT(void) {};
 	float mutate(float value);
     void run();    
@@ -22,12 +25,6 @@ public:
 	std::vector<HitInfo> generateEyePath(const Ray& eyeRay, const MarkovChain& MC) const;
 	Vector3 pathTraceFromPath(std::vector<HitInfo> path) const;
 	void accumulatePathContribution(const PathContribution pathContribution, const double scaling);
-	PathContribution calcPathContribution(const std::vector<HitInfo> path) const;
-	Vector3 pathTroughput(const std::vector<HitInfo> path) const;	
-	double pathProbabilityDensity(const std::vector<HitInfo> path) const;
-	double pathProbabilityDensity(const std::vector<HitInfo> path, int numEyeVertices) const;
-	double MISWeight(const std::vector<HitInfo> path, const int pathLength) const;
-	double directionToArea(const HitInfo current, const HitInfo next) const;
 	double acceptProb(MarkovChain& current, MarkovChain& proposal) const;
 	void calcCoordinates(std::vector<HitInfo> path, int &px, int &py) const;
 	std::vector<HitInfo> generateEyePathFromChain(MarkovChain chain) const;
@@ -38,6 +35,7 @@ private:
 	int samples;
     MarkovChain MC;
     std::vector<float> picture;
+	PathTracer* renderer;
 };
 
 #endif // CSE168_MLT_H_INCLUDED

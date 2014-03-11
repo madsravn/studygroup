@@ -2,8 +2,8 @@
 #define CONSTANTS_H_
 
 namespace Constants {
-    const int MinPathLength = 3;
-    const int MaxPathLength = 13;
+    const int MinPathLength = 2;
+    const int MaxPathLength = 12;
     const int N_INIT = 10000;
     const double LargeStepProb = 0.3;
     const int NumRNGsPerEvent = 2;
@@ -11,8 +11,8 @@ namespace Constants {
     const int NumStatesSubpath = (MaxEvents + 2) * NumRNGsPerEvent;
     const int NumStates = NumStatesSubpath * 2;
 
-    const int PathSamples = 32;
-	const int maxRecDepth = 7;
+    const int PathSamples = 4;
+	//const int maxRecDepth = 4;
 }
    
 #endif

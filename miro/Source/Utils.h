@@ -1,7 +1,11 @@
 #ifndef UTILS_H_CSE68
 #define UTILS_H_CSE68
+#include <algorithm>
 #include "Vector3.h"
 #include <vector>
+#include "Ray.h"
+
+
 double rnd(void);  
 // Based on Toshiyas smallpsmlt
 // theory: http://people.cs.kuleuven.be/~philip.dutre/GI/TotalCompendium.pdf  
@@ -26,9 +30,10 @@ std::vector<T> concatVectors(const std::vector<T> &A, const std::vector<T> &B) {
 	return AB;
 }
 
-double maxVectorValue(Vector3 &vector);
+double maxVectorValue(const Vector3 &vector);
 double luminance(Vector3 color);
 Vector3 clamp(Vector3 vector, float lowerBound, float upperBound);
+double directionToArea(HitInfo current, HitInfo next);
 
 // primary space Markov chain
 inline double perturb(const double value, const double s1, const double s2) {

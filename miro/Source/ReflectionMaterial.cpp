@@ -40,5 +40,5 @@ Ray ReflectionMaterial::bounceRay(const Ray& ray, const HitInfo& hit) const {
 }
 
 double ReflectionMaterial::getPDF(Vector3 in, Vector3 out, Vector3 normal) const {
-	return 0.0f;
+	return 1.0f;
 }

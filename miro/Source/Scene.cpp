@@ -12,8 +12,6 @@
 #include <exception>
 
 Scene * g_scene = 0;
-const int recDepth = 5;
-const int pathBounces = 5;
 const int pathSamples = Constants::PathSamples;
 
 /*
@@ -99,51 +97,21 @@ void Scene::multithread( Ray ray, Camera* cam, Image* img, int i, int j) {
 void
 	Scene::raytraceImage(Camera *cam, Image *img)
 {
-
-
 	int pfmWidth = 1500, pfmHeight = 1500;
 	pfmImage = readPFMImage("hdr/stpeters_probe.pfm", &pfmWidth, &pfmWidth);
-
-    //OLD STUFF
     
 	/*BasicShader basicShader = BasicShader(*this, img, cam);
 	basicShader.run();*/
 	PathTracer pathTracer = PathTracer(*this, img, cam, pathSamples);
-	pathTracer.run();
+	//pathTracer.run();
 	/*BiPathTracer biPathTracer = BiPathTracer(*this, img, cam, pathSamples);
 	biPathTracer.run();*/
-	/*MLT mlt = MLT(*this, img, cam, pathSamples);
-	mlt.run();*/
+	MLT mlt = MLT(*this, img, cam, pathSamples, &pathTracer);
+	mlt.run();
 	
 
 	printf("Rendering Progress: 100.000%%\n");
 	debug("done Raytracing!\n");
-}
-
-Vector3 Scene::tracePath(const Ray &ray, int recDepth, bool log) {
-
-	HitInfo hitInfo;
-	Vector3 shadeResult = 0;
-
-    if(log) std::cout << "Ray is " << ray << std::endl;
-	if (trace(hitInfo, ray, 0.0001f)) {
-		shadeResult += hitInfo.material->shade(ray, hitInfo, *this, recDepth, 7);		
-	}
-	
-	return shadeResult;
-}
-
-Vector3 Scene::basicShading(const Ray &ray) {
-	
-	HitInfo hitInfo;
-	Vector3 shadeResult = 0;
-	
-	if (trace(hitInfo, ray, 0.0001f))
-	{
-		shadeResult += (hitInfo.material->shade(ray, hitInfo, *this, recDepth, 1));
-	}	
-
-	return shadeResult;
 }
 
 bool

@@ -1,6 +1,6 @@
 #ifndef CSE168_IMAGE_H_INCLUDED
 #define CSE168_IMAGE_H_INCLUDED
-
+#include <algorithm>
 #include "Vector3.h"
 
 class Image

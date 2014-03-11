@@ -1,6 +1,6 @@
 #ifndef CSE168_TRIANGLE_MESH_H_INCLUDED
 #define CSE168_TRIANGLE_MESH_H_INCLUDED
-
+#include <algorithm>
 #include "Matrix4x4.h"
 
 class TriangleMesh
