@@ -1,9 +1,10 @@
-#include <math.h>
+#include <cmath>
 #include "Miro.h"
 #include "Scene.h"
 #include "Camera.h"
 #include "Image.h"
 #include "Console.h"
+#include <cstdlib>
 
 #include "PointLight.h"
 #include "Sphere.h"
@@ -12,6 +13,7 @@
 #include "Lambert.h"
 #include "MiroWindow.h"
 #include "assignment1.h"
+#include "Constants.h"
 //#include <fenv.h>
 
 void
@@ -77,10 +79,13 @@ int startMiro(int argc, char*argv[]) {
 	return 0;
 }
 
-
+int Constants::seconds = 120;
 int
 main(int argc, char*argv[])
 {
+    if(argc == 2) {
+        Constants::seconds = atoi(argv[1]);
+    }
 	
 	startMiro(argc, argv);
     

@@ -12,6 +12,8 @@ namespace Constants {
     const int NumStates = NumStatesSubpath * 2;
 
     const int PathSamples = 128;
+    extern int seconds;
+
 	//const int maxRecDepth = 4;
 }
    

@@ -1,6 +1,7 @@
 #include "MLT.h"
 #include "Constants.h"
 #include <limits>
+#include "Timer.h"
 
 const int maxRecDepth  = Constants::MaxPathLength;
 int samps = 0;
@@ -66,7 +67,9 @@ void MLT::run() {
         img->drawScanline(j);
         glFinish();
     }
-    while( count < 50 ) {
+    Timer t;
+    t.start();
+    while( running ) {
 		samps++;
         double isLargeStepDone;
         if(rnd() <= LargeStepProb) {
@@ -100,10 +103,13 @@ void MLT::run() {
 		i++;
 		if(i % 100000 == 0) {
 
+            if(t.duration().count()/1000 > Constants::seconds) {
+                running = false;
+                std::cout << "Stopping after " << t.duration().count() << " ms." << std::endl;
+            }
 			std::cout << "samps = " << samps << std::endl;
 
 			i = 0;
-            count++;
 		    for(int j = 0; j < img->height(); ++j) {
 		        img->drawScanline(j);
 		        glFinish();
@@ -196,4 +202,19 @@ double MLT::acceptProb(MarkovChain& current, MarkovChain& proposal) const {
 		a = clamp(cont_proposal / cont_current, 0.0, 1.0);
 	}
 	return a;
+}
+void MLT::calcCoordinates(std::vector<HitInfo> path, int &px, int &py) const {
+	Vector3 direction;	
+
+	if (path.size() >= 2) {				
+		direction = (path.at(1).P - path.at(0).P).normalized();
+		cam->rayToPixels(Ray(cam->eye(), direction), px, py, img->width(), img->height());
+	}	
+}
+
+// Trace path from eye
+std::vector<HitInfo> MLT::generateEyePathFromChain(MarkovChain chain) const {	
+	Ray ray = cam->randomRay(img->width(), img->height(), chain);
+
+	return renderer->generatePath(ray, chain);
 }
