@@ -104,10 +104,10 @@ void
 	basicShader.run();*/
 	PathTracer pathTracer = PathTracer(*this, img, cam, pathSamples);
 	//pathTracer.run();
-	/*BiPathTracer biPathTracer = BiPathTracer(*this, img, cam, pathSamples);
-	biPathTracer.run();*/
-	MLT mlt = MLT(*this, img, cam, pathSamples, &pathTracer);
-	mlt.run();
+	BiPathTracer biPathTracer = BiPathTracer(*this, img, cam, pathSamples);
+	biPathTracer.run();
+	/*MLT mlt = MLT(*this, img, cam, pathSamples, &pathTracer);
+	mlt.run();*/
 	
 
 	printf("Rendering Progress: 100.000%%\n");

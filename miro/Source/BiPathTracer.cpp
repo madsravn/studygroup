@@ -19,11 +19,13 @@ void BiPathTracer::run() {
 	Vector3 shadeResult;
 
 	double inverseSamples = 1/(double)samples;
+
 	// Paint over the geometry scene
 	for(int j = 0; j < img->height(); ++j) {
 		img->drawScanline(j);
 		glFinish();
 	}
+
 	// loop over all pixels in the image
 	for (int j = 0; j < img->height(); ++j)
 	{
@@ -62,15 +64,17 @@ void BiPathTracer::run() {
 }
 
 PathContribution BiPathTracer::calcCombinePaths(const std::vector<HitInfo> eyePath, const std::vector<HitInfo> lightPath) const {
-	PathContribution pathContribution = PathContribution();		
+	PathContribution pathContribution;		
 
 	//std::cout << "calcCombinePaths(" << eyePath.size() << ", " << lightPath.size() << ")" << std::endl;
 
 	int px, py;
 
 	for (int combinedPathSize = Constants::MinPathLength; combinedPathSize <= std::min(Constants::MaxPathLength, (int)(eyePath.size() + lightPath.size())); combinedPathSize++) {
-		for(int eyeSubPathSize = 1; eyeSubPathSize <= std::min(combinedPathSize, (int)eyePath.size()); eyeSubPathSize++) {    // Smallest path is camera to surface (length 2)		
-			int lightSubPathSize = combinedPathSize - eyeSubPathSize;
+        // Smallest path is camera to surface (length 2)		
+		for(int eyeSubPathSize = 1; eyeSubPathSize <= std::min(combinedPathSize, (int)eyePath.size()); eyeSubPathSize++) {    
+            
+            int lightSubPathSize = combinedPathSize - eyeSubPathSize;
 			
 			if(lightSubPathSize > lightPath.size()) continue;		
 
@@ -89,7 +93,7 @@ PathContribution BiPathTracer::calcCombinePaths(const std::vector<HitInfo> eyePa
 
 			if (px >= 0 && px <= img->width() && py >= 0 && py <= img->height()) {							
 				Vector3 lightPathResult = pathTraceFromPath(combinedPath);
-				Contribution contribution = Contribution(px, py, lightPathResult);
+				Contribution contribution(px, py, lightPathResult);
 				pathContribution.colors.push_back(contribution);
 
 				pathContribution.scalarContribution = std::max(pathContribution.scalarContribution, max(contribution.color));
@@ -102,7 +106,7 @@ PathContribution BiPathTracer::calcCombinePaths(const std::vector<HitInfo> eyePa
 
 void BiPathTracer::accumulatePathContribution(const PathContribution pathContribution, const double scaling) const {	
 	//std::cout << "accumulatePathContribution" << std::endl;
-	for (int i = 0; i < pathContribution.colors.size(); i++) {    // Start at first hit, [0] is camera
+	for (int i = 0; i < pathContribution.colors.size(); i++) {
 		Contribution currentColor = pathContribution.colors.at(i);
 
 		const int ix = int(currentColor.x);
