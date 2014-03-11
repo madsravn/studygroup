@@ -200,3 +200,9 @@ std::vector<HitInfo> BiPathTracer::generateLightPath(const Vector3 lightPos) con
 
 	return lightPath;
 }
+
+PathContribution BiPathTracer::calcPathContribution(const MarkovChain& MC) const {
+
+
+
+}

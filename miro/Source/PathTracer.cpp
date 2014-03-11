@@ -6,6 +6,10 @@ PathTracer::PathTracer(Scene& scene, Image* image, Camera* camera, int pathSampl
 
 }
 
+PathTracer::~PathTracer(void)
+{
+}
+
 void PathTracer::run() {
 	Ray ray;
 	HitInfo hitInfo;
@@ -54,44 +58,6 @@ void PathTracer::run() {
 	}
 }
 
-std::vector<HitInfo> PathTracer::generatePath(const Ray& eyeRay) const {
-	std::vector<HitInfo> path = std::vector<HitInfo>();
-	path.push_back(HitInfo(0.0f, eyeRay.o, eyeRay.d));	// Eye position
-
-	Ray ray = eyeRay;
-	HitInfo hitInfo;
-	for (int i = 0; i < Constants::MaxPathLength; i++)
-	{
-		if(scene.trace(hitInfo, ray, 0.001f)) {
-			path.push_back(hitInfo);
-			ray = hitInfo.material->bounceRay(ray, hitInfo);
-		} else {
-			break;
-		}
-	}
-	return path;	
-}
-
-std::vector<HitInfo> PathTracer::generatePath(const Ray& eyeRay, const MarkovChain& MC) const {
-	std::vector<HitInfo> path = std::vector<HitInfo>();
-	path.push_back(HitInfo(0.0f, eyeRay.o, eyeRay.d));	// Eye position
-
-	Ray ray = eyeRay;
-	HitInfo hitInfo;
-	for (int i = 0; i < Constants::MaxPathLength; i++)
-	{
-		if (scene.trace(hitInfo, ray, 0.001f)) {
-			path.push_back(hitInfo);
-			ray = hitInfo.material->bounceRay(ray, hitInfo, i + 1, MC);
-		}
-		else {
-			break;
-		}
-	}
-	return path;
-}
-
-// Bruges af MLT
 Vector3 PathTracer::pathTraceFromPath(std::vector<HitInfo> path) const{	
 	// Recursive shading
 	Vector3 shadeResult = Vector3(0.0f);
@@ -133,6 +99,11 @@ PathContribution PathTracer::calcPathContribution(const std::vector<HitInfo> pat
 	return result;
 }
 
+PathContribution PathTracer::calcPathContribution(const MarkovChain& MC) const {
+	MarkovChain normChain(img->width(), img->height());
+	return calcPathContribution(generatePath(cam->randomRay(img->width(), img->height(), normChain), MC));
+}
+
 // Probability density for path with all numbers of vertices
 double PathTracer::pathProbabilityDensity(const std::vector<HitInfo> path) const {
 	//std::cout << "pathProbabilityDensity" << std::endl;
@@ -167,6 +138,43 @@ double PathTracer::pathProbabilityDensity(const std::vector<HitInfo> path, int n
 	return p;
 }
 
+std::vector<HitInfo> PathTracer::generatePath(const Ray& eyeRay) const {
+	std::vector<HitInfo> path = std::vector<HitInfo>();
+	path.push_back(HitInfo(0.0f, eyeRay.o, eyeRay.d));	// Eye position
+
+	Ray ray = eyeRay;
+	HitInfo hitInfo;
+	for (int i = 0; i < Constants::MaxPathLength; i++)
+	{
+		if(scene.trace(hitInfo, ray, 0.001f)) {
+			path.push_back(hitInfo);
+			ray = hitInfo.material->bounceRay(ray, hitInfo);
+		} else {
+			break;
+		}
+	}
+	return path;	
+}
+
+std::vector<HitInfo> PathTracer::generatePath(const Ray& eyeRay, const MarkovChain& MC) const {
+	std::vector<HitInfo> path = std::vector<HitInfo>();
+	path.push_back(HitInfo(0.0f, eyeRay.o, eyeRay.d));	// Eye position
+
+	Ray ray = eyeRay;
+	HitInfo hitInfo;
+	for (int i = 0; i < Constants::MaxPathLength; i++)
+	{
+		if (scene.trace(hitInfo, ray, 0.001f)) {
+			path.push_back(hitInfo);
+			ray = hitInfo.material->bounceRay(ray, hitInfo, i + 1, MC);
+		}
+		else {
+			break;
+		}
+	}
+	return path;
+}
+
 double PathTracer::MISWeight(const std::vector<HitInfo> path, const int pathLength) const {
 	int numEyeVertices = path.size();
 	const double p_i = pathProbabilityDensity(path, numEyeVertices);
@@ -178,8 +186,4 @@ double PathTracer::MISWeight(const std::vector<HitInfo> path, const int pathLeng
 	else {
 		return std::max(std::min(p_i / p_all, 1.0), 0.0);
 	}
-}
-
-PathTracer::~PathTracer(void)
-{
 }

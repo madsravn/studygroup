@@ -6,9 +6,6 @@ const int maxRecDepth  = Constants::MaxPathLength;
 int samps = 0;
 const int biasSamples = 100000;
 
-
-
-
 MLT::MLT(Scene& scene, Image* image, Camera* camera, int pathSamples, PathTracer* tracer) : scene(scene), img(image), cam(camera), samples(pathSamples), renderer(tracer) {
 	
     MC.imageWidth = image->width();
@@ -49,7 +46,7 @@ void MLT::run() {
 		fprintf(stdout, "\rPSMLT Initializing: %5.2f", 100.0 * i / (biasSamples));
         fflush(stdout);
 		MarkovChain normChain(img->width(), img->height());        
-		b += renderer->calcPathContribution(renderer->generatePath(cam->randomRay(img->width(), img->height(), normChain), MC)).scalarContribution;
+		b += renderer->calcPathContribution(MC).scalarContribution;
 	}
     printf("\n");
 	b /= double(biasSamples);	// average
@@ -60,8 +57,7 @@ void MLT::run() {
 
     // Initialize current
     Ray tRay = cam->randomRay(img->width(), img->height(), current);
-	std::vector<HitInfo> tPath = renderer->generatePath(tRay, current);
-	current.contribution = renderer->calcPathContribution(tPath);
+	current.contribution = renderer->calcPathContribution(current);
     int count = 0;
     int i = 0;
 
@@ -79,11 +75,9 @@ void MLT::run() {
         } else {
             isLargeStepDone = 0.0;
             proposal = current.mutate(img->width(), img->height());
-        }
-
-		std::vector<HitInfo> path = generateEyePathFromChain(proposal);		
+        }	
 		
-		proposal.contribution = renderer->calcPathContribution(path);
+		proposal.contribution = renderer->calcPathContribution(proposal);
 
 		double a = acceptProb(current, proposal);
 
@@ -98,9 +92,6 @@ void MLT::run() {
 				(1.0 - a)/
 				(current.contribution.scalarContribution/b + isLargeStepDone)
 			);
-
-		/*std::cout << "a = " << a << "\tisLargeStepDone = " << isLargeStepDone << std::endl;
-		std::cout << "current scalar = " << current.contribution.scalarContribution << "proposal scalar = " << proposal.contribution.scalarContribution << std::endl;*/
 
         if(rnd() <= a) {
             current = proposal;
@@ -136,31 +127,6 @@ void MLT::run() {
 		img->drawScanline(j);
 		glFinish();
     }
-}
-
- //Recursive path tracing
-void MLT::tracePath(std::vector<HitInfo>& path, const Ray &ray, int recDepth, const MarkovChain& MC, bool log) const {
-	if(recDepth >= maxRecDepth)	return;
-	
-	HitInfo hit;
-    if(log) std::cout << "Ray is " << ray << std::endl;
-	if (!scene.trace(hit, ray, 0.0001f)) return;	
-	path.push_back(HitInfo(hit));
-	Ray randomRay = hit.material->bounceRay(ray, hit, recDepth, MC);
-	if (randomRay.d == Vector3(0.0f)) return;
-
-	tracePath(path, randomRay, recDepth + 1, MC, log);
-}
-
-// Trace path from eye
-std::vector<HitInfo> MLT::generateEyePath(const Ray& eyeRay, const MarkovChain& MC) const {
-	return renderer->generatePath(eyeRay, MC);
-
-	std::vector<HitInfo> result;	
-	result.push_back(HitInfo(0.0f, eyeRay.o));
-
-	tracePath(result, eyeRay, 1, MC);
-	return result;
 }
 
 // Random mutation of a path
@@ -230,20 +196,4 @@ double MLT::acceptProb(MarkovChain& current, MarkovChain& proposal) const {
 		a = clamp(cont_proposal / cont_current, 0.0, 1.0);
 	}
 	return a;
-}
-
-void MLT::calcCoordinates(std::vector<HitInfo> path, int &px, int &py) const {
-	Vector3 direction;	
-
-	if (path.size() >= 2) {				
-		direction = (path.at(1).P - path.at(0).P).normalized();
-		cam->rayToPixels(Ray(cam->eye(), direction), px, py, img->width(), img->height());
-	}	
-}
-
-// Trace path from eye
-std::vector<HitInfo> MLT::generateEyePathFromChain(MarkovChain chain) const {	
-	Ray ray = cam->randomRay(img->width(), img->height(), chain);
-
-	return renderer->generatePath(ray, chain);
 }

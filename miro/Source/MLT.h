@@ -20,14 +20,11 @@ public:
 	MLT(Scene& scene, Image* image, Camera* camera, int pathSamples, PathTracer* tracer);
 	~MLT(void) {};
 	float mutate(float value);
-    void run();    
-	void tracePath(std::vector<HitInfo>& path, const Ray &ray, int recDepth, const MarkovChain& MC, bool log = false) const;
+    void run();
 	std::vector<HitInfo> generateEyePath(const Ray& eyeRay, const MarkovChain& MC) const;
 	Vector3 pathTraceFromPath(std::vector<HitInfo> path) const;
 	void accumulatePathContribution(const PathContribution pathContribution, const double scaling);
 	double acceptProb(MarkovChain& current, MarkovChain& proposal) const;
-	void calcCoordinates(std::vector<HitInfo> path, int &px, int &py) const;
-	std::vector<HitInfo> generateEyePathFromChain(MarkovChain chain) const;
 private:
 	Scene& scene;
     Image* img;

@@ -20,6 +20,8 @@ public:
 	std::vector<HitInfo> generateLightPath(const Vector3 lightPos) const;
 	bool isConnectable(const std::vector<HitInfo> eyePath, const std::vector<HitInfo> lightPath) const;
 	PathContribution calcCombinePaths(const std::vector<HitInfo> eyePath, const std::vector<HitInfo> lightPath) const;
+
+	PathContribution calcPathContribution(const MarkovChain& MC) const;
 private:
 	Scene& scene;
 	Image* img;
