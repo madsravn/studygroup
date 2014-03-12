@@ -18,22 +18,26 @@ BiPathTracer::~BiPathTracer(void)
 void BiPathTracer::run() {
 	Ray ray;
 	HitInfo hitInfo;
-	Vector3 shadeResult;
+	
 
 	double inverseSamples = 1/(double)samples;
 
 	// Paint over the geometry scene
-	//for(int j = 0; j < img->height(); ++j) {
-	//	img->drawScanline(j);
-	//	glFinish();
-	//}
+	for(int j = 0; j < img->height(); ++j) {
+		for (int i = 0; i < img->width(); i++)
+		{
+			img->setPixel(i, j, Vector3(0.0f));
+		}
+		img->drawScanline(j);
+		glFinish();
+	}
 
 	// loop over all pixels in the image
 	for (int j = 0; j < img->height(); ++j)
 	{
 		for (int i = 0; i < img->width(); ++i)
 		{
-			
+			double contSum = 0.0;
 			ray = cam->eyeRay(i, j, img->width(), img->height());	
 
 			int px, py;
@@ -50,12 +54,23 @@ void BiPathTracer::run() {
 					std::vector<HitInfo> lightPath = generateLightPath(pLight->position());
 					
 					PathContribution pathContribution = calcCombinePaths(eyePath, lightPath);
-					accumulatePathContribution(pathContribution, inverseSamples);				
+					/*if (pathContribution.scalarContribution <= 0.0)
+						std::cout << "pathContribution <= 0:\t(" << i << ", " << j << ")" << std::endl;*/
+					accumulatePathContribution(pathContribution, inverseSamples);			
+
+					contSum += pathContribution.scalarContribution;
 				}
 			}
-			img->drawScanline(j);
+
+			/*if (contSum <= 0.0)
+				std::cout << "pathContribution <= 0:\t(" << i << ", " << j << ")" << std::endl;*/
+		}
+
+		for (int i = 0; i < img->height(); ++i) {
+			img->drawScanline(i);
 			glFinish();
 		}
+
 		printf("Rendering Progress: %.3f%%\r", j / double(img->height())*100.0f);
 		fflush(stdout);
 	}
@@ -67,19 +82,16 @@ void BiPathTracer::run() {
 }
 
 PathContribution BiPathTracer::calcCombinePaths(const std::vector<HitInfo> eyePath, const std::vector<HitInfo> lightPath) const {
-	PathContribution pathContribution;		
-
-	//std::cout << "calcCombinePaths(" << eyePath.size() << ", " << lightPath.size() << ")" << std::endl;
+	PathContribution pathContribution;	
 
 	int px, py;
 
 	for (int combinedPathSize = Constants::MinPathLength; combinedPathSize <= std::min(Constants::MaxPathLength, (int)(eyePath.size() + lightPath.size())); combinedPathSize++) {
         // Smallest path is camera to surface (length 2)		
-		for(int eyeSubPathSize = 1; eyeSubPathSize <= std::min(combinedPathSize, (int)eyePath.size()); eyeSubPathSize++) {    
+		for (int eyeSubPathSize = 1; eyeSubPathSize <= std::min(combinedPathSize, (int)eyePath.size()); eyeSubPathSize++) {
             
-            int lightSubPathSize = combinedPathSize - eyeSubPathSize;
-			
-			if(lightSubPathSize > lightPath.size()) continue;		
+            int lightSubPathSize = combinedPathSize - eyeSubPathSize;			
+			if(lightSubPathSize > lightPath.size()) continue;
 
 			std::vector<HitInfo> EyeSubPath = subVector(eyePath, 0, eyeSubPathSize);
 			std::vector<HitInfo> reverseLightSubPath = subVector(lightPath, 0, lightSubPathSize);
@@ -97,7 +109,6 @@ PathContribution BiPathTracer::calcCombinePaths(const std::vector<HitInfo> eyePa
 				//std::cout << "Camera not hit" << std::endl;
 				continue;
 			}
-				
 
 			cam->rayToPixels(
 				Ray(combinedPath.at(0).P, rayToPixelsDir), 
@@ -114,7 +125,7 @@ PathContribution BiPathTracer::calcCombinePaths(const std::vector<HitInfo> eyePa
 				if (w <= 0.0f) 
 					continue;
 
-				Contribution contribution(px, py, lightPathResult * (w / p));
+				Contribution contribution(px, py, lightPathResult/* * (w / p)*/);
 				pathContribution.colors.push_back(contribution);
 
 				pathContribution.scalarContribution = std::max(pathContribution.scalarContribution, maxVectorValue(contribution.color));
@@ -145,7 +156,7 @@ void BiPathTracer::accumulatePathContribution(const PathContribution pathContrib
 			picture[3*pixelpos] = color.x;
 			picture[3*pixelpos+1] = color.y;
 			picture[3*pixelpos+2] = color.z;
-			img->setPixel(ix, iy, color * s);
+			img->setPixel(ix, iy, color);
 
 			//std::cout << ix << ", " << iy << " = " << color << std::endl;
 
@@ -224,6 +235,8 @@ std::vector<HitInfo> BiPathTracer::generateEyePath(const Ray& eyeRay, const Mark
 
 std::vector<HitInfo> BiPathTracer::generateLightPath(const Vector3 lightPos) const {
 	std::vector<HitInfo> lightPath = std::vector<HitInfo>();
+	return lightPath;
+
 	Vector3 lightDir = generateRandomRayDirection();
 	/*HitInfo lightHit = HitInfo(0.0f, lightPos, lightDir);
 	lightHit.material = dummyShader;
@@ -268,9 +281,9 @@ std::vector<HitInfo> BiPathTracer::generateLightPath(const Vector3 lightPos, con
 PathContribution BiPathTracer::calcPathContribution(const MarkovChain& MC) const {
 	MarkovChain normChain(img->width(), img->height());
 
-	const PointLight* pLight = scene.lights()->at((int)MC.getNext() % scene.lights()->size()); // Choose random light
-
 	std::vector<HitInfo> eyePath = generateEyePath(cam->randomRay(img->width(), img->height(), normChain), MC);
+
+	const PointLight* pLight = scene.lights()->at((int)MC.getNext() % scene.lights()->size()); // Choose random light
 	std::vector<HitInfo> lightPath = generateLightPath(pLight->position(), MC);
 
 	return calcCombinePaths(eyePath, lightPath);

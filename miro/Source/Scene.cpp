@@ -100,14 +100,14 @@ void
 	int pfmWidth = 1500, pfmHeight = 1500;
 	pfmImage = readPFMImage("hdr/stpeters_probe.pfm", &pfmWidth, &pfmWidth);
     
-	BasicShader basicShader(*this, img, cam);
-	//basicShader.run();
+	/*BasicShader basicShader(*this, img, cam);
+	basicShader.run();*/
 	PathTracer pathTracer(*this, img, cam, pathSamples);
-	//pathTracer.run();
-	BiPathTracer biPathTracer(*this, img, cam, pathSamples);
-	biPathTracer.run();
+	pathTracer.run();
+	//BiPathTracer biPathTracer(*this, img, cam, pathSamples);
+	//biPathTracer.run();
 	Constants::seconds = 300;
-	MLT mlt(*this, img, cam, pathSamples, &biPathTracer);
+	//MLT mlt(*this, img, cam, pathSamples, &biPathTracer);
 	//mlt.run();
 
 	printf("Rendering Progress: 100.000%%\n");

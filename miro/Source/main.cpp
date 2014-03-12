@@ -73,7 +73,7 @@ int startMiro(int argc, char*argv[]) {
 	//makeCBox();
 	//makeCornellBox2();
 	//makeCornellBox();
-	makeBallRoom();
+	//makeBallRoom();
     MiroWindow miro(&argc, argv);
     miro.mainLoop();
 	

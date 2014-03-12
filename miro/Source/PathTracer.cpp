@@ -70,7 +70,6 @@ Vector3 PathTracer::pathTraceFromPath(std::vector<HitInfo> path) const{
 }
 
 PathContribution PathTracer::calcPathContribution(const std::vector<HitInfo> path) const {
-	//std::cout << "calcPathContribution" << std::endl;
 	PathContribution result = PathContribution();
 
 	if (path.size() < 2) return result;
