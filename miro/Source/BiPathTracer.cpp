@@ -102,9 +102,10 @@ PathContribution BiPathTracer::calcCombinePaths(const std::vector<HitInfo> eyePa
 			if (px >= 0 && px <= img->width() && py >= 0 && py <= img->height()) {							
 				Vector3 lightPathResult = pathTraceFromPath(combinedPath);
 				double p = pathProbabilityDensity();
-				double w = MISWeight();
-				if (p <= 0.0f || w <= 0.0f)
+				double w = MISWeight(());
+				if (p <= 0.0f || w <= 0.0f) {
 					continue;
+                }
 
 				Contribution contribution(px, py, lightPathResult);
 				pathContribution.colors.push_back(contribution);
