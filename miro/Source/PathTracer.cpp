@@ -127,7 +127,7 @@ double PathTracer::pathProbabilityDensity(const std::vector<HitInfo> path, int n
 			distanceToScreen = distanceToScreen * distanceToScreen;					// Distance to screen squared
 			p /= (cosTheta / distanceToScreen);										// Divided by cosine of angle divided by distance to screen squared	
 		}
-		else {																	// Other hits
+		else {																		// Other hits
 			// PDF of sampling ith vertex
 			Vector3 directionIn = (path.at(i - 1).P - path.at(i).P).normalized();
 			Vector3 directionOut = (path.at(i + 1).P - path.at(i).P).normalized();

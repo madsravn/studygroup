@@ -101,8 +101,8 @@ PathContribution BiPathTracer::calcCombinePaths(const std::vector<HitInfo> eyePa
 
 			if (px >= 0 && px <= img->width() && py >= 0 && py <= img->height()) {							
 				Vector3 lightPathResult = pathTraceFromPath(combinedPath);
-				double p = pathProbabilityDensity();
-				double w = MISWeight();
+				double p = pathProbabilityDensity(combinedPath, eyeSubPathSize, lightSubPathSize);
+				double w = MISWeight(combinedPath, combinedPathSize);
 				if (p <= 0.0f || w <= 0.0f)
 					continue;
 
@@ -217,6 +217,7 @@ std::vector<HitInfo> BiPathTracer::generateEyePath(const Ray& eyeRay, const Mark
 std::vector<HitInfo> BiPathTracer::generateLightPath(const Vector3 lightPos) const {
 	std::vector<HitInfo> lightPath = std::vector<HitInfo>();
 	Vector3 lightDir = generateRandomRayDirection();
+	lightPath.push_back(HitInfo(0.0f, lightPos, lightDir));
 
 	Ray ray = Ray(lightPos, lightDir);
 	HitInfo hitInfo;
@@ -236,6 +237,7 @@ std::vector<HitInfo> BiPathTracer::generateLightPath(const Vector3 lightPos) con
 std::vector<HitInfo> BiPathTracer::generateLightPath(const Vector3 lightPos, const MarkovChain& MC) const {
 	std::vector<HitInfo> lightPath = std::vector<HitInfo>();
 	Vector3 lightDir = generateRandomRayDirection(MC.getNext(), MC.getNext());
+	lightPath.push_back(HitInfo(0.0f, lightPos, lightDir));
 
 	Ray ray = Ray(lightPos, lightDir);
 	HitInfo hitInfo;
@@ -262,6 +264,17 @@ PathContribution BiPathTracer::calcPathContribution(const MarkovChain& MC) const
 	return calcCombinePaths(eyePath, lightPath);
 }
 
+// Probability density for path with all numbers of vertices
+double BiPathTracer::pathProbabilityDensity(const std::vector<HitInfo> path) const {
+	//std::cout << "pathProbabilityDensity" << std::endl;
+	double p = 0.0f;	
+	for (int numEyeVertices = 0; numEyeVertices <= path.size(); numEyeVertices++) {
+		int numLightVertices = path.size() - numEyeVertices;
+		p += pathProbabilityDensity(path, numEyeVertices, numLightVertices);										//Hvis vi skal bruge TKhanAdder ligesom Toshiya skal den tilføjes her
+	}
+	return p;
+}
+
 double BiPathTracer::pathProbabilityDensity(const std::vector<HitInfo> path, int numEyeVertices, int numLightVertices) const {
 	double p = 1.0;
 
@@ -280,8 +293,28 @@ double BiPathTracer::pathProbabilityDensity(const std::vector<HitInfo> path, int
 			Vector3 directionIn = (path.at(i - 1).P - path.at(i).P).normalized();
 			Vector3 directionOut = (path.at(i + 1).P - path.at(i).P).normalized();
 			p *= path.at(i).material->getPDF(directionIn, directionOut, path.at(i).N);
+
+			p *= directionToArea(path.at(i), path.at(i + 1));
+		}		
+	}
+
+	// sampling from light source
+	if (p != 0.0) {
+		for (int i = 1; i < numLightVertices - 1; i++) {
+			if (i == 1) {
+				Vector3 firstLightDir = path.at(path.size() - 2).P - path.at(path.size() - 1).P; // direction from light to first light hit
+				
+				// TODO: Something
+			} else {
+				HitInfo iPoint = path.at(path.size() - i);
+				Vector3 directionIn  = (path.at(path.size() - (i - 1)).P - iPoint.P).normalized();
+				Vector3 directionOut = (path.at(path.size() - (i + 1)).P - iPoint.P).normalized();
+				
+				p *= iPoint.material->getPDF(directionIn, directionOut, iPoint.N);
+
+				p *= directionToArea(path.at(i), path.at(i + 1));
+			}
 		}
-		p *= directionToArea(path.at(i), path.at(i + 1));
 	}
 	return p;
 }
