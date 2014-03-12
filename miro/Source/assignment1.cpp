@@ -598,6 +598,95 @@ void makeCornellBox2() {
     g_scene->preCalc();
 }
 
+void makeBallRoom() {
+	g_camera = new Camera;
+	g_scene = new Scene;
+	g_image = new Image;
+	Triangle* t;
+
+	g_image->resize(512, 512);
+
+	// set up the camera
+	g_camera->setBGColor(Vector3(0.0f, 0.0f, 0.3f));
+	g_camera->setEye(Vector3(0, 1, 3));
+	g_camera->setLookAt(Vector3(0, 1, 0));
+	g_camera->setUp(Vector3(0, 1, 0));
+	g_camera->setFOV(45);
+	g_camera->lensSize = 0.001f;
+	g_camera->focusDistance = 4;
+	g_camera->aperture = 0.01;
+	g_camera->focalLength = 0.04;
+	g_camera->fNumber = 3.5;
+
+	Matrix4x4 xform;
+	Matrix4x4 xform2;
+	Material* material;
+
+	// create and place a point light source
+	PointLight * light = new PointLight;
+	light->setPosition(Vector3(0, 1.8, -.5));
+	light->setColor(Vector3(1.0f));
+	light->setWattage(10);
+	light->setRadius(0.5f);
+	g_scene->addLight(light);
+
+	// create and place a point light source
+	light = new PointLight;
+	light->setPosition(Vector3(.5, .5, 1));
+	light->setColor(Vector3(.73, 0.596, 0.357));
+	//light->setColor(Vector3(1.0f));
+	light->setWattage(4);
+	light->setRadius(0.2f);
+	g_scene->addLight(light);
+
+	light = new PointLight;
+	light->setPosition(Vector3(0, 1, 2.5));
+	light->setColor(Vector3(.4, 0.396, 0.857));
+	light->setWattage(7);
+	light->setRadius(0.02f);
+	g_scene->addLight(light);
+
+	// create the floor triangles
+
+	makeSquare(
+		Vector3(-1, 0, 1),
+		Vector3(1, 0, 1),
+		Vector3(-1, 0, -1),
+		Vector3(1, 0, -1),
+		Vector3(0, 1, 0), new Lambert(Vector3(0, 1.0f, 1.0f)), g_scene);
+
+	// create the ceiling triangles
+
+	// c1, c2, c4 => c4, c3, c1
+	makeSquare(Vector3(-1, 2, 1), Vector3(-1, 2, -1), Vector3(1, 2, 1), Vector3(1, 2, -1), Vector3(0, -1, 0), new Lambert(Vector3(1.0f, 0.0f, 1.0f)), g_scene);
+
+	// create the backwall triangles
+	makeSquare(Vector3(-1, 0, -1), Vector3(1, 0, -1), Vector3(-1, 2, -1), Vector3(1, 2, -1), Vector3(0, 0, 1), new Lambert(Vector3(1.0f, 1.0f, 1.0f)), g_scene);
+
+	// create the frontwall triangles
+	//makeSquare(Vector3(-1,0,1), Vector3(1,0,1), Vector3(-1,2,1), Vector3(1,2,1), Vector3(0,0,-1),		new Lambert(Vector3(0.0f,0.0f,0.0f)), g_scene);
+
+	// create the rightwall triangles
+	makeSquare(Vector3(1, 0, -1), Vector3(1, 0, 1), Vector3(1, 2, -1), Vector3(1, 2, 1), Vector3(-1, 0, 0), new Lambert(Vector3(0.0, 1.0f, 0.0f)), g_scene);
+
+	// create the leftwall triangles
+	makeSquare(Vector3(-1, 0, 1), Vector3(-1, 0, -1), Vector3(-1, 2, 1), Vector3(-1, 2, -1), Vector3(1, 0, 0), new Lambert(Vector3(1.0f, 0.0f, 0.0f)), g_scene);
+
+	/* Meshes*/
+	TriangleMesh * mesh;
+
+	/*xform.setIdentity();
+	xform *= scale(1, 1, 1);
+	xform *= translate(0, 1.0, 0);
+	mesh = new TriangleMesh;
+	mesh->load("mesh/sphere.obj", xform);
+	material = new RefractionMaterial(1.1f);
+	addMeshTrianglesToScene(mesh, material);
+*/
+	// let objects do pre-calculations if needed
+	g_scene->preCalc();
+}
+
 void
 makeTeapotScene()
 {

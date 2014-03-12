@@ -70,9 +70,10 @@ int startMiro(int argc, char*argv[]) {
    // feenableexcept(FE_DIVBYZERO);
 	//makeCornellBoxFromObj();
 
-	makeCBox();
+	//makeCBox();
 	//makeCornellBox2();
 	//makeCornellBox();
+	makeBallRoom();
     MiroWindow miro(&argc, argv);
     miro.mainLoop();
 	
