@@ -19,10 +19,10 @@ void BiPathTracer::run() {
 	double inverseSamples = 1/(double)samples;
 
 	// Paint over the geometry scene
-	for(int j = 0; j < img->height(); ++j) {
-		img->drawScanline(j);
-		glFinish();
-	}
+	//for(int j = 0; j < img->height(); ++j) {
+	//	img->drawScanline(j);
+	//	glFinish();
+	//}
 
 	// loop over all pixels in the image
 	for (int j = 0; j < img->height(); ++j)
@@ -49,6 +49,8 @@ void BiPathTracer::run() {
 					accumulatePathContribution(pathContribution, inverseSamples);				
 				}
 			}
+			img->drawScanline(j);
+			glFinish();
 		}
 		printf("Rendering Progress: %.3f%%\r", j / double(img->height())*100.0f);
 		fflush(stdout);
@@ -99,6 +101,11 @@ PathContribution BiPathTracer::calcCombinePaths(const std::vector<HitInfo> eyePa
 
 			if (px >= 0 && px <= img->width() && py >= 0 && py <= img->height()) {							
 				Vector3 lightPathResult = pathTraceFromPath(combinedPath);
+				double p = pathProbabilityDensity();
+				double w = MISWeight();
+				if (p <= 0.0f || w <= 0.0f)
+					continue;
+
 				Contribution contribution(px, py, lightPathResult);
 				pathContribution.colors.push_back(contribution);
 
@@ -253,4 +260,40 @@ PathContribution BiPathTracer::calcPathContribution(const MarkovChain& MC) const
 	std::vector<HitInfo> lightPath = generateLightPath(pLight->position(), MC);
 
 	return calcCombinePaths(eyePath, lightPath);
+}
+
+double BiPathTracer::pathProbabilityDensity(const std::vector<HitInfo> path, int numEyeVertices, int numLightVertices) const {
+	double p = 1.0;
+
+	// sampling from the eye
+	for (int i = 1; i < numEyeVertices - 1; i++) {
+		if (i == 1) {  // First hit
+			p *= 1.0 / double(img->width() * img->height());						// divided by image size
+			Vector3 direction = (path.at(i).P - path.at(i - 1).P).normalized();		// Direction from first to second hit
+			double cosTheta = dot(direction, cam->viewDir());						// Cosine of angle from camera
+			double distanceToScreen = cam->getDistance() / cosTheta;				// Distance to screen
+			distanceToScreen = distanceToScreen * distanceToScreen;					// Distance to screen squared
+			p /= (cosTheta / distanceToScreen);										// Divided by cosine of angle divided by distance to screen squared	
+		}
+		else {																	// Other hits
+			// PDF of sampling ith vertex
+			Vector3 directionIn = (path.at(i - 1).P - path.at(i).P).normalized();
+			Vector3 directionOut = (path.at(i + 1).P - path.at(i).P).normalized();
+			p *= path.at(i).material->getPDF(directionIn, directionOut, path.at(i).N);
+		}
+		p *= directionToArea(path.at(i), path.at(i + 1));
+	}
+	return p;
+}
+
+double BiPathTracer::MISWeight(const std::vector<HitInfo> path, const int pathLength) const {
+	const double p_i = pathProbabilityDensity(path, path.size(), path.size());
+	const double p_all = pathProbabilityDensity(path);
+
+	if (!p_i || !p_all) {    // Kan man skrive (!p_i || !p_all) bare for at være et jerk?
+		return 0.0f;
+	}
+	else {
+		return std::max(std::min(p_i / p_all, 1.0), 0.0);
+	}
 }

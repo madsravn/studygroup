@@ -183,6 +183,15 @@ void makeCBox() {
 	material = new Lambert(Vector3(0.885809, 0.698859, 0.666422));
 	addMeshTrianglesToScene(mesh, material);
 
+	xform.setIdentity();
+	xform *= translate(185.5, 165 + 100, 169);
+	xform *= scale(100, 100, 100);
+	
+	//mesh = new TriangleMesh;
+	//mesh->load("mesh/sphere.obj", xform);
+	//material = new RefractionMaterial(1.4f);
+	//addMeshTrianglesToScene(mesh, material);
+
 	// let objects do pre-calculations if needed
 	g_scene->preCalc();
 }

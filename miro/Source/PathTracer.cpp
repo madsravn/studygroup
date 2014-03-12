@@ -15,7 +15,7 @@ void PathTracer::run() {
 	HitInfo hitInfo;
 	Vector3 shadeResult;
 
-	double inverseSamples = 1/(double)samples;
+	double inverseSamples = 1/(double)samples / 4;
 
 	std::cout << "inverseSamples = " << inverseSamples << std::endl;
 
@@ -47,7 +47,7 @@ void PathTracer::run() {
 				}
 			}
 
-			shadeResult *= inverseSamples / 4;
+			shadeResult *= inverseSamples;
 
 			img->setPixel(i, j, shadeResult);
 		}
@@ -82,7 +82,7 @@ PathContribution PathTracer::calcPathContribution(const std::vector<HitInfo> pat
 
 	Vector3 throughput = pathTraceFromPath(path);
 
-	double probabilityDensity = pathProbabilityDensity(path, path.size());	// Denne bliver også kørt inde i MISWeight, overflødigt? Nææh
+	double probabilityDensity = pathProbabilityDensity(path, path.size());	// Denne bliver også kørt inde i MISWeight, overflødigt? Nææh. Jo
 	if (probabilityDensity <= 0.0f) return result;
 
 	double weight = MISWeight(path, path.size());
@@ -176,8 +176,7 @@ std::vector<HitInfo> PathTracer::generatePath(const Ray& eyeRay, const MarkovCha
 }
 
 double PathTracer::MISWeight(const std::vector<HitInfo> path, const int pathLength) const {
-	int numEyeVertices = path.size();
-	const double p_i = pathProbabilityDensity(path, numEyeVertices);
+	const double p_i = pathProbabilityDensity(path, path.size());
 	const double p_all = pathProbabilityDensity(path);
 
 	if (p_i == 0.0f || p_all == 0.0f) {    // Kan man skrive (!p_i || !p_all) bare for at være et jerk?

@@ -104,12 +104,11 @@ void
 	basicShader.run();*/
 	PathTracer pathTracer = PathTracer(*this, img, cam, pathSamples);
 	//pathTracer.run();
-	//BiPathTracer biPathTracer = BiPathTracer(*this, img, cam, pathSamples);
+	BiPathTracer biPathTracer = BiPathTracer(*this, img, cam, pathSamples);
 	//biPathTracer.run();
-	Constants::seconds = 690;
-	MLT mlt = MLT(*this, img, cam, pathSamples, &pathTracer);
+	Constants::seconds = 300;
+	MLT mlt = MLT(*this, img, cam, pathSamples, &biPathTracer);
 	mlt.run();
-	
 
 	printf("Rendering Progress: 100.000%%\n");
 	debug("done Raytracing!\n");

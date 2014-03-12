@@ -7,8 +7,9 @@
 #include "Camera.h"
 #include "MarkovChain.h"
 #include "PathContribution.h"
+#include "ITracer.h"
 
-class BiPathTracer
+class BiPathTracer : public ITracer
 {
 public:
 	BiPathTracer(Scene& scene, Image* image, Camera* camera, int pathSamples);
@@ -23,7 +24,13 @@ public:
 	bool isConnectable(const std::vector<HitInfo> eyePath, const std::vector<HitInfo> lightPath) const;
 	PathContribution calcCombinePaths(const std::vector<HitInfo> eyePath, const std::vector<HitInfo> lightPath) const;
 
-	PathContribution calcPathContribution(const MarkovChain& MC) const;
+	double pathProbabilityDensity(const std::vector<HitInfo> path) const;
+	double pathProbabilityDensity(const std::vector<HitInfo> path, int numEyeVertices, int numLightVertices) const;
+
+
+	double MISWeight(const std::vector<HitInfo> path, const int pathLength) const;
+
+	virtual PathContribution calcPathContribution(const MarkovChain& MC) const;
 private:
 	Scene& scene;
 	Image* img;

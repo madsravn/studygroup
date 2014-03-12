@@ -2,6 +2,7 @@
 #define CSE168_MLT_H_INCLUDED
 
 #include <algorithm>
+#include "ITracer.h"
 #include "Utils.h"
 #include "Scene.h"
 #include "Image.h"
@@ -12,12 +13,13 @@
 #include "PathContribution.h"
 #include "PathTracer.h"
 
+
 class PathTracer;
 
 class MLT
 {
 public:	
-	MLT(Scene& scene, Image* image, Camera* camera, int pathSamples, PathTracer* tracer);
+	MLT(Scene& scene, Image* image, Camera* camera, int pathSamples, ITracer* tracer);
 	~MLT(void) {};
 	float mutate(float value);
     void run();
@@ -32,7 +34,7 @@ private:
 	int samples;
     MarkovChain MC;
     std::vector<float> picture;
-	PathTracer* renderer;
+	ITracer* renderer;
 };
 
 #endif // CSE168_MLT_H_INCLUDED

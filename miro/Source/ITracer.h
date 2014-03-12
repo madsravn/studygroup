@@ -9,6 +9,4 @@ class ITracer {
         ITracer() {}
 
 };
-
-
 #endif
