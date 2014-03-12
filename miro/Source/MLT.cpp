@@ -203,18 +203,3 @@ double MLT::acceptProb(MarkovChain& current, MarkovChain& proposal) const {
 	}
 	return a;
 }
-void MLT::calcCoordinates(std::vector<HitInfo> path, int &px, int &py) const {
-	Vector3 direction;	
-
-	if (path.size() >= 2) {				
-		direction = (path.at(1).P - path.at(0).P).normalized();
-		cam->rayToPixels(Ray(cam->eye(), direction), px, py, img->width(), img->height());
-	}	
-}
-
-// Trace path from eye
-std::vector<HitInfo> MLT::generateEyePathFromChain(MarkovChain chain) const {	
-	Ray ray = cam->randomRay(img->width(), img->height(), chain);
-
-	return renderer->generatePath(ray, chain);
-}
