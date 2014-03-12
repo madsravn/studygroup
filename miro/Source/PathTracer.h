@@ -7,8 +7,9 @@
 #include "Image.h"
 #include "Console.h"
 #include "Utils.h"
+#include "ITracer.h"
 
-class PathTracer
+class PathTracer : public ITracer
 {
 public:
 	PathTracer(Scene& scene, Image* image, Camera* camera, int pathSamples);
@@ -17,7 +18,7 @@ public:
 
 	Vector3 pathTraceFromPath(std::vector<HitInfo> path) const;
 	
-	PathContribution calcPathContribution(const MarkovChain& MC) const;
+	virtual PathContribution calcPathContribution(const MarkovChain& MC) const;
 	PathContribution calcPathContribution(const std::vector<HitInfo> path) const;
 	
 	double pathProbabilityDensity(const std::vector<HitInfo> path) const;
