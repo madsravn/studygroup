@@ -1,10 +1,14 @@
 #include "BiPathTracer.h"
 #include <algorithm>
 
+
+
 BiPathTracer::BiPathTracer(Scene& scene, Image* image, Camera* camera, int pathSamples) : scene(scene), img(image), cam(camera), samples(pathSamples) {
 	for(int i = 0; i < 3*img->height()*img->width(); ++i) {
 		picture.push_back(0.0f);
 	}
+
+	dummyShader = new Lambert(Vector3(0.0f));
 }
 
 BiPathTracer::~BiPathTracer(void)
@@ -101,12 +105,16 @@ PathContribution BiPathTracer::calcCombinePaths(const std::vector<HitInfo> eyePa
 
 			if (px >= 0 && px <= img->width() && py >= 0 && py <= img->height()) {							
 				Vector3 lightPathResult = pathTraceFromPath(combinedPath);
+				if (maxVectorValue(lightPathResult) <= 0.0) 
+					continue;
 				double p = pathProbabilityDensity(combinedPath, eyeSubPathSize, lightSubPathSize);
+				if (p <= 0.0) 
+					continue;
 				double w = MISWeight(combinedPath, combinedPathSize);
-				if (p <= 0.0f || w <= 0.0f)
+				if (w <= 0.0f) 
 					continue;
 
-				Contribution contribution(px, py, lightPathResult);
+				Contribution contribution(px, py, lightPathResult * (w / p));
 				pathContribution.colors.push_back(contribution);
 
 				pathContribution.scalarContribution = std::max(pathContribution.scalarContribution, maxVectorValue(contribution.color));
@@ -171,7 +179,7 @@ Vector3 BiPathTracer::pathTraceFromPath(std::vector<HitInfo> path) const {
 	// Recursive shading
 	Vector3 shadeResult = Vector3(0.0f);
 
-	if (path.size() >= 2) {
+	if (path.size() >= 2 && path.at(1).material != nullptr) {
 		shadeResult += path.at(1).material->shade(path, 1, scene);			
 	}
 
@@ -217,7 +225,9 @@ std::vector<HitInfo> BiPathTracer::generateEyePath(const Ray& eyeRay, const Mark
 std::vector<HitInfo> BiPathTracer::generateLightPath(const Vector3 lightPos) const {
 	std::vector<HitInfo> lightPath = std::vector<HitInfo>();
 	Vector3 lightDir = generateRandomRayDirection();
-	lightPath.push_back(HitInfo(0.0f, lightPos, lightDir));
+	/*HitInfo lightHit = HitInfo(0.0f, lightPos, lightDir);
+	lightHit.material = dummyShader;
+	lightPath.push_back(lightHit);*/
 
 	Ray ray = Ray(lightPos, lightDir);
 	HitInfo hitInfo;
@@ -237,7 +247,9 @@ std::vector<HitInfo> BiPathTracer::generateLightPath(const Vector3 lightPos) con
 std::vector<HitInfo> BiPathTracer::generateLightPath(const Vector3 lightPos, const MarkovChain& MC) const {
 	std::vector<HitInfo> lightPath = std::vector<HitInfo>();
 	Vector3 lightDir = generateRandomRayDirection(MC.getNext(), MC.getNext());
-	lightPath.push_back(HitInfo(0.0f, lightPos, lightDir));
+	/*HitInfo lightHit = HitInfo(0.0f, lightPos, lightDir);
+	lightHit.material = dummyShader;
+	lightPath.push_back(lightHit);*/
 
 	Ray ray = Ray(lightPos, lightDir);
 	HitInfo hitInfo;

@@ -4,6 +4,8 @@
 #include "Material.h"
 #include "Scene.h"
 
+
+
 class Lambert : public Material
 {
 public:
@@ -35,6 +37,8 @@ public:
 
 	virtual double getPDF(Vector3 in, Vector3 out, Vector3 normal) const;
 	float glossiness;
+
+	
 
 protected:
     Vector3 m_kd;

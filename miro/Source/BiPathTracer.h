@@ -1,4 +1,5 @@
 #pragma once
+#include "Lambert.h"
 #include "Utils.h"
 #include "Scene.h"
 #include "Image.h"
@@ -8,6 +9,8 @@
 #include "MarkovChain.h"
 #include "PathContribution.h"
 #include "ITracer.h"
+
+
 
 class BiPathTracer : public ITracer
 {
@@ -37,5 +40,6 @@ private:
 	Camera* cam;
 	int samples;
 	mutable std::vector<float> picture;
+	Material* dummyShader;
 };
 
