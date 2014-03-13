@@ -102,10 +102,10 @@ void
     
 	/*BasicShader basicShader(*this, img, cam);
 	basicShader.run();*/
-	PathTracer pathTracer(*this, img, cam, pathSamples);
-	pathTracer.run();
-	//BiPathTracer biPathTracer(*this, img, cam, pathSamples);
-	//biPathTracer.run();
+	//PathTracer pathTracer(*this, img, cam, pathSamples);
+	//pathTracer.run();
+	BiPathTracer biPathTracer(*this, img, cam, pathSamples);
+	biPathTracer.run();
 	Constants::seconds = 300;
 	//MLT mlt(*this, img, cam, pathSamples, &biPathTracer);
 	//mlt.run();

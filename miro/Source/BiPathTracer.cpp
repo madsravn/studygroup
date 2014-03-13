@@ -104,8 +104,8 @@ PathContribution BiPathTracer::calcCombinePaths(const std::vector<HitInfo> eyePa
 			Vector3 rayToPixelsDir = (combinedPath.at(1).P - combinedPath.at(0).P).normalized();
 
 			HitInfo camHit;
-			scene.trace(camHit, Ray(combinedPath.at(1).P, (combinedPath.at(0).P - combinedPath.at(1).P).normalized()));
-			if (camHit.t < (combinedPath.at(0).P - combinedPath.at(1).P).length()){
+			scene.trace(camHit, Ray(combinedPath.at(1).P, (combinedPath.at(0).P - combinedPath.at(1).P).normalized()), 0.001f);
+			if (camHit.t < (combinedPath.at(0).P - combinedPath.at(1).P).length()){ // Visibility test
 				//std::cout << "Camera not hit" << std::endl;
 				continue;
 			}
@@ -156,7 +156,7 @@ void BiPathTracer::accumulatePathContribution(const PathContribution pathContrib
 			picture[3*pixelpos] = color.x;
 			picture[3*pixelpos+1] = color.y;
 			picture[3*pixelpos+2] = color.z;
-			img->setPixel(ix, iy, color);
+			img->setPixel(ix, iy, color * s);
 
 			//std::cout << ix << ", " << iy << " = " << color << std::endl;
 
@@ -178,7 +178,7 @@ bool BiPathTracer::isConnectable(const std::vector<HitInfo> eyePath, const std::
 	HitInfo lastLightPoint = lightPath.at(lightPath.size() - 1);
 	Ray connectorRay = Ray(eyePath.at(eyePath.size() - 1).P, (lastLightPoint.P - lastEyePoint.P).normalized());
 	
-	scene.trace(hitInfo, connectorRay);
+	scene.trace(hitInfo, connectorRay, 0.001f);
 	if(hitInfo.t >= (lastEyePoint.P - lastLightPoint.P).length()) {		
 		return true;
 	} else {
@@ -235,7 +235,7 @@ std::vector<HitInfo> BiPathTracer::generateEyePath(const Ray& eyeRay, const Mark
 
 std::vector<HitInfo> BiPathTracer::generateLightPath(const Vector3 lightPos) const {
 	std::vector<HitInfo> lightPath = std::vector<HitInfo>();
-	return lightPath;
+	//return lightPath;
 
 	Vector3 lightDir = generateRandomRayDirection();
 	/*HitInfo lightHit = HitInfo(0.0f, lightPos, lightDir);
@@ -325,8 +325,8 @@ double BiPathTracer::pathProbabilityDensity(const std::vector<HitInfo> path, int
 
 	// sampling from light source
 	if (p != 0.0) {
-		for (int i = 1; i < numLightVertices - 1; i++) {
-			if (i == 1) {
+		for (int i = 2; i < numLightVertices - 1; i++) {
+			if (i == 2) {
 				Vector3 firstLightDir = path.at(path.size() - 2).P - path.at(path.size() - 1).P; // direction from light to first light hit
 				
 				// TODO: Something
