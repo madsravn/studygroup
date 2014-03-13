@@ -107,7 +107,7 @@ void MLT::run() {
                 running = false;
                 std::cout << "Stopping after " << t.duration().count() << " ms." << std::endl;
             }
-			//std::cout << "samps = " << samps << std::endl;
+			std::cout << "samps = " << samps << std::endl;
 
 			i = 0;
 		    for(int j = 0; j < img->height(); ++j) {

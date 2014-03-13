@@ -10,7 +10,8 @@ class Lambert : public Material
 {
 public:
     Lambert(const Vector3 & kd = Vector3(1),
-		const Vector3 & ka = Vector3(0)) ;
+		const Vector3 & ka = Vector3(0), 
+		const Vector3 & ke = Vector3(0));
     virtual ~Lambert();
 
 	//const type = LAMBERT;
@@ -20,6 +21,7 @@ public:
 
     void setKd(const Vector3 & kd) {m_kd = kd;}
     void setKa(const Vector3 & ka) {m_ka = ka;}
+	void setKe(const Vector3 & ke) { m_ke = ke; }
 
     virtual void preCalc() {}
     
@@ -43,6 +45,7 @@ public:
 protected:
     Vector3 m_kd;
     Vector3 m_ka;
+	Vector3 m_ke;
 	Vector3* pfmImage;
 };
 

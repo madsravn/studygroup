@@ -12,8 +12,8 @@ double M_1_PI = 1.0/M_PI;
 
 bool softShadows = false;
 
-Lambert::Lambert(const Vector3 & kd, const Vector3 & ka) :
-	m_kd(kd), m_ka(ka)
+Lambert::Lambert(const Vector3 & kd, const Vector3 & ka, const Vector3 & ke) :
+m_kd(kd), m_ka(ka), m_ke(ke)
 {
 	glossiness = 1000;
 	int pfmWidth = 1500, pfmHeight = 1500;
@@ -29,7 +29,7 @@ Vector3	Lambert::shade(const Ray& ray, const HitInfo& hit, const Scene& scene, c
 	float m = maxVectorValue((vm_kd));
 	if (recDepth > maxRecDepth && maxRecDepth != 1){
 		if (rnd() >= m) { 
-			return Vector3(0.0f);
+			return m_ke;
         }
     }
 
@@ -73,12 +73,14 @@ Vector3 Lambert::shade(const std::vector<HitInfo>& path, const int pathPosition,
 
 	Vector3 illumination_direct = Vector3(0.0f);
 	Vector3 illumination_indirect = Vector3(0.0f);
+	Vector3 illumination_emission = m_ke;
 
 	HitInfo hit = path.at(pathPosition);
 
 	const Lights *lightlist = scene.lights();
 	
-	illumination_direct = vm_kd * calcDirectIllum(hit, lightlist, scene, false);
+	if (lightlist->size() > 0)
+		illumination_direct = vm_kd * calcDirectIllum(hit, lightlist, scene, false);
 
 	// Next ray bounce
 	if (path.size() > pathPosition + 1 && path.at(pathPosition + 1).material != nullptr) {
@@ -89,7 +91,7 @@ Vector3 Lambert::shade(const std::vector<HitInfo>& path, const int pathPosition,
 		illumination_indirect = m_kd * rayColor * nDotD * M_1_PI;
 	}
 	
-	return illumination_direct + illumination_indirect;
+	return illumination_direct + illumination_indirect + illumination_emission;
 };
 
 Vector3 Lambert::calcDirectIllum(const HitInfo &hit, const Lights *lightlist, const Scene &scene, bool allLights) const {
