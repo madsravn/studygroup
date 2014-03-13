@@ -5,7 +5,7 @@
 
 const int maxRecDepth  = Constants::MaxPathLength;
 int samps = 0;
-const int biasSamples = 10000;
+const int biasSamples = 100000;
 
 MLT::MLT(Scene& scene, Image* image, Camera* camera, int pathSamples, ITracer* tracer) : scene(scene), img(image), cam(camera), samples(pathSamples), renderer(tracer) {
 	

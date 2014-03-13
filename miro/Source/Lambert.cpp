@@ -71,7 +71,7 @@ Vector3 Lambert::shade(const std::vector<HitInfo>& path, const int pathPosition,
 		}
 	}
 
-	Vector3 illumination_direct;
+	Vector3 illumination_direct = Vector3(0.0f);
 	Vector3 illumination_indirect = Vector3(0.0f);
 
 	HitInfo hit = path.at(pathPosition);
@@ -110,7 +110,7 @@ Vector3 Lambert::calcDirectIllum(const HitInfo &hit, const Lights *lightlist, co
 }
 
 Vector3 Lambert::calcLighting(const HitInfo &hit, PointLight* pLight, const Scene &scene) const {
-	Vector3 illumination_direct = Vector3(0.0f);
+	Vector3 illumination_direct = m_kd;
 
 	// Light vector
 	Vector3 lv;
@@ -124,18 +124,15 @@ Vector3 Lambert::calcLighting(const HitInfo &hit, PointLight* pLight, const Scen
 	HitInfo lightHit;
 	scene.trace(lightHit, Ray(hit.P, lv), 0.001f);		
 	bool isLightHit = Vector3(pLight->position() - hit.P).length() <= lightHit.t;
+	if (!isLightHit) return Vector3(0.0f);
 
+	if (hit.P == pLight->position())
+		return Vector3(0.0f);
 
-	if (isLightHit) {		
-
-		if (hit.P == pLight->position())
-			return illumination_direct;
-
-		//illumination_direct = (m_kd * pLight->wattage() * pLight->color() * std::max(dot(lv, hit.N), 0.0f)) / pow((pLight->position() - hit.P).length(), 2);
-		illumination_direct += pLight->wattage() * pLight->color() * std::max(dot(lv, hit.N), 0.0f) * 2 * M_PI * M_1_PI * pLight->falloff() / (pLight->position() - hit.P).length2();
-		//illumination_direct += pLight->wattage() * pLight->color() * std::max(dot(lv, hit.N), 0.0f) / pow((pLight->position() - hit.P).length(), 2);
-	}
-
+	//illumination_direct = (m_kd * pLight->wattage() * pLight->color() * std::max(dot(lv, hit.N), 0.0f)) / pow((pLight->position() - hit.P).length(), 2);
+	illumination_direct += pLight->wattage() * pLight->color() * std::max(dot(lv, hit.N), 0.0f) * 2 * M_PI * M_1_PI * pLight->falloff() / (pLight->position() - hit.P).length2();
+	//illumination_direct += pLight->wattage() * pLight->color() * std::max(dot(lv, hit.N), 0.0f) / pow((pLight->position() - hit.P).length(), 2);
+	
 	return illumination_direct;
 }
 
@@ -150,5 +147,5 @@ Ray Lambert::bounceRay(const Ray& ray, const HitInfo& hit) const {
 }
 
 double Lambert::getPDF(Vector3 in, Vector3 out, Vector3 normal) const {
-	return abs(dot(out, normal)) / PI;
+	return abs(dot(out, normal)) / M_PI;
 }

@@ -38,6 +38,8 @@ Ray RefractionMaterial::bounceRay(const Ray& ray, const HitInfo& hit, const Mark
 
 Ray RefractionMaterial::bounceRay(const Ray& ray, const HitInfo& hit) const {
 
+	Vector3 vReflect = ray.d - 2.0f * dot(ray.d, hit.N) * hit.N;
+
 	// specular refraction
 	bool into = dot(hit.N, -ray.d) > 0;		// Going in?
 	float costheta1 = dot(hit.N, -ray.d);
@@ -48,10 +50,9 @@ Ray RefractionMaterial::bounceRay(const Ray& ray, const HitInfo& hit) const {
 	else
 		my = ior/globalIoR;
 
-	float costheta2 = 1 - pow(my, 2) * (1 - pow(costheta1, 2));
+	float costheta2 = 1 - pow(my, 2) * (1 - pow(costheta1, 2));	
 
-	if (costheta2 <= 0) {
-		Vector3 vReflect = ray.d - 2.0f * dot(ray.d, hit.N) * hit.N;
+	if (costheta2 <= 0) {		
 		// Reflect instead
 		return Ray(hit.P, vReflect);
 	}
@@ -59,9 +60,8 @@ Ray RefractionMaterial::bounceRay(const Ray& ray, const HitInfo& hit) const {
 	int p = (into ? 1 : -1);
 	Vector3 vRefract = my * ray.d - p * hit.N * (my * costheta1 + sqrt(costheta2));	// New ray direction
 	vRefract.normalize();
-
 	Ray rayRefract = Ray(Vector3(hit.P), vRefract);
-
+	
 	return rayRefract;
 }
 

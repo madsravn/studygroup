@@ -40,9 +40,6 @@ void BiPathTracer::run() {
 			double contSum = 0.0;
 			ray = cam->eyeRay(i, j, img->width(), img->height());	
 
-			int px, py;
-
-			cam->rayToPixels(ray, px, py, img->width(), img->height());
 			for (int sampleCounter = 0; sampleCounter < samples; sampleCounter++){
 				
 				std::vector<HitInfo> eyePath = generateEyePath(ray);
@@ -200,6 +197,7 @@ Vector3 BiPathTracer::pathTraceFromPath(std::vector<HitInfo> path) const {
 std::vector<HitInfo> BiPathTracer::generateEyePath(const Ray& eyeRay) const {
 	std::vector<HitInfo> path = std::vector<HitInfo>();
 	path.push_back(HitInfo(0.0f, eyeRay.o, eyeRay.d));	// Eye position
+	//return path;			// Test uden eye path
 
 	Ray ray = eyeRay;
 	HitInfo hitInfo;
@@ -235,7 +233,7 @@ std::vector<HitInfo> BiPathTracer::generateEyePath(const Ray& eyeRay, const Mark
 
 std::vector<HitInfo> BiPathTracer::generateLightPath(const Vector3 lightPos) const {
 	std::vector<HitInfo> lightPath = std::vector<HitInfo>();
-	//return lightPath;
+	//return lightPath;		// Test uden light path
 
 	Vector3 lightDir = generateRandomRayDirection();
 	/*HitInfo lightHit = HitInfo(0.0f, lightPos, lightDir);
