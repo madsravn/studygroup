@@ -111,14 +111,14 @@ void makeCBox() {
 	g_camera->setFOV(40);
 
 	// create and place a point light source
-	//PointLight * light = new PointLight;
-	//light->setPosition(Vector3(278, 518.0, 279.5));    
-	//light->setColor(Vector3(18.387, 10.9873, 2.75357));
-	//light->setWattage(1);
-	//light->setWattage(50);
-	//light->setRadius(30.0f);
-	//light->setFalloff(1000.0f);
-	//g_scene->addLight(light);
+	PointLight * light = new PointLight;
+	light->setPosition(Vector3(278, 518.0, 279.5));    
+	light->setColor(Vector3(18.387, 10.9873, 2.75357));
+	light->setWattage(1);
+	light->setWattage(50000);
+	light->setRadius(30.0f);
+	light->setFalloff(1000.0f);
+	g_scene->addLight(light);
 
 	Matrix4x4 xform;
 	Matrix4x4 xform2;
@@ -189,7 +189,7 @@ void makeCBox() {
 	mesh = new TriangleMesh;
 	mesh->load("mesh/sphere.obj", xform);
 	material = new RefractionMaterial(1.4f);
-	Lambert* emissionMaterial = new Lambert(Vector3(1.0f), Vector3(0.0f), Vector3(10.9873, 2.75357, 180.387)*10);
+	Lambert* emissionMaterial = new Lambert(Vector3(0.0f, 0.0f, 1.0f)/*, Vector3(0.0f), Vector3(10.9873, 2.75357, 180.387)*100*/);
 	material = emissionMaterial;
 	addMeshTrianglesToScene(mesh, material);
 

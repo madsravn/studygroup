@@ -197,7 +197,7 @@ Vector3 BiPathTracer::pathTraceFromPath(std::vector<HitInfo> path) const {
 std::vector<HitInfo> BiPathTracer::generateEyePath(const Ray& eyeRay) const {
 	std::vector<HitInfo> path = std::vector<HitInfo>();
 	path.push_back(HitInfo(0.0f, eyeRay.o, eyeRay.d));	// Eye position
-	//return path;			// Test uden eye path
+	return path;			// Test uden eye path
 
 	Ray ray = eyeRay;
 	HitInfo hitInfo;
@@ -303,7 +303,9 @@ double BiPathTracer::pathProbabilityDensity(const std::vector<HitInfo> path, int
 
 	// sampling from the eye
 	for (int i = 1; i < numEyeVertices - 1; i++) {
-		if (i == 1) {  // First hit
+		if (i == 0) {
+
+		} else if (i == 1) {  // First hit
 			p *= 1.0 / double(img->width() * img->height());						// divided by image size
 			Vector3 direction = (path.at(i).P - path.at(i - 1).P).normalized();		// Direction from first to second hit
 			double cosTheta = dot(direction, cam->viewDir());						// Cosine of angle from camera
@@ -316,27 +318,27 @@ double BiPathTracer::pathProbabilityDensity(const std::vector<HitInfo> path, int
 			Vector3 directionIn = (path.at(i - 1).P - path.at(i).P).normalized();
 			Vector3 directionOut = (path.at(i + 1).P - path.at(i).P).normalized();
 			p *= path.at(i).material->getPDF(directionIn, directionOut, path.at(i).N);
-
-			p *= directionToArea(path.at(i), path.at(i + 1));
 		}		
+		p *= directionToArea(path.at(i), path.at(i + 1));
 	}
 
 	// sampling from light source
-	if (p != 0.0) {
+	if (p != 0.0) {		
+
 		for (int i = 2; i < numLightVertices - 1; i++) {
 			if (i == 2) {
-				Vector3 firstLightDir = path.at(path.size() - 2).P - path.at(path.size() - 1).P; // direction from light to first light hit
-				
-				// TODO: Something
+				HitInfo firstPoint = path.at(path.size() - 1);
+				HitInfo secondPoint = path.at(path.size() - 2);
+				Vector3 firstLightDir = (secondPoint.P - firstPoint.P).normalized(); // direction from light to first light hit				
+				p *= abs(dot(firstLightDir, firstPoint.N)) / PI;				
 			} else {
 				HitInfo iPoint = path.at(path.size() - i);
 				Vector3 directionIn  = (path.at(path.size() - (i - 1)).P - iPoint.P).normalized();
 				Vector3 directionOut = (path.at(path.size() - (i + 1)).P - iPoint.P).normalized();
 				
-				p *= iPoint.material->getPDF(directionIn, directionOut, iPoint.N);
-
-				p *= directionToArea(path.at(i), path.at(i + 1));
+				p *= iPoint.material->getPDF(directionIn, directionOut, iPoint.N);				
 			}
+			p *= directionToArea(path.at(i), path.at(i + 1));
 		}
 	}
 	return p;

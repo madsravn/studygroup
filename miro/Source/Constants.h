@@ -10,7 +10,7 @@ namespace Constants {
     const int MaxEvents = MaxPathLength + 1;
     const int NumStatesSubpath = (MaxEvents + 2) * NumRNGsPerEvent;
     const int NumStates = NumStatesSubpath * 2;
-    const int PathSamples = 512;
+    const int PathSamples = 16;
     extern int seconds;
 }
    

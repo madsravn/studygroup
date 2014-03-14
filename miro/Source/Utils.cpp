@@ -31,16 +31,31 @@ Vector3 generateRandomRayDirection(float rand1, float rand2){
 	//float rand1 = rnd();
 	//float rand2 = rnd();
 
-	const float glossiness = 1.0f;
 
-	const float temp1 = 2.0 * PI * rand1;
-	const float temp2 = pow(rand2, 2.0f / (glossiness + 1.0f));
-	const float temp3 = pow(rand2, 1.0f / (glossiness + 1.0f));
-	const float s = sin(temp1);
-	const float c = cos(temp1);
-	const float t = sqrt(1.0 - temp2);
-	
-	Vector3 rayDirection = Vector3(s*t, c*t, temp3);
+
+	const double phi = 2 * PI * rand1;
+	const double theta = acos(1 - 2 * rand2);
+
+	const float x = 2 * cos(phi) * sqrt(rand2*(1 - rand2));
+	const float y = 2 * sin(phi) * sqrt(rand2*(1 - rand2));
+	const float z = 1 - 2*rand2;
+
+
+	Vector3 rayDirection = Vector3(x, y, z);
+
+
+
+
+	//const float glossiness = 1.0f;
+
+	//const float temp1 = 2.0 * PI * rand1;
+	//const float temp2 = pow(rand2, 2.0f / (glossiness + 1.0f));
+	//const float temp3 = pow(rand2, 1.0f / (glossiness + 1.0f));
+	//const float s = sin(temp1);
+	//const float c = cos(temp1);
+	//const float t = sqrt(1.0 - temp2);
+	//
+	//Vector3 rayDirection = Vector3(s*t, c*t, temp3);
 	
 	rayDirection.normalize();	
 

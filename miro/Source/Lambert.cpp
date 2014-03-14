@@ -8,6 +8,7 @@
 
 double M_PI = 3.14159265358979;
 double M_1_PI = 1.0/M_PI;
+
 #endif
 
 bool softShadows = false;
@@ -80,7 +81,7 @@ Vector3 Lambert::shade(const std::vector<HitInfo>& path, const int pathPosition,
 	const Lights *lightlist = scene.lights();
 	
 	if (lightlist->size() > 0)
-		illumination_direct = vm_kd * calcDirectIllum(hit, lightlist, scene, false);
+		illumination_direct = calcDirectIllum(hit, lightlist, scene, false);
 
 	// Next ray bounce
 	if (path.size() > pathPosition + 1 && path.at(pathPosition + 1).material != nullptr) {
@@ -131,8 +132,10 @@ Vector3 Lambert::calcLighting(const HitInfo &hit, PointLight* pLight, const Scen
 	if (hit.P == pLight->position())
 		return Vector3(0.0f);
 
+	illumination_direct = (m_kd * pLight->color() * pLight->wattage() * std::max(dot(lv, hit.N), 0.0f)); 
+	illumination_direct /= (pLight->position() - hit.P).length2();
 	//illumination_direct = (m_kd * pLight->wattage() * pLight->color() * std::max(dot(lv, hit.N), 0.0f)) / pow((pLight->position() - hit.P).length(), 2);
-	illumination_direct += pLight->wattage() * pLight->color() * std::max(dot(lv, hit.N), 0.0f) * 2 * M_PI * M_1_PI * pLight->falloff() / (pLight->position() - hit.P).length2();
+	//illumination_direct += pLight->wattage() * pLight->color() * std::max(dot(lv, hit.N), 0.0f) * 2 * M_PI * M_1_PI * pLight->falloff() / (pLight->position() - hit.P).length2();
 	//illumination_direct += pLight->wattage() * pLight->color() * std::max(dot(lv, hit.N), 0.0f) / pow((pLight->position() - hit.P).length(), 2);
 	
 	return illumination_direct;
