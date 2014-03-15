@@ -62,13 +62,15 @@ Vector3 Lambert::shade(const std::vector<HitInfo>& path, const int pathPosition,
 		return Vector3(0.0f);
 	}
 
-    Vector3 vm_kd(m_kd);
-	float m = maxVectorValue(vm_kd);
+	Vector3 f(m_kd);
+	float p = maxVectorValue(f);
 	if (pathPosition >= 7){ 		// Efter 7 bounces
-		if (rnd() >= m) {
+		if (rnd() >= p) {
 			return Vector3(0.0f);
-		} else {
-			vm_kd *= (1/m);
+		}
+		else
+		{
+			f *= 1.0 / p;
 		}
 	}
 
@@ -89,7 +91,8 @@ Vector3 Lambert::shade(const std::vector<HitInfo>& path, const int pathPosition,
 		Vector3 nextRayDirection = (nextHit.P - hit.P).normalized();
 		Vector3 rayColor = nextHit.material->shade(path, pathPosition + 1, scene, log);	
 		float nDotD = dot(hit.N, nextRayDirection);
-		illumination_indirect = m_kd * rayColor * nDotD * M_1_PI;
+		illumination_indirect = rayColor * nDotD * M_1_PI;
+		//illumination_indirect = f * rayColor;
 	}
 	
 	return illumination_direct + illumination_indirect + illumination_emission;
@@ -129,14 +132,18 @@ Vector3 Lambert::calcLighting(const HitInfo &hit, PointLight* pLight, const Scen
 	bool isLightHit = Vector3(pLight->position() - hit.P).length() <= lightHit.t;
 	if (!isLightHit) return Vector3(0.0f);
 
-	if (hit.P == pLight->position())
-		return Vector3(0.0f);
+	if (hit.P == pLight->position()) return Vector3(0.0f);
+
+	double LDotN = std::max(dot(lv, hit.N), 0.0f);
+	if (LDotN <= 0.0) return Vector3(0.0f);
+
+	/*Vector3 f = m_kd * (1.0 / maxVectorValue(m_kd));
+	Vector3 lightEmission = pLight->color() * pLight->wattage();
+	double omega = 2 * M_PI;
+	illumination_direct += f * lightEmission * LDotN * omega * M_1_PI;*/
 
 	illumination_direct = (m_kd * pLight->color() * pLight->wattage() * std::max(dot(lv, hit.N), 0.0f)); 
 	illumination_direct /= (pLight->position() - hit.P).length2();
-	//illumination_direct = (m_kd * pLight->wattage() * pLight->color() * std::max(dot(lv, hit.N), 0.0f)) / pow((pLight->position() - hit.P).length(), 2);
-	//illumination_direct += pLight->wattage() * pLight->color() * std::max(dot(lv, hit.N), 0.0f) * 2 * M_PI * M_1_PI * pLight->falloff() / (pLight->position() - hit.P).length2();
-	//illumination_direct += pLight->wattage() * pLight->color() * std::max(dot(lv, hit.N), 0.0f) / pow((pLight->position() - hit.P).length(), 2);
 	
 	return illumination_direct;
 }

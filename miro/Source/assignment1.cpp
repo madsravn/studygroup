@@ -114,6 +114,7 @@ void makeCBox() {
 	PointLight * light = new PointLight;
 	light->setPosition(Vector3(278, 518.0, 279.5));    
 	light->setColor(Vector3(18.387, 10.9873, 2.75357));
+	light->setColor(Vector3(10.9873));
 	light->setWattage(1);
 	light->setWattage(50000);
 	light->setRadius(30.0f);
@@ -170,7 +171,7 @@ void makeCBox() {
 		Vector3(-1,0,0),
 		new Lambert(Vector3(0.570068, 0.0430135, 0.0443706)), g_scene);
 	
-	xform.setIdentity();
+	/*xform.setIdentity();
 	mesh = new TriangleMesh;
 	mesh->load("mesh/cbox_smallbox.obj", xform);
 	material = new Lambert(Vector3(0.885809, 0.698859, 0.666422));
@@ -180,18 +181,18 @@ void makeCBox() {
 	mesh = new TriangleMesh;
 	mesh->load("mesh/cbox_largebox.obj", xform);
 	material = new Lambert(Vector3(0.885809, 0.698859, 0.666422));
-	addMeshTrianglesToScene(mesh, material);
+	addMeshTrianglesToScene(mesh, material);*/
 
-	xform.setIdentity();
-	xform *= translate(185.5, 165 + 100, 169);
-	xform *= scale(100, 100, 100);
-	
-	mesh = new TriangleMesh;
-	mesh->load("mesh/sphere.obj", xform);
-	material = new RefractionMaterial(1.4f);
-	Lambert* emissionMaterial = new Lambert(Vector3(0.0f, 0.0f, 1.0f)/*, Vector3(0.0f), Vector3(10.9873, 2.75357, 180.387)*100*/);
-	material = emissionMaterial;
-	addMeshTrianglesToScene(mesh, material);
+	//xform.setIdentity();
+	//xform *= translate(185.5, 165 + 100, 169);
+	//xform *= scale(100, 100, 100);
+	//
+	//mesh = new TriangleMesh;
+	//mesh->load("mesh/sphere.obj", xform);
+	//material = new RefractionMaterial(1.4f);
+	//Lambert* emissionMaterial = new Lambert(Vector3(0.0f, 0.0f, 1.0f), Vector3(0.0f), Vector3(10.9873, 2.75357, 180.387)*100);
+	//material = emissionMaterial;
+	//addMeshTrianglesToScene(mesh, material);
 
 
 	// let objects do pre-calculations if needed
