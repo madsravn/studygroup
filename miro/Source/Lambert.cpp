@@ -64,13 +64,13 @@ Vector3 Lambert::shade(const std::vector<HitInfo>& path, const int pathPosition,
 
 	Vector3 f(m_kd);
 	float p = maxVectorValue(f);
-	if (pathPosition >= 7){ 		// Efter 7 bounces
-		if (rnd() >= p) {
-			return Vector3(0.0f);
+	if (pathPosition > 5){ 		// Efter 7 bounces
+		if (rnd() < p) {
+			f *= 1.0 / p;
 		}
 		else
 		{
-			f *= 1.0 / p;
+			return Vector3(0.0f);			
 		}
 	}
 
@@ -83,7 +83,7 @@ Vector3 Lambert::shade(const std::vector<HitInfo>& path, const int pathPosition,
 	const Lights *lightlist = scene.lights();
 	
 	if (lightlist->size() > 0)
-		illumination_direct = calcDirectIllum(hit, lightlist, scene, false);
+		illumination_direct = calcDirectIllum(hit, lightlist, scene, true);
 
 	// Next ray bounce
 	if (path.size() > pathPosition + 1 && path.at(pathPosition + 1).material != nullptr) {
@@ -91,8 +91,9 @@ Vector3 Lambert::shade(const std::vector<HitInfo>& path, const int pathPosition,
 		Vector3 nextRayDirection = (nextHit.P - hit.P).normalized();
 		Vector3 rayColor = nextHit.material->shade(path, pathPosition + 1, scene, log);	
 		float nDotD = dot(hit.N, nextRayDirection);
-		illumination_indirect = rayColor * nDotD * M_1_PI;
-		//illumination_indirect = f * rayColor;
+		illumination_indirect = f * rayColor;
+
+		//illumination_indirect = m_kd * rayColor * dot(hit.N, nextRayDirection) * M_1_PI;
 	}
 	
 	return illumination_direct + illumination_indirect + illumination_emission;
@@ -137,13 +138,11 @@ Vector3 Lambert::calcLighting(const HitInfo &hit, PointLight* pLight, const Scen
 	double LDotN = std::max(dot(lv, hit.N), 0.0f);
 	if (LDotN <= 0.0) return Vector3(0.0f);
 
-	/*Vector3 f = m_kd * (1.0 / maxVectorValue(m_kd));
+	Vector3 f = m_kd * (1.0 / maxVectorValue(m_kd));
 	Vector3 lightEmission = pLight->color() * pLight->wattage();
-	double omega = 2 * M_PI;
-	illumination_direct += f * lightEmission * LDotN * omega * M_1_PI;*/
-
-	illumination_direct = (m_kd * pLight->color() * pLight->wattage() * std::max(dot(lv, hit.N), 0.0f)); 
-	illumination_direct /= (pLight->position() - hit.P).length2();
+	//double omega = 2 * M_PI * (1 - 1); // = 0	
+	illumination_direct = f * lightEmission * LDotN * M_1_PI;
+	//illumination_direct = (m_kd * pLight->color() * pLight->wattage() * std::max(dot(lv, hit.N), 0.0f)) / (pLight->position() - hit.P).length2();
 	
 	return illumination_direct;
 }
@@ -159,5 +158,5 @@ Ray Lambert::bounceRay(const Ray& ray, const HitInfo& hit) const {
 }
 
 double Lambert::getPDF(Vector3 in, Vector3 out, Vector3 normal) const {
-	return abs(dot(out, normal)) / M_PI;
+	return abs(dot(out, normal)) * M_1_PI;
 }

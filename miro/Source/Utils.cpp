@@ -12,6 +12,16 @@ double rnd(void) {
 // Based on Toshiyas smallpsmlt
 // theory: http://people.cs.kuleuven.be/~philip.dutre/GI/TotalCompendium.pdf  
 Vector3 generateRandomRayDirection(Vector3 normal, float rand1, float rand2){
+
+	double r1 = 2 * PI * rand1;  	// angle around
+	double r2s = sqrt(rand2);// distance from center
+	Vector3 w = normal;  								// w = normal
+	Vector3 u = (cross((fabs(w.x) > .1 ? Vector3(0,1,0) : Vector3(1,0,0)), w) ).normalized(); // u is perpendicular to w
+	Vector3 v = cross(w, u);  							// v is perpendicular to u and w
+	Vector3 d = (u*cos(r1)*r2s + v*sin(r1)*r2s + w*sqrt(1 - rand2)).normalized();  // d is random reflection ray
+
+	return d;
+
 	Vector3 rayDirection = generateRandomRayDirection(rand1, rand2);
 
 	//onb(rayDirection, normal);

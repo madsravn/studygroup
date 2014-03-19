@@ -18,7 +18,6 @@ BiPathTracer::~BiPathTracer(void)
 void BiPathTracer::run() {
 	Ray ray;
 	HitInfo hitInfo;
-	
 
 	double inverseSamples = 1/(double)samples;
 
@@ -36,38 +35,24 @@ void BiPathTracer::run() {
 	for (int j = 0; j < img->height(); ++j)
 	{
 		for (int i = 0; i < img->width(); ++i)
-		{
-			double contSum = 0.0;
+		{			
 			ray = cam->eyeRay(i, j, img->width(), img->height());	
 
 			for (int sampleCounter = 0; sampleCounter < samples; sampleCounter++){
 				
 				std::vector<HitInfo> eyePath = generateEyePath(ray);
 				
-				for (int light = 0; light < scene.lights()->size(); light++) {					
-					Vector3 lightPathResult = Vector3(0.0f);
+				for (int light = 0; light < scene.lights()->size(); light++) {
+					Vector3 lightPathResult(0.0f);
 					
 					const PointLight* pLight = scene.lights()->at(light);
 					std::vector<HitInfo> lightPath = generateLightPath(pLight->position());
 					
-					PathContribution pathContribution = calcCombinePaths(eyePath, lightPath);
-					/*if (pathContribution.scalarContribution <= 0.0)
-						std::cout << "pathContribution <= 0:\t(" << i << ", " << j << ")" << std::endl;*/
-					accumulatePathContribution(pathContribution, inverseSamples);			
-
-					contSum += pathContribution.scalarContribution;
+					PathContribution pathContribution = calcCombinePaths(eyePath, lightPath);					
+					accumulatePathContribution(pathContribution, inverseSamples);					
 				}
-			}
-
-			/*if (contSum <= 0.0)
-				std::cout << "pathContribution <= 0:\t(" << i << ", " << j << ")" << std::endl;*/
+			}		
 		}
-
-		for (int i = 0; i < img->height(); ++i) {
-			img->drawScanline(i);
-			glFinish();
-		}
-
 		printf("Rendering Progress: %.3f%%\r", j / double(img->height())*100.0f);
 		fflush(stdout);
 	}
@@ -102,8 +87,7 @@ PathContribution BiPathTracer::calcCombinePaths(const std::vector<HitInfo> eyePa
 
 			HitInfo camHit;
 			scene.trace(camHit, Ray(combinedPath.at(1).P, (combinedPath.at(0).P - combinedPath.at(1).P).normalized()), 0.001f);
-			if (camHit.t < (combinedPath.at(0).P - combinedPath.at(1).P).length()){ // Visibility test
-				//std::cout << "Camera not hit" << std::endl;
+			if (camHit.t < (combinedPath.at(0).P - combinedPath.at(1).P).length()){ // Visibility test				
 				continue;
 			}
 
@@ -111,18 +95,18 @@ PathContribution BiPathTracer::calcCombinePaths(const std::vector<HitInfo> eyePa
 				Ray(combinedPath.at(0).P, rayToPixelsDir), 
 				px, py, img->width(), img->height());
 
-			if (px >= 0 && px <= img->width() && py >= 0 && py <= img->height()) {							
-				Vector3 lightPathResult = pathTraceFromPath(combinedPath);
-				if (maxVectorValue(lightPathResult) <= 0.0) 
-					continue;
-				double p = pathProbabilityDensity(combinedPath, eyeSubPathSize, lightSubPathSize);
-				if (p <= 0.0) 
-					continue;
-				double w = MISWeight(combinedPath, combinedPathSize);
-				if (w <= 0.0f) 
-					continue;
+			if (px >= 0 && px <= img->width() && py >= 0 && py <= img->height()) {	
 
-				Contribution contribution(px, py, lightPathResult/* * (w / p)*/);
+				Vector3 lightPathResult = pathTraceFromPath(combinedPath);
+				if (maxVectorValue(lightPathResult) <= 0.0) continue;
+
+				double p = pathProbabilityDensity(combinedPath, eyeSubPathSize, lightSubPathSize);
+				if (p <= 0.0) continue;
+
+				double w = MISWeight(combinedPath, combinedPathSize);
+				if (w <= 0.0f) continue;
+
+				Contribution contribution(px, py, lightPathResult * (w / p));
 				pathContribution.colors.push_back(contribution);
 
 				pathContribution.scalarContribution = std::max(pathContribution.scalarContribution, maxVectorValue(contribution.color));
@@ -197,7 +181,7 @@ Vector3 BiPathTracer::pathTraceFromPath(std::vector<HitInfo> path) const {
 std::vector<HitInfo> BiPathTracer::generateEyePath(const Ray& eyeRay) const {
 	std::vector<HitInfo> path = std::vector<HitInfo>();
 	path.push_back(HitInfo(0.0f, eyeRay.o, eyeRay.d));	// Eye position
-	return path;			// Test uden eye path
+	//return path;			// Test uden eye path
 
 	Ray ray = eyeRay;
 	HitInfo hitInfo;
@@ -348,7 +332,7 @@ double BiPathTracer::MISWeight(const std::vector<HitInfo> path, const int pathLe
 	const double p_i = pathProbabilityDensity(path, path.size(), path.size());
 	const double p_all = pathProbabilityDensity(path);
 
-	if (!p_i || !p_all) {    // Kan man skrive (!p_i || !p_all) bare for at være et jerk?
+	if (!p_i || !p_all) {
 		return 0.0f;
 	}
 	else {

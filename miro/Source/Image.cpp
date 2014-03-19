@@ -66,8 +66,8 @@ Vector3 Image::getPixel(int x, int y) {
 
 void Image::setPixel(int x, int y, const Vector3& p)
 {
-	//Vector3 p_t  = p;
-	Vector3 p_t  = toneMapping(p);
+	Vector3 p_t  = p;
+	//Vector3 p_t  = toneMapping(p);
     // do some tone mapping
     if (x >= 0 && x < m_width && y < m_height && y >= 0)
     {
