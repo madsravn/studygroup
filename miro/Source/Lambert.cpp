@@ -140,7 +140,6 @@ Vector3 Lambert::calcLighting(const HitInfo &hit, PointLight* pLight, const Scen
 
 	Vector3 f = m_kd * (1.0 / maxVectorValue(m_kd));
 	Vector3 lightEmission = pLight->color() * pLight->wattage();
-	//double omega = 2 * M_PI * (1 - 1); // = 0	
 	illumination_direct = f * lightEmission * LDotN * M_1_PI;
 	//illumination_direct = (m_kd * pLight->color() * pLight->wattage() * std::max(dot(lv, hit.N), 0.0f)) / (pLight->position() - hit.P).length2();
 	

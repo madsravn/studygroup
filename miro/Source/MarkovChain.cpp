@@ -28,6 +28,8 @@ MarkovChain::getNext() const {
     double ret = u.at(pos);
     count++;
     pos = ( pos + 1 ) % u.size();
+
+	return rnd();
     return ret;
 }
 

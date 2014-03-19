@@ -101,23 +101,23 @@ void MLT::run() {
         }
         
 		i++;
-		//if(i % 1000 == 0) {
+		if(i % 1000 == 0) {
 
             if(t.duration().count()/1000 > Constants::seconds) {
                 running = false;
                 std::cout << "Stopping after " << t.duration().count() << " ms." << std::endl;
             }
-			//std::cout << "samps = " << samps << std::endl;
+			std::cout << "samps = " << samps << std::endl;
 
-			//i = 0;
-		 //   for(int j = 0; j < img->height(); ++j) {
-		 //       img->drawScanline(j);
-		 //       glFinish();
-		 //   }
-      	//}
+			i = 0;
+		    for(int j = 0; j < img->height(); ++j) {
+		        img->drawScanline(j);
+		        glFinish();
+		    }
+      	}
         
         //printf("Rendering Progress: %.3f%%\r", i/float(count)*100.0f);
-        //fflush(stdout);
+        fflush(stdout);
     }
 
 	double s = double(img->width() * img->height()) / double(samps);

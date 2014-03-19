@@ -33,16 +33,11 @@ void PathTracer::run() {
 						
 						Vector3 traceResult = Vector3(0.0f);
 						Vector3 pathResult = Vector3(0.0f);
-						if (!buildPath) {
-							if (scene.trace(hitInfo, ray, 0.0001f)) {
-								traceResult = hitInfo.material->shade(ray, hitInfo, scene, 0, Constants::MaxPathLength, 0);
-								shadeResult += traceResult;
-							}
-						} else {
-							std::vector<HitInfo> path = generatePath(ray);
-							pathResult = pathTraceFromPath(path);
-							shadeResult += pathResult;					
-						}
+
+						std::vector<HitInfo> path = generatePath(ray);
+						pathResult = pathTraceFromPath(path);
+						shadeResult += pathResult;					
+
 					}
 				}
 			}
@@ -69,6 +64,7 @@ Vector3 PathTracer::pathTraceFromPath(std::vector<HitInfo> path) const{
 	return shadeResult;
 }
 
+// Used by MLT
 PathContribution PathTracer::calcPathContribution(const std::vector<HitInfo> path) const {
 	PathContribution result = PathContribution();
 
@@ -81,13 +77,13 @@ PathContribution PathTracer::calcPathContribution(const std::vector<HitInfo> pat
 
 	Vector3 throughput = pathTraceFromPath(path);
 
-	double probabilityDensity = pathProbabilityDensity(path, path.size());	// Denne bliver også kørt inde i MISWeight, overflødigt? Nææh. Jo
+	double probabilityDensity = pathProbabilityDensity(path, path.size());
 	if (probabilityDensity <= 0.0f) return result;
 
 	double weight = MISWeight(path, path.size());
 	if (weight <= 0.0f) return result;
 
-	Vector3 color = throughput * (weight / probabilityDensity);
+	Vector3 color = throughput/* * (weight / probabilityDensity)*/;
 
 	// Assert color is positive
 	if (maxVectorValue(color) <= 0.0f) return result;
@@ -98,9 +94,24 @@ PathContribution PathTracer::calcPathContribution(const std::vector<HitInfo> pat
 	return result;
 }
 
+// Used by MLT
 PathContribution PathTracer::calcPathContribution(const MarkovChain& MC) const {
 	MarkovChain normChain(img->width(), img->height());
-	return calcPathContribution(generatePath(cam->randomRay(img->width(), img->height(), normChain), MC));
+
+	//PathContribution result = PathContribution();
+
+	std::vector<HitInfo> path = generatePath(cam->randomRay(img->width(), img->height(), normChain), MC);
+/*	Vector3 shadeResult = pathTraceFromPath(path);
+
+	int px = -1, py = -1;
+	Vector3 direction = (path.at(1).P - path.at(0).P).normalized();
+	cam->rayToPixels(Ray(cam->eye(), direction), px, py, img->width(), img->height());
+
+	result.colors.push_back(Contribution(px, py, shadeResult));
+	result.scalarContribution = 1.0;
+
+	return result;*/
+	return calcPathContribution(path);
 }
 
 // Probability density for path with all numbers of vertices
@@ -155,6 +166,7 @@ std::vector<HitInfo> PathTracer::generatePath(const Ray& eyeRay) const {
 	return path;	
 }
 
+// Used by MLT
 std::vector<HitInfo> PathTracer::generatePath(const Ray& eyeRay, const MarkovChain& MC) const {
 	std::vector<HitInfo> path = std::vector<HitInfo>();
 	path.push_back(HitInfo(0.0f, eyeRay.o, eyeRay.d));	// Eye position
@@ -182,6 +194,6 @@ double PathTracer::MISWeight(const std::vector<HitInfo> path, const int pathLeng
 		return 0.0f;
 	}
 	else {
-		return std::max(std::min(p_i / p_all, 1.0), 0.0);
+		return std::max(std::min(p_i / p_all * 2.0, 1.0), 0.0);
 	}
 }

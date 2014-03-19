@@ -106,7 +106,7 @@ void
 	//pathTracer.run();
 	//BiPathTracer biPathTracer(*this, img, cam, pathSamples);
 	//biPathTracer.run();
-	Constants::seconds = 900;
+	Constants::seconds = 600;
 	MLT mlt(*this, img, cam, pathSamples, &pathTracer);
 	mlt.run();
 
