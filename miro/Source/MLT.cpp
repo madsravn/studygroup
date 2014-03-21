@@ -63,10 +63,10 @@ void MLT::run() {
     int i = 0;
 
     // Paint over the geometry scene
-    for(int j = 0; j < img->height(); ++j) {
+    /*for(int j = 0; j < img->height(); ++j) {
         img->drawScanline(j);
         glFinish();
-    }
+    }*/
     Timer t;
     t.start();
     while( running ) {
@@ -78,43 +78,41 @@ void MLT::run() {
         } else {
             isLargeStepDone = 0.0;
             proposal = current.mutate(img->width(), img->height());
-        }	
+        }
 		
 		proposal.contribution = renderer->calcPathContribution(proposal);
 
 		double a = acceptProb(current, proposal);
 
-		// accumulate samples
-		if (proposal.contribution.scalarContribution > 0.0f)
-			accumulatePathContribution(proposal.contribution, 
-				(a + isLargeStepDone)/
-				(proposal.contribution.scalarContribution/b + isLargeStepDone)
-			);
-		if (current.contribution.scalarContribution > 0.0f)
-			accumulatePathContribution(current.contribution, 
-				(1.0 - a)/
-				(current.contribution.scalarContribution/b + isLargeStepDone)
-			);
+		// accumulate samples		
+
+		if (proposal.contribution.scalarContribution > 0.0) 
+			accumulatePathContribution(
+					proposal.contribution, 
+					(a + isLargeStepDone)/(proposal.contribution.scalarContribution/b + isLargeStepDone));
+		if (current.contribution.scalarContribution > 0.0) 
+			accumulatePathContribution(
+					current.contribution, 
+					(1.0 - a)/(current.contribution.scalarContribution/b + isLargeStepDone));
 
         if(rnd() <= a) {
             current = proposal;
         }
         
 		i++;
-		if(i % 1000 == 0) {
 
             if(t.duration().count()/1000 > Constants::seconds) {
                 running = false;
                 std::cout << "Stopping after " << t.duration().count() << " ms." << std::endl;
+				i = 0;
+				for(int j = 0; j < img->height(); ++j) {
+					img->drawScanline(j);
+					glFinish();
+				}
             }
-			std::cout << "samps = " << samps << std::endl;
-
-			i = 0;
-		    for(int j = 0; j < img->height(); ++j) {
-		        img->drawScanline(j);
-		        glFinish();
-		    }
-      	}
+			if(i % 100000 == 0) {
+				std::cout << "samps = " << samps << std::endl;
+			}
         
         //printf("Rendering Progress: %.3f%%\r", i/float(count)*100.0f);
         fflush(stdout);
@@ -122,23 +120,27 @@ void MLT::run() {
 
 	double s = double(img->width() * img->height()) / double(samps);
 	
+	Vector3 avg(0.0f);
+
     for(int j = 0; j < img->height(); ++j) {
 		for (int i = 0; i < img->width(); ++i) {
 
 			int pixelpos = j*img->width() + i;
 
-			Vector3 color = Vector3(picture[3 * pixelpos], picture[3 * pixelpos + 1], picture[3 * pixelpos + 2]);
-			img->setPixel(i, j, color * s);
+			Vector3 color = Vector3(picture[3 * pixelpos], picture[3 * pixelpos + 1], picture[3 * pixelpos + 2]) * s;
+			avg += color;
+			img->setPixel(i, j, color);
 		}
 		img->drawScanline(j);
 		glFinish();
     }
+	std::cout << avg / double(img->width() * img->height()) << std::endl;
 }
 
 // Random mutation of a path
 float MLT::mutate(float value) {
 	//std::cout << "mutate" << std::endl;
-	float s1 = 1.0f / 1024, s2 = 1.0f/64;
+	float s1 = 1.0f / 1024, s2 = 1.0f / 64;
 	float dv = s2 * exp(-log(s2/s1)*rnd());
 	if (rnd() < 0.5f) {
 		value += dv;

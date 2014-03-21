@@ -29,7 +29,7 @@ MarkovChain::getNext() const {
     count++;
     pos = ( pos + 1 ) % u.size();
 
-	return rnd();
+	//return rnd();
     return ret;
 }
 

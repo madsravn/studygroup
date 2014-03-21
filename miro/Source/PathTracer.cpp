@@ -3,7 +3,6 @@
 bool buildPath = true;	// Build path before shading
 
 PathTracer::PathTracer(Scene& scene, Image* image, Camera* camera, int pathSamples)  : scene(scene), img(image), cam(camera), samples(pathSamples) {
-
 }
 
 PathTracer::~PathTracer(void)
@@ -15,9 +14,11 @@ void PathTracer::run() {
 	HitInfo hitInfo;
 	Vector3 shadeResult;
 
-	double inverseSamples = 1/(double)samples / 4;
+	double inverseSamples = 1/(double)samples;
 
 	std::cout << "inverseSamples = " << inverseSamples << std::endl;
+
+	Vector3 avg(0.0f);
 
 	// loop over all pixels in the image
 	for (int j = 0; j < img->height(); ++j)
@@ -25,25 +26,33 @@ void PathTracer::run() {
 		for (int i = 0; i < img->width(); ++i)
 		{
 			shadeResult = Vector3(0.0f);			
+			
+			ray = cam->eyeRay(i, j, img->width(), img->height());
 
 			for (int AAx = 0; AAx < 2; AAx++) {
 				for (int AAy = 0; AAy < 2; AAy++) {
-					ray = cam->eyeRay(i - 0.25f + (float)AAx/2, j - 0.25f + (float)AAy/2, img->width(), img->height());
+					//ray = cam->eyeRay(i - 0.25f + (float)AAx/2, j - 0.25f + (float)AAy/2, img->width(), img->height());
 					for (int sampleCounter = 0; sampleCounter < samples/4; sampleCounter++){
 						
-						Vector3 traceResult = Vector3(0.0f);
-						Vector3 pathResult = Vector3(0.0f);
+						Vector3 traceResult(0.0f);
+						Vector3 pathResult(0.0f);
 
 						std::vector<HitInfo> path = generatePath(ray);
-						pathResult = pathTraceFromPath(path);
-						shadeResult += pathResult;					
+						if (path.size() < 2) break;
 
+						PathContribution contribution = calcPathContribution(path);
+						for (int c = 0; c < contribution.colors.size(); c++)
+						{
+							Contribution cont = contribution.colors.at(c);
+							pathResult += cont.color;
+						}
+						shadeResult += pathResult;
 					}
 				}
 			}
 
 			shadeResult *= inverseSamples;
-
+			avg += shadeResult;
 			img->setPixel(i, j, shadeResult);
 		}
 		img->drawScanline(j);
@@ -51,12 +60,12 @@ void PathTracer::run() {
 		printf("Rendering Progress: %.3f%%\r", j / double(img->height())*100.0f);
 		fflush(stdout);
 	}
+	std::cout << avg / double(img->width() * img->height()) << std::endl;
 }
 
 Vector3 PathTracer::pathTraceFromPath(std::vector<HitInfo> path) const{	
 	// Recursive shading
-	Vector3 shadeResult = Vector3(0.0f);
-
+	Vector3 shadeResult(0.0f);
 	if (path.size() >= 2) {
 		shadeResult += path.at(1).material->shade(path, 1, scene);			
 	}
@@ -70,26 +79,23 @@ PathContribution PathTracer::calcPathContribution(const std::vector<HitInfo> pat
 
 	if (path.size() < 2) return result;
 
+	// Pixel Position
 	int px = -1, py = -1;
 	Vector3 direction = (path.at(1).P - path.at(0).P).normalized();
-
 	cam->rayToPixels(Ray(cam->eye(), direction), px, py, img->width(), img->height());
-
+	
+	// Path Probability Density
+	/*double probabilityDensity = pathProbabilityDensity(path, path.size());
+	if (probabilityDensity <= 0.0f) return result;*/
+	
+	// Color
 	Vector3 throughput = pathTraceFromPath(path);
-
-	double probabilityDensity = pathProbabilityDensity(path, path.size());
-	if (probabilityDensity <= 0.0f) return result;
-
-	double weight = MISWeight(path, path.size());
-	if (weight <= 0.0f) return result;
-
-	Vector3 color = throughput/* * (weight / probabilityDensity)*/;
-
+	Vector3 color = throughput;
+	//color = Vector3(.5f);
 	// Assert color is positive
 	if (maxVectorValue(color) <= 0.0f) return result;
-
-	result.colors.push_back(Contribution(px, py, color));
-	result.scalarContribution = std::max(maxVectorValue(color), result.scalarContribution);
+	result.colors.push_back(Contribution(px, py, color));	
+	result.scalarContribution = std::max(maxVectorValue(color), result.scalarContribution);	
 
 	return result;
 }
@@ -97,26 +103,12 @@ PathContribution PathTracer::calcPathContribution(const std::vector<HitInfo> pat
 // Used by MLT
 PathContribution PathTracer::calcPathContribution(const MarkovChain& MC) const {
 	MarkovChain normChain(img->width(), img->height());
-
-	//PathContribution result = PathContribution();
-
 	std::vector<HitInfo> path = generatePath(cam->randomRay(img->width(), img->height(), normChain), MC);
-/*	Vector3 shadeResult = pathTraceFromPath(path);
-
-	int px = -1, py = -1;
-	Vector3 direction = (path.at(1).P - path.at(0).P).normalized();
-	cam->rayToPixels(Ray(cam->eye(), direction), px, py, img->width(), img->height());
-
-	result.colors.push_back(Contribution(px, py, shadeResult));
-	result.scalarContribution = 1.0;
-
-	return result;*/
 	return calcPathContribution(path);
 }
 
 // Probability density for path with all numbers of vertices
 double PathTracer::pathProbabilityDensity(const std::vector<HitInfo> path) const {
-	//std::cout << "pathProbabilityDensity" << std::endl;
 	double p = 0.0f;
 	for (int numEyeVertices = 0; numEyeVertices <= path.size(); numEyeVertices++) {
 		p += pathProbabilityDensity(path, numEyeVertices);										//Hvis vi skal bruge TKhanAdder ligesom Toshiya skal den tilføjes her
@@ -184,16 +176,4 @@ std::vector<HitInfo> PathTracer::generatePath(const Ray& eyeRay, const MarkovCha
 		}
 	}
 	return path;
-}
-
-double PathTracer::MISWeight(const std::vector<HitInfo> path, const int pathLength) const {
-	const double p_i = pathProbabilityDensity(path, path.size());
-	const double p_all = pathProbabilityDensity(path);
-
-	if (p_i == 0.0f || p_all == 0.0f) {    // Kan man skrive (!p_i || !p_all) bare for at være et jerk?
-		return 0.0f;
-	}
-	else {
-		return std::max(std::min(p_i / p_all * 2.0, 1.0), 0.0);
-	}
 }

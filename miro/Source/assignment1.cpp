@@ -116,7 +116,7 @@ void makeCBox() {
 	light->setColor(Vector3(18.387, 10.9873, 2.75357));
 	//light->setColor(Vector3(10.9873));
 	light->setWattage(1);
-	light->setWattage(1);
+	light->setWattage(0.1);
 	light->setRadius(30.0f);
 	light->setFalloff(1000.0f);
 	g_scene->addLight(light);
