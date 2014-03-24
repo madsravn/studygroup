@@ -8,3 +8,5 @@ void makeCornellBox();
 void makeCornellBox2();
 void makeCornellBoxFromObj();
 void makePBRTScene();
+void makeOccludeRoom();
+void makeOccludeRoom2();

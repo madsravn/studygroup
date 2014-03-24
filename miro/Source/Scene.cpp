@@ -106,9 +106,10 @@ void
 	pathTracer.run();
 	//BiPathTracer biPathTracer(*this, img, cam, pathSamples);
 	//biPathTracer.run();
-	Constants::seconds = 214;
-	//MLT mlt(*this, img, cam, pathSamples, &pathTracer);
-	//mlt.run();
+	Constants::seconds = pathTracer.renderSeconds;
+	//Constants::seconds = 1;
+	MLT mlt(*this, img, cam, pathSamples, &pathTracer);
+	mlt.run();
 
 	printf("Rendering Progress: 100.000%%\n");
 	debug("done Raytracing!\n");
@@ -118,4 +119,20 @@ bool
 Scene::trace(HitInfo& minHit, const Ray& ray, float tMin, float tMax) const
 {
 	return m_bvh.intersect(minHit, ray, tMin, tMax);
+}
+
+void Scene::writeImg(const char * title) {
+	char str[1024];
+	sprintf(str, "%s_%d.ppm", title, (int)time(0));
+	if (g_camera->isOpenGL())
+	{
+		unsigned char* buf = new unsigned char[g_image->width()*g_image->height() * 3];
+		glReadPixels(0, 0, g_image->width(), g_image->height(),
+			GL_RGB, GL_UNSIGNED_BYTE, buf);
+		g_image->writePPM(str, buf, g_image->width(), g_image->height());
+	}
+	else
+	{
+		g_image->writePPM(str);
+	}
 }

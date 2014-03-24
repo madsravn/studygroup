@@ -33,6 +33,8 @@ public:
                float tMin = 0.0f, float tMax = MIRO_TMAX) const;
 	Vector3 basicShading(const Ray &ray);
 	Vector3 tracePath(const Ray &ray, int recDepth, bool log = false);
+
+	void Scene::writeImg(const char * title);
 	
 	Vector3 pathTraceFromPath(std::vector<HitInfo> path);
 	

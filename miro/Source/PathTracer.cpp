@@ -1,6 +1,8 @@
 #include "PathTracer.h"
+#include "Timer.h"
 
 bool buildPath = true;	// Build path before shading
+bool AA = false;
 
 PathTracer::PathTracer(Scene& scene, Image* image, Camera* camera, int pathSamples)  : scene(scene), img(image), cam(camera), samples(pathSamples) {
 }
@@ -18,49 +20,70 @@ void PathTracer::run() {
 
 	std::cout << "inverseSamples = " << inverseSamples << std::endl;
 
-	Vector3 avg(0.0f);
-
+	Timer t;
+	t.start();
 	// loop over all pixels in the image
 	for (int j = 0; j < img->height(); ++j)
 	{
 		for (int i = 0; i < img->width(); ++i)
 		{
-			shadeResult = Vector3(0.0f);			
-			
-			ray = cam->eyeRay(i, j, img->width(), img->height());
+			shadeResult = Vector3(0.0f);						
 
-			for (int AAx = 0; AAx < 2; AAx++) {
-				for (int AAy = 0; AAy < 2; AAy++) {
-					//ray = cam->eyeRay(i - 0.25f + (float)AAx/2, j - 0.25f + (float)AAy/2, img->width(), img->height());
-					for (int sampleCounter = 0; sampleCounter < samples/4; sampleCounter++){
-						
-						Vector3 traceResult(0.0f);
-						Vector3 pathResult(0.0f);
+			if (!AA) {
+				ray = cam->eyeRay(i, j, img->width(), img->height());
+				for (int sampleCounter = 0; sampleCounter < samples; sampleCounter++){
 
-						std::vector<HitInfo> path = generatePath(ray);
-						if (path.size() < 2) break;
+					Vector3 traceResult(0.0f);
+					Vector3 pathResult(0.0f);
 
-						PathContribution contribution = calcPathContribution(path);
-						for (int c = 0; c < contribution.colors.size(); c++)
-						{
-							Contribution cont = contribution.colors.at(c);
-							pathResult += cont.color;
+					std::vector<HitInfo> path = generatePath(ray);
+					if (path.size() < 2) break;
+
+					PathContribution contribution = calcPathContribution(path);
+					for (int c = 0; c < contribution.colors.size(); c++)
+					{
+						Contribution cont = contribution.colors.at(c);
+						pathResult += cont.color;
+					}
+					shadeResult += pathResult;
+				}
+			}
+			else {
+				for (int AAx = 0; AAx < 2; AAx++) {
+					for (int AAy = 0; AAy < 2; AAy++) {
+						ray = cam->eyeRay(i - 0.25f + (float)AAx/2, j - 0.25f + (float)AAy/2, img->width(), img->height());
+						for (int sampleCounter = 0; sampleCounter < samples / 4; sampleCounter++){
+
+							Vector3 traceResult(0.0f);
+							Vector3 pathResult(0.0f);
+
+							std::vector<HitInfo> path = generatePath(ray);
+							if (path.size() < 2) break;
+
+							PathContribution contribution = calcPathContribution(path);
+							for (int c = 0; c < contribution.colors.size(); c++)
+							{
+								Contribution cont = contribution.colors.at(c);
+								pathResult += cont.color;
+							}
+							shadeResult += pathResult;
 						}
-						shadeResult += pathResult;
 					}
 				}
 			}
 
 			shadeResult *= inverseSamples;
-			avg += shadeResult;
 			img->setPixel(i, j, shadeResult);
 		}
 		img->drawScanline(j);
 		glFinish();
 		printf("Rendering Progress: %.3f%%\r", j / double(img->height())*100.0f);
-		fflush(stdout);
-	}
-	std::cout << avg / double(img->width() * img->height()) << std::endl;
+		fflush(stdout);		
+	}	
+	renderSeconds = (t.duration().count() / 1000);
+	char str[1024];
+	sprintf(str, "PT_%d_%ds", Constants::PathSamples, (t.duration().count() / 1000));
+	scene.writeImg(str);
 }
 
 Vector3 PathTracer::pathTraceFromPath(std::vector<HitInfo> path) const{	

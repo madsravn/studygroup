@@ -5,7 +5,7 @@
 
 const int maxRecDepth  = Constants::MaxPathLength;
 int samps = 0;
-const int biasSamples = 100000;
+const int biasSamples = 1000;
 
 MLT::MLT(Scene& scene, Image* image, Camera* camera, int pathSamples, ITracer* tracer) : scene(scene), img(image), cam(camera), samples(pathSamples), renderer(tracer) {
 	
@@ -101,40 +101,48 @@ void MLT::run() {
         
 		i++;
 
-            if(t.duration().count()/1000 > Constants::seconds) {
-                running = false;
-                std::cout << "Stopping after " << t.duration().count() << " ms." << std::endl;
-				i = 0;
-				for(int j = 0; j < img->height(); ++j) {
-					img->drawScanline(j);
-					glFinish();
-				}
-            }
-			if(i % 100000 == 0) {
-				std::cout << "samps = " << samps << std::endl;
+        if(t.duration().count()/1000 > Constants::seconds) {
+            running = false;
+            std::cout << "Stopping after " << t.duration().count() << " ms." << std::endl;
+			i = 0;
+			for(int j = 0; j < img->height(); ++j) {
+				img->drawScanline(j);
+				glFinish();
 			}
+
+        }
+		if(i % 1000000 == 0) {
+			std::cout << "samps = " << samps << std::endl;
+
+			for (int j = 0; j < img->height(); ++j) {
+				img->drawScanline(j);
+				glFinish();
+			}
+		}
         
-        //printf("Rendering Progress: %.3f%%\r", i/float(count)*100.0f);
+		printf("Rendering Progress: %.3f%%\r", (t.duration().count() / 1000) / float(Constants::seconds)*100.0f);
         fflush(stdout);
-    }
+    }	
 
 	double s = double(img->width() * img->height()) / double(samps);
 	
-	Vector3 avg(0.0f);
-
     for(int j = 0; j < img->height(); ++j) {
 		for (int i = 0; i < img->width(); ++i) {
 
 			int pixelpos = j*img->width() + i;
 
 			Vector3 color = Vector3(picture[3 * pixelpos], picture[3 * pixelpos + 1], picture[3 * pixelpos + 2]) * s;
-			avg += color;
+
 			img->setPixel(i, j, color);
 		}
 		img->drawScanline(j);
 		glFinish();
     }
-	std::cout << avg / double(img->width() * img->height()) << std::endl;
+
+	char str[1024];
+	sprintf(str, "PT_MLT_%ds", (t.duration().count() / 1000));
+
+	scene.writeImg(str);
 }
 
 // Random mutation of a path
@@ -172,7 +180,7 @@ Vector3 MLT::pathTraceFromPath(std::vector<HitInfo> path) const{
 }
 
 void MLT::accumulatePathContribution(const PathContribution pathContribution, const double scaling) {
-	for (int i = 0; i < pathContribution.colors.size(); i++) {    // Start at first hit, [0] is camera
+	for (int i = 0; i < pathContribution.colors.size(); i++) {
 		Contribution currentColor = pathContribution.colors.at(i);
 
 		const int ix = int(currentColor.x);
@@ -182,11 +190,10 @@ void MLT::accumulatePathContribution(const PathContribution pathContribution, co
 		if (ix >= 0 && ix < img->width() && iy >= 0 && iy < img->height()) {	
             int pixelpos = iy*img->width() + ix;
 
-			Vector3 newColor = color + Vector3(picture[3*pixelpos], picture[3*pixelpos+1], picture[3*pixelpos+2]);
+			color += Vector3(picture[3 * pixelpos], picture[3 * pixelpos + 1], picture[3 * pixelpos + 2]);
 
 			double s = (double)(img->width() * img->height()) / (double)samps;
-
-            color = newColor;
+            
             picture[3*pixelpos] = color.x;
             picture[3*pixelpos+1] = color.y;
             picture[3*pixelpos+2] = color.z;

@@ -9,6 +9,9 @@
 class Lambert : public Material
 {
 public:
+
+	
+
     Lambert(const Vector3 & kd = Vector3(1),
 		const Vector3 & ka = Vector3(0), 
 		const Vector3 & ke = Vector3(0));

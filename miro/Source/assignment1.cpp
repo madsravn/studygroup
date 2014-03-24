@@ -94,7 +94,6 @@ void makePBRTScene() {
 
 }
 
-
 void makeCBox() {
 	g_camera = new Camera;
 	g_scene = new Scene;
@@ -105,18 +104,25 @@ void makeCBox() {
 
 	// set up the camera
 	g_camera->setBGColor(Vector3(0.0f, 0.0f, 0.3f));
-	g_camera->setEye(Vector3(278, 273, -800));
-	g_camera->setLookAt(Vector3(278, 273, -799));
+	g_camera->setEye(Vector3(278, 273, -750));
+	g_camera->setLookAt(Vector3(278, 273, -600));
 	g_camera->setUp(Vector3(0, 1, 0));
 	g_camera->setFOV(40);
 
 	// create and place a point light source
-	PointLight * light = new PointLight;
-	light->setPosition(Vector3(278, 518.0, 279.5));    
+	/*PointLight * light = new PointLight;
+	light->setPosition(Vector3(278, 518.0, 279.5));
 	light->setColor(Vector3(18.387, 10.9873, 2.75357));
-	//light->setColor(Vector3(10.9873));
-	light->setWattage(1);
 	light->setWattage(0.1);
+	light->setRadius(30.0f);
+	light->setFalloff(1000.0f);
+	g_scene->addLight(light);*/
+
+	// create and place a point light source
+	PointLight * light = new PointLight;
+	light->setPosition(Vector3(400, 5, 555));
+	light->setColor(Vector3(18.387, 10.9873, 2.75357));
+	light->setWattage(1);
 	light->setRadius(30.0f);
 	light->setFalloff(1000.0f);
 	g_scene->addLight(light);
@@ -183,16 +189,58 @@ void makeCBox() {
 	material = new Lambert(Vector3(0.885809, 0.698859, 0.666422));
 	addMeshTrianglesToScene(mesh, material);
 
+	//xform.setIdentity();
+	//xform *= translate(-200, 0, 555);
+	//xform *= scale(500, 500, 500);
+	//mesh = new TriangleMesh;
+	//mesh->load("mesh/sphere.obj", xform);
+	//material = new Lambert(Vector3(0.1, 0.2, 0.8));
+	////material = new RefractionMaterial(1.4f);
+	//addMeshTrianglesToScene(mesh, material);
+
+	//xform.setIdentity();
+	//xform *= translate(900, 150, 555);
+	//xform *= scale(500, 500, 500);
+	//mesh = new TriangleMesh;
+	//mesh->load("mesh/sphere.obj", xform);
+	//material = new Lambert(Vector3(0.1, 0.2, 0.8));
+	////material = new RefractionMaterial(2.49f);
+	//addMeshTrianglesToScene(mesh, material);
+
+
+
+	/*Sphere* sphere = new Sphere();
+	sphere->setCenter(Vector3(-200, 0, 555));
+	sphere->setRadius(500);
+	sphere->setMaterial(new Lambert(Vector3(0.1, 0.2, 0.8)));
+	g_scene->addObject(sphere);*/
+
+	/*sphere = new Sphere();
+	sphere->setCenter(Vector3(900, 150, 555));
+	sphere->setRadius(500);
+	sphere->setMaterial(new Lambert(Vector3(0.1, 0.2, 0.8)));
+	g_scene->addObject(sphere);*/
+
+
+	
+
 	xform.setIdentity();
 	xform *= translate(185.5, 165 + 100, 169);
 	xform *= scale(100, 100, 100);
-	
-	//mesh = new TriangleMesh;
-	//mesh->load("mesh/sphere.obj", xform);
-	//material = new RefractionMaterial(1.4f);
-	///*Lambert* emissionMaterial = new Lambert(Vector3(0.0f, 0.0f, 1.0f), Vector3(0.0f), Vector3(10.9873, 2.75357, 180.387)*100);
-	//material = emissionMaterial;*/
-	//addMeshTrianglesToScene(mesh, material);
+	mesh = new TriangleMesh;
+	mesh->load("mesh/sphere.obj", xform);
+	material = new RefractionMaterial(1.4f);
+	//material = new ReflectionMaterial();
+	addMeshTrianglesToScene(mesh, material);
+
+	xform.setIdentity();
+	xform *= translate(355.5, 70, 69);
+	xform *= scale(70, 70, 70);
+	mesh = new TriangleMesh;
+	mesh->load("mesh/sphere.obj", xform);
+	material = new RefractionMaterial(2.49f);
+	//material = new ReflectionMaterial();
+	addMeshTrianglesToScene(mesh, material);
 
 	// let objects do pre-calculations if needed
 	g_scene->preCalc();
@@ -336,7 +384,6 @@ void makeCornellBox() {
 	// let objects do pre-calculations if needed
     g_scene->preCalc();
 }
-
 
 void makeCornellBox2() {
 	g_camera = new Camera;
@@ -807,6 +854,437 @@ void makeBallRoom() {
 	addMeshTrianglesToScene(mesh, material);
 
 	// let objects do pre-calculations if needed
+	g_scene->preCalc();
+}
+
+void makeOccludeRoom() {
+	g_camera = new Camera;
+	g_scene = new Scene;
+	g_image = new Image;
+	Triangle* t;
+
+	g_image->resize(512, 512);
+
+	// set up the camera
+	g_camera->setBGColor(Vector3(0.0f, 0.0f, 0.3f));
+	g_camera->setEye(Vector3(0, 1, 3));
+	g_camera->setLookAt(Vector3(0, 1, 0));
+	g_camera->setUp(Vector3(0, 1, 0));
+	g_camera->setFOV(45);
+	g_camera->lensSize = 0.001f;
+	g_camera->focusDistance = 4;
+	g_camera->aperture = 0.01;
+	g_camera->focalLength = 0.04;
+	g_camera->fNumber = 3.5;
+
+	Matrix4x4 xform;
+	Matrix4x4 xform2;
+	Material* material;
+
+	// create and place a point light source
+	PointLight * light = new PointLight;
+	light->setPosition(Vector3(-.8, .1, -.8));
+	light->setColor(Vector3(0.357, 0.596, 0.73));
+	light->setColor(Vector3(1.0f));
+	light->setWattage(50);
+	light->setRadius(0.04f);
+	light->setFalloff(1.0f);
+	g_scene->addLight(light);
+
+	// create and place a point light source
+	light = new PointLight;
+	light->setPosition(Vector3(.8, .1, -.8));
+	light->setColor(Vector3(0.73, 0.596, 0.357));
+	//light->setColor(Vector3(1.0f));
+	light->setWattage(50);
+	light->setRadius(0.04f);
+	light->setFalloff(1.0f);
+	g_scene->addLight(light);
+	
+	// create the floor triangles
+	makeSquare(
+		Vector3(-1, 0, 1),
+		Vector3(-1, 0, -1),
+		Vector3(1, 0, 1),
+		Vector3(1, 0, -1),
+		Vector3(0, 1, 0),
+		new Lambert(Vector3(0.885809, 0.698859, 0.666422)), g_scene);
+
+	// create the ceiling triangles	
+	makeSquare(
+		Vector3(1, 2, -1),
+		Vector3(1, 2, 1),
+		Vector3(-1, 2, -1),
+		Vector3(-1, 2, 1),
+		Vector3(0, -1, 0),
+		new Lambert(Vector3(0.885809, 0.698859, 0.666422)), g_scene);
+
+	// create the backwall triangles
+	makeSquare(
+		Vector3(1, 0, -1),
+		Vector3(-1, 0, -1),
+		Vector3(1, 2, -1),
+		Vector3(-1, 2, -1),
+		Vector3(0, 0, 1),
+		new Lambert(Vector3(0.885809, 0.698859, 0.666422)), g_scene);
+
+	// create the rightwall triangles (green)
+	makeSquare(
+		Vector3(-1, 0, 1),
+		Vector3(-1, 0, -1),
+		Vector3(-1, 2, 1),
+		Vector3(-1, 2, -1),
+		Vector3(1, 0, 0),
+		new Lambert(Vector3(0.105421, 0.37798, 0.076425)), g_scene);
+
+	// create the leftwall triangles (red)
+	makeSquare(
+		Vector3(1, 0, -1),
+		Vector3(1, 0, 1),
+		Vector3(1, 2, -1),
+		Vector3(1, 2, 1),
+		Vector3(-1, 0, 0),
+		new Lambert(Vector3(0.570068, 0.0430135, 0.0443706)), g_scene);
+
+
+	/* Lamp 1 */
+	// create the low front panel
+	makeSquare(
+		Vector3(-.6, 0, -.6),
+		Vector3(-1, 0, -.6),
+		Vector3(-.6, 1.2, -.6),
+		Vector3(-1, 1.2, -.6),
+		Vector3(0, 0, 1),
+		new Lambert(Vector3(0.698859, 0.666422, 0.885809)), g_scene);
+
+	// create the low side panel
+	makeSquare(
+		Vector3(-.6, 0, -.6),
+		Vector3(-.6, 0, -1),
+		Vector3(-.6, 1.2, -.6),
+		Vector3(-.6, 1.2, -1),
+		Vector3(1, 0, 0),
+		new Lambert(Vector3(0.698859, 0.666422, 0.885809)), g_scene);
+
+	// create the low back panel
+	makeSquare(
+		Vector3(-.59, 0, -.59),
+		Vector3(-1, 0, -.59),
+		Vector3(-.59, 1.2, -.59),
+		Vector3(-1, 1.2, -.59),
+		Vector3(0, 0, -1),
+		new Lambert(Vector3(0.698859, 0.666422, 0.885809)), g_scene);
+
+	// create the low side panel
+	makeSquare(
+		Vector3(-.59, 0, -.59),
+		Vector3(-.59, 0, -1),
+		Vector3(-.59, 1.2, -.59),
+		Vector3(-.59, 1.2, -1),
+		Vector3(-1, 0, 0),
+		new Lambert(Vector3(0.698859, 0.666422, 0.885809)), g_scene);
+
+	// create the left top triangles
+	makeSquare(
+		Vector3(-1, 1.2, -.59),
+		Vector3(-1, 1.2, -.6),
+		Vector3(-.59, 1.2, -.59),
+		Vector3(-.6, 1.2, -.6),
+		Vector3(0, 1, 0),
+		new Lambert(Vector3(0.885809, 0.698859, 0.666422)), g_scene);
+
+	// create the right top triangles
+	makeSquare(
+		Vector3(-.59, 1.2, -1),
+		Vector3(-.6, 1.2, -1),
+		Vector3(-.59, 1.2, -.59),
+		Vector3(-.6, 1.2, -.6),
+		Vector3(0, 1, 0),
+		new Lambert(Vector3(0.885809, 0.698859, 0.666422)), g_scene);
+
+
+
+	// create the high front panel
+	makeSquare(
+		Vector3(-.55, .8, -.55),
+		Vector3(-1, .8, -.55),
+		Vector3(-.55, 2, -.55),
+		Vector3(-1, 2, -.55),
+		Vector3(0, 0, 1),
+		new Lambert(Vector3(0.105421, 0.37798, 0.076425)), g_scene);
+
+	// create the high side panel
+	makeSquare(
+		Vector3(-.5, .8, -.5),
+		Vector3(-.5, .8, -1),
+		Vector3(-.5, 2, -.5),
+		Vector3(-.5, 2, -1),
+		Vector3(1, 0, 0),
+		new Lambert(Vector3(0.105421, 0.37798, 0.076425)), g_scene);
+
+	//// create the middle front panel
+	//makeSquare(
+	//	Vector3(-.4, 0, -.4),
+	//	Vector3(-1, 0, -.4),
+	//	Vector3(-.4, 1.3, -.4),
+	//	Vector3(-1, 1.3, -.4),
+	//	Vector3(0, 0, 1),
+	//	new RefractionMaterial(2.49)
+	//	/*new Lambert(Vector3(0.698859, 0.666422, 0.885809)*/
+	//	, g_scene);
+
+	//// create the middle side panel
+	//makeSquare(
+	//	Vector3(-.4, 0, -.4),
+	//	Vector3(-.4, 0, -1),
+	//	Vector3(-.4, 1.3, -.4),
+	//	Vector3(-.4, 1.3, -1),
+	//	Vector3(1, 0, 0),
+	//	new RefractionMaterial(2.49)
+	//	/*new Lambert(Vector3(0.105421, 0.37798, 0.076425)*/
+	//	, g_scene);
+
+	/* Lamp 2 */
+	// create the low front panel
+	makeSquare(
+		Vector3(.7, 0, -.7),
+		Vector3(1, 0, -.7),
+		Vector3(.7, 1.2, -.7),
+		Vector3(1, 1.2, -.7),
+		Vector3(0, 0, 1),
+		new Lambert(Vector3(0.698859, 0.666422, 0.885809)), g_scene);
+
+	// create the low side panel
+	makeSquare(
+		Vector3(.7, 0, -.7),
+		Vector3(.7, 0, -1),
+		Vector3(.7, 1.2, -.7),
+		Vector3(.7, 1.2, -1),
+		Vector3(-1, 0, 0),
+		new Lambert(Vector3(0.698859, 0.666422, 0.885809)), g_scene);
+
+	// create the high front panel
+	makeSquare(
+		Vector3(.5, .8, -.5),
+		Vector3(1, .8, -.5),
+		Vector3(.5, 2, -.5),
+		Vector3(1, 2, -.5),
+		Vector3(0, 0, 1),
+		new Lambert(Vector3(0.105421, 0.37798, 0.076425)), g_scene);
+
+	// create the high side panel
+	makeSquare(
+		Vector3(.5, .8, -.5),
+		Vector3(.5, .8, -1),
+		Vector3(.5, 2, -.5),
+		Vector3(.5, 2, -1),
+		Vector3(-1, 0, 0),
+		new Lambert(Vector3(0.105421, 0.37798, 0.076425)), g_scene);
+
+	//// create the middle front panel
+	//makeSquare(
+	//	Vector3(.4, 0, -.4),
+	//	Vector3(1, 0, -.4),
+	//	Vector3(.4, 1.3, -.4),
+	//	Vector3(1, 1.3, -.4),
+	//	Vector3(0, 0, 1),
+	//	/*new RefractionMaterial(2.49)*/
+	//	new Lambert(Vector3(0.698859, 0.666422, 0.885809))
+	//	, g_scene);
+
+	//// create the middle side panel
+	//makeSquare(
+	//	Vector3(.4, 0, -.4),
+	//	Vector3(.4, 0, -1),
+	//	Vector3(.4, 1.3, -.4),
+	//	Vector3(.4, 1.3, -1),
+	//	Vector3(-1, 0, 0),
+	//	/*new RefractionMaterial(2.49)*/
+	//	new Lambert(Vector3(0.105421, 0.37798, 0.076425))
+	//	, g_scene);
+
+
+
+	g_scene->preCalc();
+}
+
+void makeOccludeRoom2() {
+	g_camera = new Camera;
+	g_scene = new Scene;
+	g_image = new Image;
+	Triangle* t;
+
+	g_image->resize(512, 512);
+
+	// set up the camera
+	g_camera->setBGColor(Vector3(0.0f, 0.0f, 0.3f));
+	g_camera->setEye(Vector3(0, 1, 3));
+	g_camera->setLookAt(Vector3(0, 1, 0));
+	g_camera->setUp(Vector3(0, 1, 0));
+	g_camera->setFOV(45);
+	g_camera->lensSize = 0.001f;
+	g_camera->focusDistance = 4;
+	g_camera->aperture = 0.01;
+	g_camera->focalLength = 0.04;
+	g_camera->fNumber = 3.5;
+
+	Matrix4x4 xform;
+	Matrix4x4 xform2;
+	Material* material;
+
+	PointLight * light;
+
+	// create and place a point light source
+	light = new PointLight;
+	light->setPosition(Vector3(-.8, .1, -.8));
+	light->setColor(Vector3(.5, .7, 1));
+	light->setWattage(50);
+	light->setRadius(0.04f);
+	light->setFalloff(1.0f);
+	g_scene->addLight(light);
+
+	// create and place a point light source
+	light = new PointLight;
+	light->setPosition(Vector3(.8, .1, -.8));
+	light->setColor(Vector3(1, .7, .5));
+	light->setWattage(50);
+	light->setRadius(0.04f);
+	light->setFalloff(1.0f);
+	g_scene->addLight(light);
+
+	// Test light
+	light = new PointLight;
+	light->setPosition(Vector3(0, 1, 1));
+	light->setColor(Vector3(1, 1, 1));
+	light->setWattage(.2);
+	g_scene->addLight(light);
+
+	// create the floor triangles
+	makeSquare(
+		Vector3(-1, 0, 1),
+		Vector3(-1, 0, -1),
+		Vector3(1, 0, 1),
+		Vector3(1, 0, -1),
+		Vector3(0, 1, 0),
+		new Lambert(Vector3(0.885809, 0.698859, 0.666422)), g_scene);
+
+	// create the ceiling triangles	
+	makeSquare(
+		Vector3(1, 2, -1),
+		Vector3(1, 2, 1),
+		Vector3(-1, 2, -1),
+		Vector3(-1, 2, 1),
+		Vector3(0, -1, 0),
+		new Lambert(Vector3(0.885809, 0.698859, 0.666422)), g_scene);
+
+	// create the backwall triangles
+	makeSquare(
+		Vector3(1, 0, -1),
+		Vector3(-1, 0, -1),
+		Vector3(1, 2, -1),
+		Vector3(-1, 2, -1),
+		Vector3(0, 0, 1),
+		new Lambert(Vector3(0.885809, 0.698859, 0.666422)), g_scene);
+
+	// create the rightwall triangles (green)
+	makeSquare(
+		Vector3(-1, 0, 1),
+		Vector3(-1, 0, -1),
+		Vector3(-1, 2, 1),
+		Vector3(-1, 2, -1),
+		Vector3(1, 0, 0),
+		new Lambert(Vector3(0.105421, 0.37798, 0.076425)), g_scene);
+
+	// create the leftwall triangles (red)
+	makeSquare(
+		Vector3(1, 0, -1),
+		Vector3(1, 0, 1),
+		Vector3(1, 2, -1),
+		Vector3(1, 2, 1),
+		Vector3(-1, 0, 0),
+		new Lambert(Vector3(0.570068, 0.0430135, 0.0443706)), g_scene);
+
+	// create the high front panel
+	makeSquare(
+		Vector3(1, 0, -.6),
+		Vector3(-1, 0, -.6),
+		Vector3(1, 1.2, -.6),
+		Vector3(-1, 1.2, -.6),
+		Vector3(0, 0, -1),
+		new Lambert(Vector3(0.698859, 0.666422, 0.885809)), g_scene);
+
+	// create the high back panel
+	makeSquare(
+		Vector3(1, 0, -.59),
+		Vector3(-1, 0, -.59),
+		Vector3(1, 1.2, -.59),
+		Vector3(-1, 1.2, -.59),
+		Vector3(0, 0, 1),
+		new Lambert(Vector3(0.698859, 0.666422, 0.885809)), g_scene);
+
+	// create the high top panel
+	makeSquare(
+		Vector3(-1, 1.2, -.59),
+		Vector3(-1, 1.2, -.6),
+		Vector3(1, 1.2, -.59),
+		Vector3(1, 1.2, -.6),
+		Vector3(0, 1, 0),
+		new Lambert(Vector3(0.698859, 0.666422, 0.885809)), g_scene);
+
+	// create the low front panel
+	makeSquare(
+		Vector3(1, .8, -.3),
+		Vector3(-1, .8, -.3),
+		Vector3(1, 2, -.3),
+		Vector3(-1, 2, -.3),
+		Vector3(0, 0, -1),
+		new Lambert(Vector3(0.885809, 0.698859, 0.666422)), g_scene);
+
+	// create the low back panel
+	makeSquare(
+		Vector3(1, .8, -.29),
+		Vector3(-1, .8, -.29),
+		Vector3(1, 2, -.29),
+		Vector3(-1, 2, -.29),
+		Vector3(0, 0, 1),
+		new Lambert(Vector3(0.885809, 0.698859, 0.666422)), g_scene);
+
+	// create the low bottom panel
+	makeSquare(
+		Vector3(-1, .8, -.29),
+		Vector3(-1, .8, -.3),
+		Vector3(1, .8, -.29),
+		Vector3(1, .8, -.3),
+		Vector3(0, -1, 0),
+		new Lambert(Vector3(0.885809, 0.698859, 0.666422)), g_scene);
+
+	// create the front high front panel
+	makeSquare(
+		Vector3(1, 0, 0),
+		Vector3(-1, 0, 0),
+		Vector3(1, 1.2, 0),
+		Vector3(-1, 1.2, 0),
+		Vector3(0, 0, -1),
+		new Lambert(Vector3(0.698859, 0.666422, 0.885809)), g_scene);
+
+	// create the front high back panel
+	makeSquare(
+		Vector3(1, 0, .01),
+		Vector3(-1, 0, .01),
+		Vector3(1, 1.2, .01),
+		Vector3(-1, 1.2, .01),
+		Vector3(0, 0, 1),
+		new Lambert(Vector3(0.698859, 0.666422, 0.885809)), g_scene);
+
+	// create the front high top panel
+	makeSquare(
+		Vector3(-1, 1.2, .01),
+		Vector3(-1, 1.2, 0),
+		Vector3(1, 1.2, .01),
+		Vector3(1, 1.2, 0),
+		Vector3(0, 1, 0),
+		new Lambert(Vector3(0.698859, 0.666422, 0.885809)), g_scene);
+
 	g_scene->preCalc();
 }
 

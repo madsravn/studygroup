@@ -69,8 +69,8 @@ int startMiro(int argc, char*argv[]) {
     //makeSponzaScene();
    // feenableexcept(FE_DIVBYZERO);
 	//makeCornellBoxFromObj();
-
-	makeCBox();
+	makeOccludeRoom2();
+	//makeCBox();
 	//makeCornellBox2();
 	//makeCornellBox();
 	//makeBallRoom();
