@@ -12,7 +12,7 @@
 class PathTracer : public ITracer
 {
 public:
-	int renderSeconds = 0;
+	int renderSeconds;
 
 	PathTracer(Scene& scene, Image* image, Camera* camera, int pathSamples);
 	~PathTracer(void);

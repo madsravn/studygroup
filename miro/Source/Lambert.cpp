@@ -47,7 +47,7 @@ Vector3	Lambert::shade(const Ray& ray, const HitInfo& hit, const Scene& scene, c
 
 	// Next ray bounce
 	if (maxRecDepth != 1) {
-		if(scene.trace(randomRayHit, randomRay, 0.001f)) {
+		if(scene.trace(randomRayHit, randomRay, 0.0001f)) {
 			Vector3 randomRayColor = randomRayHit.material->shade(randomRay, randomRayHit, scene, recDepth + 1, maxRecDepth, log);
 			float nDotD = dot(hit.N, randomRay.d);
 			illumination_indirect = randomRayColor * nDotD * M_1_PI;
@@ -127,7 +127,7 @@ Vector3 Lambert::calcLighting(const HitInfo &hit, PointLight* pLight, const Scen
 
 	// Shadow ray test
 	HitInfo lightHit;
-	scene.trace(lightHit, Ray(hit.P, lv), 0.001f);		
+	scene.trace(lightHit, Ray(hit.P, lv), 0.0001f);		
 	bool isLightHit = Vector3(pLight->position() - hit.P).length() <= lightHit.t;
 	if (!isLightHit) return Vector3(0.0f);
 

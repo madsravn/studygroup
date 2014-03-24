@@ -1288,6 +1288,55 @@ void makeOccludeRoom2() {
 	g_scene->preCalc();
 }
 
+void makeMLTRoom() {
+
+	g_camera = new Camera;
+	g_scene = new Scene;
+	g_image = new Image;
+	Triangle* t;
+
+	g_image->resize(512, 512);
+
+	// set up the camera
+	g_camera->setBGColor(Vector3(0.0f, 0.0f, 0.3f));
+	g_camera->setEye(Vector3(0, -2, 0));
+	g_camera->setLookAt(Vector3(4, -6, 0));
+	g_camera->setUp(Vector3(0, 1, 0));
+	g_camera->setFOV(45);
+	g_camera->lensSize = 0.001f;
+	g_camera->focusDistance = 4;
+	g_camera->aperture = 0.01;
+	g_camera->focalLength = 0.04;
+	g_camera->fNumber = 3.5;
+
+	Matrix4x4 xform;
+	Matrix4x4 xform2;
+	Material* material;
+
+	PointLight * light;
+
+	// create and place a point light source
+	light = new PointLight;
+	light->setPosition(Vector3(-.8, .1, -.8));
+	light->setColor(Vector3(.5, .7, 1));
+	light->setWattage(50);
+	light->setRadius(0.04f);
+	light->setFalloff(1.0f);
+	g_scene->addLight(light);
+
+	TriangleMesh * mesh;
+
+	xform.setIdentity();
+	xform *= scale(1, 1, 1);
+    xform *= translate(0, 0, 0);
+    mesh = new TriangleMesh;
+    mesh->load("mesh/MLT_test_1.obj", xform);
+	material = new RefractionMaterial(0.7f);
+    addMeshTrianglesToScene(mesh, material);
+
+	g_scene->preCalc();
+}
+
 void
 makeTeapotScene()
 {

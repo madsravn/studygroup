@@ -13,7 +13,7 @@ Vector3 ReflectionMaterial::shade(const Ray& ray, const HitInfo& hit, const Scen
 	Vector3 vReflect = ray.d - 2.0f * dot(ray.d, hit.N) * hit.N;
 	Ray rayReflect = Ray(Vector3(hit.P), vReflect);
 
-	if(scene.trace(reflectionHit, rayReflect, 0.001f, 100.0f)) {
+	if(scene.trace(reflectionHit, rayReflect, 0.0001f)) {
 		return reflectionHit.material->shade(rayReflect, reflectionHit, scene, recDepth + 1, maxRecDepth);
 	} else {
 		//Image based

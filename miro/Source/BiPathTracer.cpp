@@ -187,7 +187,7 @@ std::vector<HitInfo> BiPathTracer::generateEyePath(const Ray& eyeRay) const {
 	HitInfo hitInfo;
 	for (int i = 0; i < Constants::MaxPathLength; i++)
 	{
-		if(scene.trace(hitInfo, ray, 0.001f)) {
+		if(scene.trace(hitInfo, ray, 0.0001f)) {
 			path.push_back(hitInfo);
 			ray = hitInfo.material->bounceRay(ray, hitInfo);
 		} else {
@@ -205,7 +205,7 @@ std::vector<HitInfo> BiPathTracer::generateEyePath(const Ray& eyeRay, const Mark
 	HitInfo hitInfo;
 	for (int i = 0; i < Constants::MaxPathLength; i++)
 	{
-		if(scene.trace(hitInfo, ray, 0.001f)) {
+		if(scene.trace(hitInfo, ray, 0.0001f)) {
 			path.push_back(hitInfo);
 			ray = hitInfo.material->bounceRay(ray, hitInfo, MC);
 		} else {
@@ -228,7 +228,7 @@ std::vector<HitInfo> BiPathTracer::generateLightPath(const Vector3 lightPos) con
 	HitInfo hitInfo;
 
 	for (int i = 0; i < Constants::MaxPathLength; i++) {
-		if(scene.trace(hitInfo, ray, 0.001f)) {
+		if(scene.trace(hitInfo, ray, 0.0001f)) {
 			lightPath.push_back(hitInfo);
 			ray = hitInfo.material->bounceRay(ray, hitInfo);
 		} else {
@@ -250,7 +250,7 @@ std::vector<HitInfo> BiPathTracer::generateLightPath(const Vector3 lightPos, con
 	HitInfo hitInfo;
 
 	for (int i = 0; i < Constants::MaxPathLength; i++) {
-		if(scene.trace(hitInfo, ray, 0.001f)) {
+		if(scene.trace(hitInfo, ray, 0.0001f)) {
 			lightPath.push_back(hitInfo);
 			ray = hitInfo.material->bounceRay(ray, hitInfo, MC);
 		} else {

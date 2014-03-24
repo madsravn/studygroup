@@ -13,7 +13,7 @@ Vector3 RefractionMaterial::shade(const Ray& ray, const HitInfo& hit, const Scen
 
 	Ray rayRefract = bounceRay(ray, hit);
 	HitInfo refractionHit;
-	if(scene.trace(refractionHit, rayRefract, 0.001f)) {
+	if(scene.trace(refractionHit, rayRefract, 0.0001f)) {
 		refractionColor = refractionHit.material->shade(rayRefract, refractionHit, scene, recDepth + 1, maxRecDepth, log);
 	}
 	else {

@@ -10,3 +10,4 @@ void makeCornellBoxFromObj();
 void makePBRTScene();
 void makeOccludeRoom();
 void makeOccludeRoom2();
+void makeMLTRoom();

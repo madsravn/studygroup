@@ -171,7 +171,7 @@ std::vector<HitInfo> PathTracer::generatePath(const Ray& eyeRay) const {
 	HitInfo hitInfo;
 	for (int i = 0; i < Constants::MaxPathLength; i++)
 	{
-		if(scene.trace(hitInfo, ray, 0.001f)) {
+		if(scene.trace(hitInfo, ray, 0.0001f)) {
 			path.push_back(hitInfo);
 			ray = hitInfo.material->bounceRay(ray, hitInfo);
 		} else {
@@ -190,7 +190,7 @@ std::vector<HitInfo> PathTracer::generatePath(const Ray& eyeRay, const MarkovCha
 	HitInfo hitInfo;
 	for (int i = 0; i < Constants::MaxPathLength; i++)
 	{
-		if (scene.trace(hitInfo, ray, 0.001f)) {
+		if (scene.trace(hitInfo, ray, 0.0001f)) {
 			path.push_back(hitInfo);
 			ray = hitInfo.material->bounceRay(ray, hitInfo, MC);
 		}
