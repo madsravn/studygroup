@@ -122,7 +122,7 @@ void makeCBox() {
 	PointLight * light = new PointLight;
 	light->setPosition(Vector3(400, 5, 555));
 	light->setColor(Vector3(18.387, 10.9873, 2.75357));
-	light->setWattage(1);
+	light->setWattage(.2);
 	light->setRadius(30.0f);
 	light->setFalloff(1000.0f);
 	g_scene->addLight(light);

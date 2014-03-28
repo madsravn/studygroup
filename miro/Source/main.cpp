@@ -70,8 +70,8 @@ int startMiro(int argc, char*argv[]) {
    // feenableexcept(FE_DIVBYZERO);
 	//makeCornellBoxFromObj();
 	//makeOccludeRoom2();
-	makeMLTRoom();
-	//makeCBox();
+	//makeMLTRoom();
+	makeCBox();
 	//makeCornellBox2();
 	//makeCornellBox();
 	//makeBallRoom();

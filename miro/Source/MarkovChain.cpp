@@ -11,11 +11,6 @@ MarkovChain::MarkovChain() {
     }
 }
 
-//double
-//MarkovChain::get(int i) const {
-//    return u.at(i);
-//}
-
 void
 MarkovChain::reset() {
     count = 0;
@@ -29,7 +24,6 @@ MarkovChain::getNext() const {
     count++;
     pos = ( pos + 1 ) % u.size();
 
-	//return rnd();
     return ret;
 }
 
@@ -46,6 +40,7 @@ MarkovChain::MarkovChain(int width, int height) {
 
 MarkovChain
 MarkovChain::large_step(int width, int height) const {
+	pos = 0;
     MarkovChain Result(width, height);
     for(int i = 0; i < states; ++i) {
         Result.u[i] = rnd();
@@ -54,6 +49,7 @@ MarkovChain::large_step(int width, int height) const {
 }
 
 MarkovChain MarkovChain::mutate(int width, int height) const {
+	pos = 0;
     MarkovChain Result(width, height);
     Result.u[0] = (perturb(u[0], 2.0 / double(width + height), 0.1));
     Result.u[1] = (perturb(u[1], 2.0 / double(width + height), 0.1));
