@@ -1299,8 +1299,11 @@ void makeMLTRoom() {
 
 	// set up the camera
 	g_camera->setBGColor(Vector3(0.0f, 0.0f, 0.3f));
-	g_camera->setEye(Vector3(3, 1, 5));
-	g_camera->setLookAt(Vector3(0, 1, 0));
+	//g_camera->setEye(Vector3(3, 1, 5));
+	//g_camera->setLookAt(Vector3(0, 1, 0));
+
+	g_camera->setEye(Vector3(1, 1, -2.5));
+	g_camera->setLookAt(Vector3(-1, 1, 5));
 	g_camera->setUp(Vector3(0, 1, 0));
 	g_camera->setFOV(45);
 	g_camera->lensSize = 0.001f;
